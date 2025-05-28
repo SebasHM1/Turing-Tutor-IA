@@ -1,7 +1,7 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="8725154F-92F9-57E6-3AF9-4ABE597F9E67" name="PROFESOR">
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="4EC4278C-F249-437D-2A9A-D05F0BF2DCDD" name="RESPUESTA">
 <createdBy>Santiago</createdBy>
-<createdTime>2025-05-27 05:58:10 UTC</createdTime>
+<createdTime>2025-05-28 00:24:07 UTC</createdTime>
 <ownerDesignName>MER</ownerDesignName>
 <engineerTo>
 <item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
@@ -15,9 +15,9 @@
 <minVolumes>0</minVolumes>
 <normalForm>Third</normalForm>
 <attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
-<Attribute name="id_profesor" id="BD2F58FC-3013-11D4-5826-0241B31ECA83">
+<Attribute name="id_respuesta" id="B36D0973-995F-05C8-F179-CFD73DA3F37A">
 <createdBy>Santiago</createdBy>
-<createdTime>2025-05-27 22:30:19 UTC</createdTime>
+<createdTime>2025-05-28 00:24:17 UTC</createdTime>
 <ownerDesignName>MER</ownerDesignName>
 <engineerTo>
 <item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
@@ -25,9 +25,9 @@
 <use>0</use>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 </Attribute>
-<Attribute name="nombre" id="B61D88D2-2C39-11DE-EE3E-B4D4CEAEE969">
+<Attribute name="texto_respuesta" id="635DD4C8-DEF9-5C2C-63DE-FA9BF73EAC4F">
 <createdBy>Santiago</createdBy>
-<createdTime>2025-05-27 22:30:24 UTC</createdTime>
+<createdTime>2025-05-28 00:24:18 UTC</createdTime>
 <ownerDesignName>MER</ownerDesignName>
 <engineerTo>
 <item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
@@ -36,9 +36,9 @@
 <use>0</use>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 </Attribute>
-<Attribute name="apellido" id="2DB742E9-396F-6944-219E-5AEFDDADC07C">
+<Attribute name="correcta" id="6AF9D87F-60F8-0A03-3635-053A6637E4D2">
 <createdBy>Santiago</createdBy>
-<createdTime>2025-05-27 22:30:28 UTC</createdTime>
+<createdTime>2025-05-28 00:24:36 UTC</createdTime>
 <ownerDesignName>MER</ownerDesignName>
 <engineerTo>
 <item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
@@ -47,29 +47,41 @@
 <use>0</use>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 </Attribute>
-<Attribute name="email" id="654E75F4-37C5-1844-03F9-CB498EFA32B3">
+<Attribute name="id_pregunta" id="F2A2556D-A4E1-17D3-AFBF-705BBE7F4EF6">
 <createdBy>Santiago</createdBy>
-<createdTime>2025-05-27 22:30:32 UTC</createdTime>
+<createdTime>2025-05-28 00:24:47 UTC</createdTime>
 <ownerDesignName>MER</ownerDesignName>
 <engineerTo>
 <item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
 </engineerTo>
 <nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id_pregunta1" id="8C8A4D2E-283E-A516-9697-892D41320D0E">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-28 00:25:27 UTC</createdTime>
+<generatorID>29848D24-2788-F7E8-6819-87D76302986E</generatorID>
+<ownerDesignName>MER</ownerDesignName>
+<engineerTo>
+<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
+</engineerTo>
+<referedAttribute>A7944BFA-66E9-BF1E-F92D-2C9970A44235</referedAttribute>
 <use>0</use>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 </Attribute>
 </attributes>
 <identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
-<identifier id="5A28F436-7C4A-E26E-2DC1-405ACBE1FB84" name="PROFESOR PK">
+<identifier id="11C7F854-1E84-3228-757C-2D92FEBDC5C2" name="RESPUESTA PK">
 <createdBy>Santiago</createdBy>
-<createdTime>2025-05-27 22:31:23 UTC</createdTime>
+<createdTime>2025-05-28 00:24:55 UTC</createdTime>
 <ownerDesignName>MER</ownerDesignName>
 <engineerTo>
 <item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
 </engineerTo>
 <pk>true</pk>
 <usedAttributes>
-<attributeRef>BD2F58FC-3013-11D4-5826-0241B31ECA83</attributeRef>
+<attributeRef>B36D0973-995F-05C8-F179-CFD73DA3F37A</attributeRef>
 </usedAttributes>
 </identifier>
 </identifiers>

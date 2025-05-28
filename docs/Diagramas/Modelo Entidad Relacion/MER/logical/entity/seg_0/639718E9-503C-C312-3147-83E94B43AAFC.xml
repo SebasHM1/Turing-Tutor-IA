@@ -1,0 +1,109 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="639718E9-503C-C312-3147-83E94B43AAFC" name="RECOMENDACION">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-28 00:20:01 UTC</createdTime>
+<ownerDesignName>MER</ownerDesignName>
+<engineerTo>
+<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="id_recomendacion" id="3E98CBCD-E533-4CC2-097B-E4FE25D9B512">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-28 00:20:08 UTC</createdTime>
+<ownerDesignName>MER</ownerDesignName>
+<engineerTo>
+<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="tipo" id="9AEB1AB0-203C-1214-FEBA-58C11607E16A">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-28 00:20:09 UTC</createdTime>
+<ownerDesignName>MER</ownerDesignName>
+<engineerTo>
+<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="descripcion" id="639CF2CC-0516-91F8-3DE0-843215A71409">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-28 00:20:14 UTC</createdTime>
+<ownerDesignName>MER</ownerDesignName>
+<engineerTo>
+<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="fecha_generacion" id="3426C09A-C2A7-0476-708F-C5245569049C">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-28 00:20:18 UTC</createdTime>
+<ownerDesignName>MER</ownerDesignName>
+<engineerTo>
+<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id_tutor" id="2789FDFC-B56A-EDCF-1A3E-DFBEA32E31FB">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-28 00:20:25 UTC</createdTime>
+<ownerDesignName>MER</ownerDesignName>
+<engineerTo>
+<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id_estudiante" id="33F91140-AFAE-A5F9-0F76-ABCBB7AFFCAF">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-28 00:20:30 UTC</createdTime>
+<ownerDesignName>MER</ownerDesignName>
+<engineerTo>
+<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id_tutor1" id="4C407BC9-980F-6B99-0A5A-D2650879CF79">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-28 00:26:34 UTC</createdTime>
+<generatorID>1C2E4EE9-5706-1FD0-5050-E8C20A6AD09E</generatorID>
+<ownerDesignName>MER</ownerDesignName>
+<engineerTo>
+<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
+</engineerTo>
+<referedAttribute>54F7F037-5A13-ACF3-F531-4FD0A999D485</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id_estudiante1" id="ACD924B9-8DF9-1BE6-97E5-3352DF2FDE32">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-28 00:27:15 UTC</createdTime>
+<generatorID>1B4EE036-393C-46FB-1602-ADD761D5BA88</generatorID>
+<ownerDesignName>MER</ownerDesignName>
+<engineerTo>
+<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
+</engineerTo>
+<referedAttribute>D84DB798-12AA-6A54-0F87-A96E2E6A8919</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+</Entity>

@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="D884532E-C941-A54D-ECB2-C697AD9BF227" name="USUARIO">
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="D884532E-C941-A54D-ECB2-C697AD9BF227" name="ESTUDIANTE">
 <createdBy>Santiago</createdBy>
 <createdTime>2025-05-27 05:52:30 UTC</createdTime>
 <ownerDesignName>MER</ownerDesignName>
@@ -15,7 +15,7 @@
 <minVolumes>0</minVolumes>
 <normalForm>Third</normalForm>
 <attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
-<Attribute name="id_usuario" id="D84DB798-12AA-6A54-0F87-A96E2E6A8919">
+<Attribute name="id_estudiante" id="D84DB798-12AA-6A54-0F87-A96E2E6A8919">
 <createdBy>Santiago</createdBy>
 <createdTime>2025-05-27 05:52:44 UTC</createdTime>
 <ownerDesignName>MER</ownerDesignName>
@@ -36,7 +36,7 @@
 <use>0</use>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 </Attribute>
-<Attribute name="codigo_u" id="F045EF84-644F-E57C-2698-30A11A574321">
+<Attribute name="apellido" id="F045EF84-644F-E57C-2698-30A11A574321">
 <createdBy>Santiago</createdBy>
 <createdTime>2025-05-27 05:52:58 UTC</createdTime>
 <ownerDesignName>MER</ownerDesignName>
@@ -47,53 +47,9 @@
 <use>0</use>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 </Attribute>
-<Attribute name="rol" id="8724940C-B46E-D7FC-C2C1-4D58F760D09C">
+<Attribute name="email" id="8724940C-B46E-D7FC-C2C1-4D58F760D09C">
 <createdBy>Santiago</createdBy>
 <createdTime>2025-05-27 05:53:12 UTC</createdTime>
-<ownerDesignName>MER</ownerDesignName>
-<engineerTo>
-<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
-</engineerTo>
-<nullsAllowed>true</nullsAllowed>
-<use>0</use>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-</Attribute>
-<Attribute name="correo" id="EB48B057-81FF-E561-ABA5-C12568A207AA">
-<createdBy>Santiago</createdBy>
-<createdTime>2025-05-27 05:53:17 UTC</createdTime>
-<ownerDesignName>MER</ownerDesignName>
-<engineerTo>
-<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
-</engineerTo>
-<nullsAllowed>true</nullsAllowed>
-<use>0</use>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-</Attribute>
-<Attribute name="contraseña" id="0ED746D1-8C1C-E87A-3489-6B6C56882ED5">
-<createdBy>Santiago</createdBy>
-<createdTime>2025-05-27 05:53:21 UTC</createdTime>
-<ownerDesignName>MER</ownerDesignName>
-<engineerTo>
-<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
-</engineerTo>
-<nullsAllowed>true</nullsAllowed>
-<use>0</use>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-</Attribute>
-<Attribute name="fecha_registro" id="AF157EA5-3F8E-064D-1093-566BA7E41010">
-<createdBy>Santiago</createdBy>
-<createdTime>2025-05-27 05:53:44 UTC</createdTime>
-<ownerDesignName>MER</ownerDesignName>
-<engineerTo>
-<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
-</engineerTo>
-<nullsAllowed>true</nullsAllowed>
-<use>0</use>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-</Attribute>
-<Attribute name="grupo" id="243AD15F-576B-B00B-C22E-4E1F75401CB8">
-<createdBy>Santiago</createdBy>
-<createdTime>2025-05-27 05:54:11 UTC</createdTime>
 <ownerDesignName>MER</ownerDesignName>
 <engineerTo>
 <item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
