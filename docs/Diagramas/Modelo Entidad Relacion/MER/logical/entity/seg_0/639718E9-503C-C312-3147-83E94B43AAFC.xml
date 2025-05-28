@@ -22,7 +22,6 @@
 <engineerTo>
 <item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
 </engineerTo>
-<nullsAllowed>true</nullsAllowed>
 <use>0</use>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 </Attribute>
@@ -106,4 +105,18 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 </Attribute>
 </attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="4C39FA8E-BEB3-E916-5D38-79DB9DEBA956" name="RECOMENDACION PK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-28 00:56:51 UTC</createdTime>
+<ownerDesignName>MER</ownerDesignName>
+<engineerTo>
+<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>3E98CBCD-E533-4CC2-097B-E4FE25D9B512</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
 </Entity>

@@ -69,6 +69,18 @@
 <use>0</use>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 </Attribute>
+<Attribute name="id_evaluacion" id="AD6C8892-BE12-1118-44F2-D4C4A91D242C">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-28 00:57:09 UTC</createdTime>
+<generatorID>8C2981EE-A3DB-28A6-E05F-608D5CB72C89</generatorID>
+<ownerDesignName>MER</ownerDesignName>
+<engineerTo>
+<item key="EF3A5EAD-9E38-02B4-2A77-7FE3684EFE52" value="true"/>
+</engineerTo>
+<referedAttribute>D39D9BE6-E24C-4D00-5C47-D909CEA17723</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
 </attributes>
 <identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
 <identifier id="B3D4EDC6-5539-6500-4F22-926983653292" name="PREGUNTA PK">
