@@ -1,0 +1,108 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="C2CD8791-A81A-77D9-128A-7BA21E898ACC" name="USER">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>CAD65B6F-F740-FC51-A8C3-3D76600D824C</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_user" id="887E5BBD-A5BF-A859-5129-B18B0FD7B782">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>341673CC-4B33-6A82-6763-F3C12A4F45E4</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="name" id="3949B253-7A87-CB37-D489-43970EEB497A">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>4E33C231-A614-51A1-550B-4546BD28D67C</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="last_name" id="7DD6D354-4517-2D0A-3697-397D4171DD33">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>6C2BC202-6A9B-AD82-AA87-F96CE8C248E2</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="email" id="2251BACF-3093-4ED4-E489-266C08D2150C">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>832A9346-B730-ED26-D692-7B4E380B2941</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="password" id="6E3BC581-B042-DBFA-C61F-F94CD40E76D6">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>48392E12-6BE6-FE65-3C68-A8E305F9A860</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="role" id="99335D3B-CFE4-18D2-5106-D8D85B8A810E">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>C44E3763-157A-113E-610E-85A1BC2BEC87</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="university_code" id="99331371-E722-0217-B9BA-A975E1DA1048">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>C313979E-6AF8-E939-C4FF-DA8462F617F0</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="group" id="2FDF65C1-B26A-EA98-C7EE-FDD58160BA7F">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>00A290E8-0B55-B104-514C-F5CF7322EEAC</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="state" id="532390A4-631E-A965-E647-9242BBE86145">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>90D2B318-1F15-7C13-30A3-5CC3CDAF564C</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="F6D8B01B-8685-0A5C-ADDC-6066F9DD865E" name="USER_PK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>EBA1C03A-316F-FC9C-5795-E84771D439CD</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="887E5BBD-A5BF-A859-5129-B18B0FD7B782"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

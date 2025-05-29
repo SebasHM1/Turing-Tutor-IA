@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="Conversations" id="9905F899-E7F0-A0C4-28E9-B53543892E5F" version="3.5">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:47:56 UTC</createdTime>
+<ownerDesignName>Conversations</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>9905F899-E7F0-A0C4-28E9-B53543892E5F</designId>
+</OSDM_Design>

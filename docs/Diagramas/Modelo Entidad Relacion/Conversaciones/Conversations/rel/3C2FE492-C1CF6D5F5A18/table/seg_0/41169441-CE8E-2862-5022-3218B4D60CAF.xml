@@ -1,0 +1,105 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="41169441-CE8E-2862-5022-3218B4D60CAF" name="MESSAGE">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>03719781-581E-3F53-8958-5986BFB4A8D8</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_message" id="BE0E57CC-1561-8B2B-45CD-D2A90213EBE9">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>9EAEC60C-9D0F-9B0E-2D22-AE4008789C74</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="id_conversation" id="EED2D002-919E-2F72-F65C-AE5CBF5CEDAC">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>1B5C8F45-6696-81E0-7419-279025126479</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="date" id="DA0F7931-6B5D-DE6F-6407-69B311C6D3BA">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>CB03E87A-AC5B-6335-0536-369CA6F0C745</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="content" id="A8A6D1B8-9D66-3F2A-BC68-C2C0CEF4B1C8">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>38B8CC97-55B4-0E61-B3A7-9F505D38D60A</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="transmitter" id="1F66CC67-FF70-7380-B977-9F879F449FB7">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>657C3148-AB5D-4665-1C2B-492C52391B9E</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="attach" id="8045BC8E-017A-567C-8724-DF1750A487CB">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>70BE47EF-F387-FCCB-2D5A-20141EE23AC3</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="id_conversation1" id="4714230E-9959-AE85-A876-DDF2A6196D8B">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>0F2690A6-DB81-F3E2-FFA9-3A111097CCB5</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="B0F23363-15B0-E4F1-C9FC-A70F5049B8EE" referredColumn="4A86DE87-47D8-59A0-7BD2-78B03E266074"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="4857F408-6A66-6D83-E3BD-56D45B5960FE" name="MESSAGE_PK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>8B7C4E75-384D-5BBB-D155-B625A3904634</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="BE0E57CC-1561-8B2B-45CD-D2A90213EBE9"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7B887DD8-9E21-1A03-3882-70BEF43A5C86" name="MESSAGE_CONVERSATION_FK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>2C8B5063-8FC0-784B-8CC5-9E5B37ED24ED</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4714230E-9959-AE85-A876-DDF2A6196D8B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

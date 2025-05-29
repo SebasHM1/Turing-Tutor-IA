@@ -1,8 +1,8 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="Usuarios" id="6F457635-9E22-DB39-7AA6-FB61636172A5" version="3.5">
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="Usuarios" id="6BE74091-40F6-608A-B14D-34F7B6D82740" version="3.5">
 <createdBy>Santiago</createdBy>
-<createdTime>2025-05-29 20:31:05 UTC</createdTime>
+<createdTime>2025-05-29 20:36:41 UTC</createdTime>
 <ownerDesignName>Usuarios</ownerDesignName>
 <capitalNames>false</capitalNames>
-<designId>6F457635-9E22-DB39-7AA6-FB61636172A5</designId>
+<designId>6BE74091-40F6-608A-B14D-34F7B6D82740</designId>
 </OSDM_Design>
