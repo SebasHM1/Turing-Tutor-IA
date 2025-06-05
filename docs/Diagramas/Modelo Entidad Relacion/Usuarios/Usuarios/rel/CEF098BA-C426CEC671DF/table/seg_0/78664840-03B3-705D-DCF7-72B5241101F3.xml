@@ -1,0 +1,89 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="78664840-03B3-705D-DCF7-72B5241101F3" name="TEACHER">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>E99E0869-EEDA-9F45-5E05-EBFE1BD7E05B</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_user" id="C829011E-12CF-38AF-BBCD-3D1611472229">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>33C6818B-C76B-9CAB-EA77-1198D4B11AF8</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="department" id="ADC9B028-774A-2D0F-740D-F913ECA0FBF2">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>09103693-3EAC-90F8-B473-1307D591EB6F</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="last_access_date" id="3195CB5A-064B-648F-A2A5-09D8F3BA5F20">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>D618222E-8FF2-D9F6-444F-DBAD6CDC9363</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="id_user1" id="6B2916D0-E130-86DA-DC41-92800D5EC39F">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>615ECC0A-CE44-A0E8-CDD1-83C333CDF1A2</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="87A4C22E-1A7A-2F59-162D-C18ECBF000D7" referredColumn="887E5BBD-A5BF-A859-5129-B18B0FD7B782"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="BC0C91AC-E7E4-FCFA-EDA1-E949D282F074" name="TEACHER_PK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>703D18B7-6BAE-BFC4-EAFC-E9660853C52D</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C829011E-12CF-38AF-BBCD-3D1611472229"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="917CEE7F-DC04-3CEF-10B2-F8E8EF8CA7A1" name="TEACHER__IDX">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<relationGeneratorID>D27BE8F9-7319-4D95-F25C-CA24B59F3F4B</relationGeneratorID>
+<indexColumnUsage>
+<colUsage columnID="6B2916D0-E130-86DA-DC41-92800D5EC39F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7D52F447-C33B-D4BC-65F9-391AAE9E217A" name="TEACHER_USER_FK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>D27BE8F9-7319-4D95-F25C-CA24B59F3F4B</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6B2916D0-E130-86DA-DC41-92800D5EC39F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

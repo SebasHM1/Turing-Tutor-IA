@@ -1,0 +1,76 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="E99E0869-EEDA-9F45-5E05-EBFE1BD7E05B" name="TEACHER">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:44:57 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="id user" id="33C6818B-C76B-9CAB-EA77-1198D4B11AF8">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:45:47 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="department" id="09103693-3EAC-90F8-B473-1307D591EB6F">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:45:55 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="last access date" id="D618222E-8FF2-D9F6-444F-DBAD6CDC9363">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:46:02 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id user2" id="615ECC0A-CE44-A0E8-CDD1-83C333CDF1A2">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:46:46 UTC</createdTime>
+<generatorID>D27BE8F9-7319-4D95-F25C-CA24B59F3F4B</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<referedAttribute>341673CC-4B33-6A82-6763-F3C12A4F45E4</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="703D18B7-6BAE-BFC4-EAFC-E9660853C52D" name="TEACHER PK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:46:22 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>33C6818B-C76B-9CAB-EA77-1198D4B11AF8</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

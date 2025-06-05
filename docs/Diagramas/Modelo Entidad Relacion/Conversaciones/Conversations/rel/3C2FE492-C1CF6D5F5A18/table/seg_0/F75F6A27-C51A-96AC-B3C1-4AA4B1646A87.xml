@@ -1,0 +1,109 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="F75F6A27-C51A-96AC-B3C1-4AA4B1646A87" name="METRIC_CONVERSATION">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>65440AE1-D5CD-A246-367A-B5F4A551E819</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_metric" id="F70DE361-F816-3F72-4577-E6AF17F6D422">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>04B7C8FF-E15E-5C40-067D-9290A30BA9C2</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="id_conversation" id="C4A60A62-2D63-5FFD-B202-F5536BD29A07">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>F71034BC-1065-9DA5-0185-45B6B32F51A2</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="difficulty_detected" id="DB860493-1CF0-C4C9-F82D-80FD735DAB76">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>215A77C9-B26E-ED36-AB3A-F973FC6954CA</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="response_time" id="5162CA8E-E815-A961-D6A7-2EE312B9E4C1">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>0A961045-31D4-B219-E455-C6A24A6F7DC4</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="interactions" id="E936409B-1B15-05E1-CE27-E45C0D2D69AA">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>65B11428-DF6C-96FB-C9D4-B3340243D4EA</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="id_conversation1" id="3F65792B-74B0-385D-6382-7B18E1196383">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>3FE5B16F-A291-5641-7F71-1741D87D6F38</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="CDCC5F5F-29D5-28C2-DECB-C593332572CD" referredColumn="4A86DE87-47D8-59A0-7BD2-78B03E266074"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="DEAC54A6-5A14-7C64-04B2-E041D1829AB4" name="METRIC_CONVERSATION_PK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>C45D63E0-3ED4-6A7E-D598-958EC591601B</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F70DE361-F816-3F72-4577-E6AF17F6D422"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="16D5A5FE-43A5-D55D-2FAC-3F7663BF624A" name="METRIC_CONVERSATION__IDX">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<ownerDesignName>Conversations</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<relationGeneratorID>0AE9A7FF-8B72-E2D9-D347-81C89E896961</relationGeneratorID>
+<indexColumnUsage>
+<colUsage columnID="3F65792B-74B0-385D-6382-7B18E1196383"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="05CB8A71-6ABC-3AF8-74A3-7A1079B480C3" name="METRIC_CONVERSATION_CONVERSATION_FK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>0AE9A7FF-8B72-E2D9-D347-81C89E896961</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="3F65792B-74B0-385D-6382-7B18E1196383"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

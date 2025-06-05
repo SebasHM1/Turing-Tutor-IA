@@ -1,0 +1,117 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="03719781-581E-3F53-8958-5986BFB4A8D8" name="MESSAGE">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:53:54 UTC</createdTime>
+<ownerDesignName>Conversations</ownerDesignName>
+<engineerTo>
+<item key="3C2FE492-6B44-E8C9-AE78-C1CF6D5F5A18" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="id_message" id="9EAEC60C-9D0F-9B0E-2D22-AE4008789C74">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:54:03 UTC</createdTime>
+<ownerDesignName>Conversations</ownerDesignName>
+<engineerTo>
+<item key="3C2FE492-6B44-E8C9-AE78-C1CF6D5F5A18" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id_conversation" id="1B5C8F45-6696-81E0-7419-279025126479">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:54:23 UTC</createdTime>
+<ownerDesignName>Conversations</ownerDesignName>
+<engineerTo>
+<item key="3C2FE492-6B44-E8C9-AE78-C1CF6D5F5A18" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="date" id="CB03E87A-AC5B-6335-0536-369CA6F0C745">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:54:32 UTC</createdTime>
+<ownerDesignName>Conversations</ownerDesignName>
+<engineerTo>
+<item key="3C2FE492-6B44-E8C9-AE78-C1CF6D5F5A18" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="content" id="38B8CC97-55B4-0E61-B3A7-9F505D38D60A">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:54:47 UTC</createdTime>
+<ownerDesignName>Conversations</ownerDesignName>
+<engineerTo>
+<item key="3C2FE492-6B44-E8C9-AE78-C1CF6D5F5A18" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="transmitter" id="657C3148-AB5D-4665-1C2B-492C52391B9E">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:54:52 UTC</createdTime>
+<ownerDesignName>Conversations</ownerDesignName>
+<engineerTo>
+<item key="3C2FE492-6B44-E8C9-AE78-C1CF6D5F5A18" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="attach" id="70BE47EF-F387-FCCB-2D5A-20141EE23AC3">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:55:13 UTC</createdTime>
+<ownerDesignName>Conversations</ownerDesignName>
+<engineerTo>
+<item key="3C2FE492-6B44-E8C9-AE78-C1CF6D5F5A18" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id_conversation1" id="0F2690A6-DB81-F3E2-FFA9-3A111097CCB5">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:58:16 UTC</createdTime>
+<generatorID>2C8B5063-8FC0-784B-8CC5-9E5B37ED24ED</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<engineerTo>
+<item key="3C2FE492-6B44-E8C9-AE78-C1CF6D5F5A18" value="true"/>
+</engineerTo>
+<referedAttribute>A9D3012E-2470-7242-B53D-CFA18307C5AA</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="issue" id="54347120-8EDB-D7D4-2482-A20CBE25385F">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:23:45 UTC</createdTime>
+<ownerDesignName>Conversations</ownerDesignName>
+<engineerTo>
+<item key="3C2FE492-6B44-E8C9-AE78-C1CF6D5F5A18" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="8B7C4E75-384D-5BBB-D155-B625A3904634" name="MESSAGE PK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:54:22 UTC</createdTime>
+<ownerDesignName>Conversations</ownerDesignName>
+<engineerTo>
+<item key="3C2FE492-6B44-E8C9-AE78-C1CF6D5F5A18" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>9EAEC60C-9D0F-9B0E-2D22-AE4008789C74</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

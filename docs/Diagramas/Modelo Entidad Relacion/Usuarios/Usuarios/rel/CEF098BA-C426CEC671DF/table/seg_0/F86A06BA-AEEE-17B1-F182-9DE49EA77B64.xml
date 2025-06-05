@@ -1,0 +1,108 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="F86A06BA-AEEE-17B1-F182-9DE49EA77B64" name="STUDENT">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>6BD759E8-A069-B26C-A37D-FCFAB827DD56</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_user" id="7F96D64B-414E-3F9A-6A4B-6CC59F31A8EB">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>1C45CDCA-EC68-FDF0-AF3F-4CFDBAEFD6E2</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="progress" id="B02CE117-78A1-085E-04DB-AB9A853AE703">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>742C340D-CF28-784C-BE65-1219B5A7899E</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="difficulty_area" id="0AC30FF5-E2E7-513D-100B-9BAD059BF2F4">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>0E0596EC-E1AE-418C-F563-ABCB343702DA</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="average" id="7081FA2B-D2ED-A6F3-0F9C-7A40160882EB">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>5A69F174-837D-082D-0380-54B773BFEEA5</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="last_access_date" id="AEBE0D58-A540-1903-54A2-B366B27CB913">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>834A5A0A-FD0E-35CD-DC26-44EE1C73B1DF</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="id_user1" id="73E70A17-44EF-8EF8-0F07-C7B969A59327">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>12611F32-7665-0DBD-8703-3AE879BFD19D</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="45AB4789-5D33-5D44-1DF0-A1A7C12EB10A" referredColumn="887E5BBD-A5BF-A859-5129-B18B0FD7B782"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="30BC6A1F-1089-CF88-FB4A-5C59EE17F304" name="STUDENT_PK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>3E046654-6201-548B-F067-B4786B1C42E8</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="7F96D64B-414E-3F9A-6A4B-6CC59F31A8EB"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C617A3B1-D880-5169-6112-6EC7A7D8381C" name="STUDENT__IDX">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<relationGeneratorID>475D930B-3F13-54BF-E7B3-F967F9253AD2</relationGeneratorID>
+<indexColumnUsage>
+<colUsage columnID="73E70A17-44EF-8EF8-0F07-C7B969A59327"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="674489BD-99D3-20A7-A7E1-2A0800FB49F9" name="STUDENT_USER_FK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:12 UTC</createdTime>
+<generatorID>475D930B-3F13-54BF-E7B3-F967F9253AD2</generatorID>
+<ownerDesignName>Usuarios</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="73E70A17-44EF-8EF8-0F07-C7B969A59327"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

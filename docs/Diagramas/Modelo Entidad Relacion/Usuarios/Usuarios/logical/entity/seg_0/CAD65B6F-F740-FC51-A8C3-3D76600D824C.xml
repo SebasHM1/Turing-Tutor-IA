@@ -1,0 +1,124 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="CAD65B6F-F740-FC51-A8C3-3D76600D824C" name="USER">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:40:11 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="id user" id="341673CC-4B33-6A82-6763-F3C12A4F45E4">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:40:17 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="name" id="4E33C231-A614-51A1-550B-4546BD28D67C">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:40:26 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="last name" id="6C2BC202-6A9B-AD82-AA87-F96CE8C248E2">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:40:29 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="email" id="832A9346-B730-ED26-D692-7B4E380B2941">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:40:37 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="password" id="48392E12-6BE6-FE65-3C68-A8E305F9A860">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:40:43 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="role" id="C44E3763-157A-113E-610E-85A1BC2BEC87">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:41:29 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="university code" id="C313979E-6AF8-E939-C4FF-DA8462F617F0">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:41:53 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="group" id="00A290E8-0B55-B104-514C-F5CF7322EEAC">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:42:15 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="state" id="90D2B318-1F15-7C13-30A3-5CC3CDAF564C">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:42:31 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="EBA1C03A-316F-FC9C-5795-E84771D439CD" name="USER_PK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 20:40:32 UTC</createdTime>
+<ownerDesignName>Usuarios</ownerDesignName>
+<engineerTo>
+<item key="CEF098BA-76BE-C88E-9711-C426CEC671DF" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>341673CC-4B33-6A82-6763-F3C12A4F45E4</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

@@ -1,0 +1,82 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="49B47205-F263-8A5F-19C8-A853A4208887" name="CONVERSATION">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>D0D9B3C3-5EFF-E780-E2AE-40E3D8E57876</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_conversation" id="4A86DE87-47D8-59A0-7BD2-78B03E266074">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>A9D3012E-2470-7242-B53D-CFA18307C5AA</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="id_user" id="93CB0688-14B3-4A7D-9591-C81FAE60E164">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>B9ED897D-1A90-7FD8-8669-9C48F923FD98</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="date" id="79C24291-435A-CE2B-785C-47D9D6056DF9">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>9D933FCE-3B31-AA52-DD79-CE072AE82EE4</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="issue" id="01F0DC78-CC6F-28C7-2A41-8A4461043B04">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>45BD8551-849E-4D08-A5AD-1A2570572AAD</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="type" id="59BE4A2B-B7E6-4EAB-DE18-5CFECD1F0F93">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>895A5E43-4AA2-25E5-3B89-DE77159EFFD4</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="state" id="F77F278F-EEDF-287A-BB9E-6356D59D744B">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>498C7B06-DEBE-5DA2-95D4-8E2D4532075D</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="B39EE332-BC50-2321-3868-41ED1F971C95" name="CONVERSATION_PK">
+<createdBy>Santiago</createdBy>
+<createdTime>2025-05-29 21:05:37 UTC</createdTime>
+<generatorID>39673F18-0564-50CD-D621-5B0B618B7132</generatorID>
+<ownerDesignName>Conversations</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4A86DE87-47D8-59A0-7BD2-78B03E266074"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
