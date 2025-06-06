@@ -1,0 +1,141 @@
+body {
+    background: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    width: 350px;
+    padding: 32px 28px;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    background: #fff;
+}
+
+.logo-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.logo {
+    background: #0066ff;
+    color: #fff;
+    border-radius: 12px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-right: 10px;
+}
+
+.brand {
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+h2 {
+    margin: 0 0 8px 0;
+    font-size: 1.6em;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 18px;
+}
+
+form label {
+    display: block;
+    margin: 12px 0 6px 0;
+    font-weight: 500;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    background: #f5f7fa;
+    border-radius: 7px;
+    padding: 0 10px;
+    margin-bottom: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.input-group i {
+    color: #b0b0b0;
+    font-size: 1.1em;
+    margin-right: 8px;
+}
+
+.input-group input {
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 12px 0;
+    flex: 1;
+    font-size: 1em;
+}
+
+.input-group .fa-eye {
+    margin-left: 8px;
+    cursor: pointer;
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0 18px 0;
+    font-size: 0.97em;
+}
+
+.options .forgot {
+    color: #0066ff;
+    text-decoration: none;
+}
+
+.sign-in-btn {
+    width: 100%;
+    background: #0066ff;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 12px 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background 0.2s;
+}
+
+.sign-in-btn:hover {
+    background: #0052cc;
+}
+
+.register-link {
+    text-align: center;
+    font-size: 0.98em;
+    margin-top: 8px;
+}
+
+.register-link a {
+    color: #0066ff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.input-group input[type="text"],
+.input-group input[type="email"], /* Django puede usar type="email" si es un EmailField */
+.input-group input[type="password"] {
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 12px 0; /* Ajusta según veas necesario */
+    flex: 1;
+    font-size: 1em;
+    width: 100%; /* Para asegurar que ocupe el espacio disponible en flex */
+}
