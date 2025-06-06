@@ -32,8 +32,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'), # BASE_DIR apunta a la raíz de tu proyecto
 ]
 
+# Application global variables
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_REDIRECT_URL = 'chatbot:chat_interface'
 LOGOUT_REDIRECT_URL = 'login'
 
 
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
+    'chatbot',
 ]
 
 MIDDLEWARE = [
