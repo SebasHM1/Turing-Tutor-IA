@@ -4,6 +4,8 @@ from django.contrib.auth.forms import UserCreationForm as DjangoUserCreationForm
 # No necesitamos importar AuthenticationForm si no lo estamos personalizando
 from .models import CustomUser # UserRole y UserState no son necesarios aquí a menos que los uses explícitamente en el formulario
 
+from django.contrib.auth.forms import PasswordResetForm
+
 class CustomUserCreationForm(DjangoUserCreationForm):
     # Definimos explícitamente los campos que queremos en el formulario de registro
     # además de los que maneja UserCreationForm (email, password1, password2).
@@ -58,3 +60,11 @@ class CustomUserCreationForm(DjangoUserCreationForm):
 
 # No es necesario un CustomAuthenticationForm si USERNAME_FIELD = 'email',
 # ya que AuthenticationForm se adapta bien a esto.
+
+class CustomPasswordResetForm(PasswordResetForm):
+    email = forms.EmailField(
+        label="Email",
+        max_length=254,
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa tu correo electrónico'}),
+        help_text='Ingresa el correo electrónico asociado a tu cuenta.'
+    )

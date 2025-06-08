@@ -22,10 +22,16 @@ urlpatterns = [
 
 
     #URLS A IMPLEMENTAR CON RESETEO DE CONTRASENA
-    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='registration/password_reset_form.html'), name='password_reset'),
-    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'), name='password_reset_done'),
-    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='registration/password_reset_confirm.html'), name='password_reset_confirm'),
-    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'), name='password_reset_complete'),
+    path('password_reset/', auth_views.PasswordResetView.as_view(
+        template_name='password_reset/form.html', 
+        email_template_name='password_reset/email.html',
+        html_email_template_name='password_reset/email.html'
+        ), 
+        name='password_reset'),
+
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset/done.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset/confirm.html'), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset/complete.html'), name='password_reset_complete'),
 
 
     #path('users/', include('users.urls')), <--- Puedes eliminar esto si defines las URLs de users directamente aquí

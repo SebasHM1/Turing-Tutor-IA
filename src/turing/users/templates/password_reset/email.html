@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Restablece tu contraseña</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .email-container {
+            max-width: 500px;
+            margin: 40px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            border: 1px solid #eee;
+            text-align: center;
+        }
+
+        .email-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            background: #0066ff;
+            color: #fff;
+            border-radius: 12px;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-right: 10px;
+        }
+
+        .brand {
+            font-weight: bold;
+            font-size: 1.2em;
+            vertical-align: middle;
+        }
+
+        h2 {
+            font-size: 20px;
+            color: #333;
+            margin-top: 0;
+        }
+
+        .reset-button {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 12px 24px;
+            background-color: #0066ff;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .footer {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="email-container">
+        <div class="email-header">
+            <div class="logo-title">
+                <span class="brand">Turing Tutor</span>
+            </div>
+        </div>
+
+        <h2>Hola {{ user.get_username }},</h2>
+
+        <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta en Turing Tutor.</p>
+
+        <p>Haz clic en el siguiente botón para crear una nueva contraseña:</p>
+
+        <p style="text-align: center;">
+            <a href="{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}" class="reset-button">
+                Restablecer Contraseña
+            </a>
+        </p>
+
+        <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
+
+        <p>¡Gracias!</p>
+
+        <div class="footer">
+            Este mensaje fue enviado automáticamente desde Turing Tutor.<br>
+            © 2025 Turing Tutor. Todos los derechos reservados.
+        </div>
+    </div>
+
+</body>
+</html>

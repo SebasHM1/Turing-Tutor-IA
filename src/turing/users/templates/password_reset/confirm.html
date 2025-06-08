@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restablecer Contraseña - Turing Tutor</title>
+    <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
+</head>
+<body>
+    <div class="login-container">
+        <!-- Logo y nombre -->
+        <div class="logo-title">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+            <span class="brand">Turing Tutor</span>
+        </div>
+
+        <!-- Título y subtítulo -->
+        <h2>Restablecer Contraseña</h2>
+        <p class="subtitle">Por favor, introduce tu nueva contraseña.</p>
+
+        <!-- Formulario -->
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Contraseña nueva -->
+            <label for="{{ form.new_password1.id_for_label }}">Nueva Contraseña</label>
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                {{ form.new_password1 }}
+            </div>
+            {% if form.new_password1.errors %}
+                {% for error in form.new_password1.errors %}
+                    <p style="color:red; font-size:0.8em; text-align:left;">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Confirmar contraseña -->
+            <label for="{{ form.new_password2.id_for_label }}">Confirmar Contraseña</label>
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                {{ form.new_password2 }}
+            </div>
+            {% if form.new_password2.errors %}
+                {% for error in form.new_password2.errors %}
+                    <p style="color:red; font-size:0.8em; text-align:left;">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Botón submit -->
+            <button type="submit" class="sign-in-btn">Restablecer Contraseña</button>
+        </form>
+
+        <!-- Enlace a login -->
+        <div class="register-link">
+            <a href="{% url 'login' %}">Iniciar sesión</a>
+        </div>
+    </div>
+</body>
+</html>
