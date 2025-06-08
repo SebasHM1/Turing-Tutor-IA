@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restablecer Contraseña - Turing Tutor</title>
+    <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
+</head>
+<body>
+    <div class="login-container">
+        <!-- Logo y nombre -->
+        <div class="logo-title">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+            <span class="brand">Turing Tutor</span>
+        </div>
+
+        <!-- Título y mensaje -->
+        <h2>Revisa tu correo electrónico</h2>
+        <p class="subtitle">
+            Te hemos enviado un enlace para restablecer tu contraseña.
+
+        </p>
+        <p class="subtitle">
+            Revisa tu bandeja de entrada y spam.
+        </p>
+
+        <!-- Botón para volver a login -->
+        <div class="register-link">
+            <a href="{% url 'login' %}" class="forgot">Volver a iniciar sesión</a>
+        </div>
+    </div>
+</body>
+</html>

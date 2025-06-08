@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restablecer Contraseña - Turing Tutor</title>
+    <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
+</head>
+<body>
+    <div class="login-container">
+        <!-- Logo and Brand -->
+        <div class="logo-title">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+            <span class="brand">Turing Tutor</span>
+        </div>
+
+        <!-- Reset Password Form -->
+        <h2>Restablecer Contraseña</h2>
+        <p>Introduce correo electrónico restablecer contraseña</p>
+
+        {% if form.non_field_errors %}
+            <p style="color: red; text-align:left; margin-bottom:10px;">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </p>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Email Field -->
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            <div class="input-group">
+                <i class="fa-regular fa-envelope"></i>
+                {{ form.email }}
+            </div>
+            {% if form.email.errors %}
+                {% for error in form.email.errors %}
+                    <p style="color:red; font-size:0.8em; text-align:left;">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Add space between field and button -->
+            <div style="height: 20px;"></div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="sign-in-btn">Enviar enlace de restablecimiento</button>
+        </form>
+
+        <!-- Back to Login Link -->
+        <div class="register-link">
+            <a href="{% url 'login' %}">Volver a iniciar sesión</a>
+        </div>
+    </div>
+</body>
+</html>
