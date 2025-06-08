@@ -3,6 +3,9 @@ env/
 venv/
 .env/
 .venv/
+.env
+.venv
+
 
 # Archivos de Python compilados
 __pycache__/

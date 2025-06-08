@@ -8,12 +8,16 @@ body {
 }
 
 .login-container {
-    width: 350px;
-    padding: 32px 28px;
+    width: 90%;
+    max-width: 350px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 16px 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
     background: #fff;
 }
+
 
 .logo-title {
     display: flex;
@@ -129,13 +133,16 @@ form label {
 }
 
 .input-group input[type="text"],
-.input-group input[type="email"], /* Django puede usar type="email" si es un EmailField */
+.input-group input[type="email"],
+/* Django puede usar type="email" si es un EmailField */
 .input-group input[type="password"] {
     border: none;
     background: transparent;
     outline: none;
-    padding: 12px 0; /* Ajusta según veas necesario */
+    padding: 12px 0;
+    /* Ajusta según veas necesario */
     flex: 1;
     font-size: 1em;
-    width: 100%; /* Para asegurar que ocupe el espacio disponible en flex */
+    width: 100%;
+    /* Para asegurar que ocupe el espacio disponible en flex */
 }

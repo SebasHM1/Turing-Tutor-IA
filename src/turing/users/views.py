@@ -7,19 +7,19 @@ from .forms import CustomUserCreationForm # <--- Usa tu formulario personalizado
 from .models import UserState 
 
 def register_view(request):
-    if request.user.is_authenticated:
-        return redirect('chatbot:chat_interface')
+    # Eliminamos por completo el if request.user.is_authenticated
 
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST) # <--- Usa tu formulario
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            # Asegurarse que el estado sea activo para nuevos registros via web
+            user = form.save(commit=False)
+            # Activamos el estado y marcamos activo
             user.state = UserState.ACTIVE
-            user.is_active = True # Asegura que Django lo vea como activo
+            user.is_active = True
             user.save()
-            login(request, user)
-            return redirect('chatbot:chat_interface')
+            # Redirigimos al login, no hacemos login automático
+            return redirect('login')
     else:
-        form = CustomUserCreationForm() # <--- Usa tu formulario
+        form = CustomUserCreationForm()
+
     return render(request, 'registration/register.html', {'form': form})
