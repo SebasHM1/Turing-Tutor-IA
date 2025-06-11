@@ -1,1 +1,111 @@
-<h1>Pagina principal del chatbot A IMPLEMENTAR</h1>
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- User Info -->
+        <div class="user-info">
+            <div class="avatar" style="margin-left: 20px;">
+                {% if user.profile.avatar_url %}
+                    <img src="{{ user.profile.avatar_url }}" alt="User Avatar">
+                {% else %}
+                    <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+                {% endif %}
+            </div>
+            <div class="user-details" style="margin-left: 40px;">
+                <h3>John Smith</h3>
+                <p>Student ID:</p>
+                <p class="student-id">123456789</p>
+            </div>
+        </div>
+
+        <hr class="sidebar-divider" style="margin: 20px 0;">
+
+        <!-- Navigation -->
+        <ul class="nav-links">
+            <li><a href="#"><i class="fas fa-comment"></i> Chats</a></li>
+            <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+            <li><a href="#"><i class="fas fa-question-circle"></i> Help Center</a></li>
+        </ul>
+
+        <hr class="sidebar-divider" style="margin: 20px 0;">
+
+        <!-- Recent Chats -->
+        <div class="recent-chats">
+            <h3>Recent Chats</h3>
+            <ul>
+                {% for chat in recent_chats %}
+                    <li>
+                        <a href="{% url 'chatbot:chat_detail' chat.id %}">
+                            <div class="chat-info">
+                                <span class="chat-name">{{ chat.name }}</span>
+                                <span class="chat-time">{{ chat.last_message_time|date:"H:i" }}</span>
+                            </div>
+                        </a>
+                    </li>
+                {% empty %}
+                    <li>No recent chats</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="main-chat">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div class="avatar" style="margin-right: 10px;">
+                <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+            </div>
+            <div class="bot-details" style="margin-left: 10px;">
+                <h2>Turing Tutor</h2>
+                <p>AI Learning Assistant</p>
+            </div>
+        </div>
+
+        <!-- Chat Log -->
+        <div id="chat-log">
+            {% for msg in messages %}
+                <div class="{{ msg.sender }}">
+                    <strong>{{ msg.sender|title }}:</strong> {{ msg.message }}
+                    <small>{{ msg.timestamp|date:"H:i" }}</small>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Message Input Form -->
+        <form id="chat-form">
+            <input type="text" id="message-input" autocomplete="off" placeholder="Type your message..." required>
+            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('chat-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const input = document.getElementById('message-input');
+            const message = input.value;
+            input.value = '';
+            const response = await fetch("{% url 'chatbot:send_message' %}", {
+                method: "POST",
+                headers: {"X-CSRFToken": "{{ csrf_token }}"},
+                body: new URLSearchParams({message})
+            });
+            const data = await response.json();
+            if (data.bot_message) {
+                location.reload(); // O mejor, agrega el mensaje al DOM dinámicamente
+            }
+        };
+    </script>
+</body>
+</html>
