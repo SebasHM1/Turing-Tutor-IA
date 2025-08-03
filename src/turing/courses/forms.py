@@ -1,10 +1,10 @@
 from django import forms
-from .models import Materia
+from .models import Course
 
-class MateriaForm(forms.ModelForm):
+class CourseForm(forms.ModelForm):
     class Meta:
-        model  = Materia
-        fields = ['nombre', 'descripcion', 'nivel']
+        model  = Course
+        fields = ['name', 'description', 'level']
         widgets = {
-            'descripcion': forms.Textarea(attrs={'rows': 3}),
+            'description': forms.Textarea(attrs={'rows': 3}),
         }

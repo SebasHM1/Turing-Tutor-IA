@@ -1,68 +1,102 @@
 from django.shortcuts import render
-
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
-from django.views.generic import (CreateView, ListView, RedirectView)
+from django.views.generic import CreateView, ListView, RedirectView
 
-from .models import Materia, ProfesorMateria
-from .forms import MateriaForm
+from .models import Course, TeacherCourse, Enrollment
+from .forms import CourseForm
 
-
-class SoloProfesoresMixin(UserPassesTestMixin):
+class TeachersOnlyMixin(UserPassesTestMixin):
     def test_func(self):
-        return hasattr(self.request.user, 'role') and self.request.user.role == 'Teacher'
+        return self.request.user.role == 'Teacher'
+
+class StudentsOnlyMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.role == 'Student'
 
 
-class MateriaCreateView(LoginRequiredMixin, SoloProfesoresMixin, CreateView):
-    model = Materia
-    form_class = MateriaForm
-    # CAMBIO: Se elimina 'courses/'
-    template_name = 'materia_form.html'
-    success_url = reverse_lazy('courses:mis_materias')
+class CourseCreateView(LoginRequiredMixin, TeachersOnlyMixin, CreateView):
+    model = Course
+    form_class = CourseForm
+    template_name = 'course_form.html'
+    success_url = reverse_lazy('courses:my_courses')
 
     def form_valid(self, form):
-        # Asigna el profesor responsable automáticamente
-        form.instance.responsable = self.request.user
+        form.instance.owner = self.request.user
         response = super().form_valid(form)
-        # El profesor queda vinculado a la materia que acaba de crear
-        ProfesorMateria.objects.create(
-            profesor=self.request.user,
-            materia=self.object
+        TeacherCourse.objects.get_or_create(
+            teacher=self.request.user,
+            course=self.object
         )
         return response
 
 
-class MisMateriasView(LoginRequiredMixin, SoloProfesoresMixin, ListView):
-    template_name = 'mis_materias.html'
-    context_object_name = 'materias'
+class MyCoursesView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
+    template_name = 'my_courses.html'
+    context_object_name = 'courses'
 
     def get_queryset(self):
-        # Este es el queryset de las materias en las que el profesor está inscrito.
-        return Materia.objects.filter(profesores__profesor=self.request.user).distinct()
+        return Course.objects.filter(teachers__teacher=self.request.user).distinct()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Aquí obtenemos las materias en las que el profesor NO está inscrito.
-        # Esta consulta es la que probablemente tenías en tu plantilla.
-        materias_inscritas_ids = self.get_queryset().values_list('id', flat=True)
-        context['otras_materias'] = Materia.objects.exclude(id__in=materias_inscritas_ids)
+        enrolled_ids = self.get_queryset().values_list('id', flat=True)
+        context['other_courses'] = Course.objects.exclude(id__in=enrolled_ids)
         return context
 
 
-class UnirseMateriaView(LoginRequiredMixin, SoloProfesoresMixin, RedirectView):
-    pattern_name = 'courses:mis_materias'
+class JoinCourseTeacherView(LoginRequiredMixin, TeachersOnlyMixin, RedirectView):
+    pattern_name = 'courses:my_courses'
 
     def get_redirect_url(self, *args, **kwargs):
-        materia = Materia.objects.get(pk=kwargs['pk'])
-        ProfesorMateria.objects.get_or_create(profesor=self.request.user, materia=materia)
-        return super().get_redirect_url(*args, **kwargs)
+        course = Course.objects.get(pk=kwargs['pk'])
+        TeacherCourse.objects.get_or_create(teacher=self.request.user, course=course)
+        return reverse_lazy('courses:my_courses') 
 
 
-class SalirMateriaView(LoginRequiredMixin, SoloProfesoresMixin, RedirectView):
-    pattern_name = 'courses:mis_materias'
+class LeaveCourseTeacherView(LoginRequiredMixin, TeachersOnlyMixin, RedirectView):
+    pattern_name = 'courses:my_courses'
 
     def get_redirect_url(self, *args, **kwargs):
-        ProfesorMateria.objects.filter(
-            profesor=self.request.user, materia_id=kwargs['pk']
+        TeacherCourse.objects.filter(
+            teacher=self.request.user, course_id=kwargs['pk']
         ).delete()
-        return super().get_redirect_url(*args, **kwargs)
+        return reverse_lazy('courses:my_courses')   
+
+
+class MyStudentCoursesView(LoginRequiredMixin, StudentsOnlyMixin, ListView):
+    template_name = 'my_student_courses.html'
+    context_object_name = 'courses'
+
+    def get_queryset(self):
+        # Materias en las que el estudiante YA está inscrito
+        return Course.objects.filter(
+            enrollments__student=self.request.user
+        ).distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        enrolled_ids = context['courses'].values_list('id', flat=True)
+        # Materias disponibles para unirse
+        context['other_courses'] = Course.objects.exclude(id__in=enrolled_ids)
+        return context
+
+
+
+class JoinCourseStudentView(LoginRequiredMixin, StudentsOnlyMixin, RedirectView):
+    pattern_name = 'courses:my_student_courses'
+
+    def get_redirect_url(self, *args, **kwargs):
+        course = Course.objects.get(pk=kwargs['pk'])
+        Enrollment.objects.get_or_create(student=self.request.user, course=course)
+        return reverse_lazy('courses:my_student_courses')
+
+
+class LeaveCourseStudentView(LoginRequiredMixin, StudentsOnlyMixin, RedirectView):
+    pattern_name = 'courses:my_student_courses'
+
+    def get_redirect_url(self, *args, **kwargs):
+        Enrollment.objects.filter(
+            student=self.request.user, course_id=kwargs['pk']
+        ).delete()
+        return reverse_lazy('courses:my_student_courses')
