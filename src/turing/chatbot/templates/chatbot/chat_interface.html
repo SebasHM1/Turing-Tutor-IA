@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 {% load static %}
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot</title>
     <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+    <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -16,9 +18,9 @@
         <div class="user-info">
             <div class="avatar" style="margin-left: 20px;">
                 {% if user.profile.avatar_url %}
-                    <img src="{{ user.profile.avatar_url }}" alt="User Avatar">
+                <img src="{{ user.profile.avatar_url }}" alt="User Avatar">
                 {% else %}
-                    <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+                <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
                 {% endif %}
             </div>
             <div class="user-details" style="margin-left: 40px;">
@@ -45,16 +47,16 @@
             <h3>Recent Chats</h3>
             <ul>
                 {% for chat in recent_chats %}
-                    <li>
-                        <a href="{% url 'chatbot:chat_detail' chat.id %}">
-                            <div class="chat-info">
-                                <span class="chat-name">{{ chat.name }}</span>
-                                <span class="chat-time">{{ chat.last_message_time|date:"H:i" }}</span>
-                            </div>
-                        </a>
-                    </li>
+                <li>
+                    <a href="{% url 'chatbot:chat_detail' chat.id %}">
+                        <div class="chat-info">
+                            <span class="chat-name">{{ chat.name }}</span>
+                            <span class="chat-time">{{ chat.last_message_time|date:"H:i" }}</span>
+                        </div>
+                    </a>
+                </li>
                 {% empty %}
-                    <li>No recent chats</li>
+                <li>No recent chats</li>
                 {% endfor %}
             </ul>
         </div>
@@ -76,10 +78,10 @@
         <!-- Chat Log -->
         <div id="chat-log">
             {% for msg in messages %}
-                <div class="{{ msg.sender }}">
-                    <strong>{{ msg.sender|title }}:</strong> {{ msg.message }}
-                    <small>{{ msg.timestamp|date:"H:i" }}</small>
-                </div>
+            <div class="{{ msg.sender }}">
+                <strong>{{ msg.sender|title }}:</strong> {{ msg.message }}
+                <small>{{ msg.timestamp|date:"H:i" }}</small>
+            </div>
             {% endfor %}
         </div>
 
@@ -103,7 +105,7 @@
             }, speed);
         }
 
-        document.getElementById('chat-form').onsubmit = async function(e) {
+        document.getElementById('chat-form').onsubmit = async function (e) {
             e.preventDefault();
             const input = document.getElementById('message-input');
             const message = input.value;
@@ -122,8 +124,8 @@
             // Fetch bot response
             const response = await fetch("{% url 'chatbot:send_message' %}", {
                 method: "POST",
-                headers: {"X-CSRFToken": "{{ csrf_token }}"},
-                body: new URLSearchParams({message})
+                headers: { "X-CSRFToken": "{{ csrf_token }}" },
+                body: new URLSearchParams({ message })
             });
             const data = await response.json();
 
@@ -141,4 +143,5 @@
         };
     </script>
 </body>
+
 </html>
