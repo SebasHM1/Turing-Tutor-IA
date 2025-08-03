@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Materia</title>
+
+    <!-- Reutilizamos estilos del login + nuevos estilos de curso -->
+    <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/courses_styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="login-container course-form-container">
+        <div class="logo-title">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+            <span class="brand">Crear Materia</span>
+        </div>
+
+        <h2>Nueva materia</h2>
+        <p class="subtitle">Completa el formulario y haz clic en Guardar</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Name -->
+            <label for="{{ form.name.id_for_label }}">Nombre</label>
+            <div class="input-group">
+                <i class="fa-regular fa-bookmark"></i>
+                {{ form.name }}
+            </div>
+            {% for error in form.name.errors %}
+            <p style="color:red; font-size:0.8em;">{{ error }}</p>
+            {% endfor %}
+
+            <!-- Description -->
+            <label for="{{ form.description.id_for_label }}">Descripción</label>
+            <div class="input-group">
+                <i class="fa-solid fa-align-left"></i>
+                {{ form.description }}
+            </div>
+            {% for error in form.description.errors %}
+            <p style="color:red; font-size:0.8em;">{{ error }}</p>
+            {% endfor %}
+
+            <!-- Level -->
+            <label for="{{ form.level.id_for_label }}">Nivel</label>
+            <div class="input-group">
+                <i class="fa-solid fa-layer-group"></i>
+                {{ form.level }}
+            </div>
+            {% for error in form.level.errors %}
+            <p style="color:red; font-size:0.8em;">{{ error }}</p>
+            {% endfor %}
+
+            <button type="submit" class="sign-in-btn" style="margin-top:14px;">Guardar</button>
+        </form>
+
+        <div class="register-link">
+            <a href="{% url 'courses:my_courses' %}">← Volver a mis materias</a>
+        </div>
+    </div>
+</body>
+
+</html>

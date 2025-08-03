@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Materias</title>
+
+    <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/courses_styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="main-chat">
+        <div class="chat-header">
+            <div class="avatar">
+                <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+            </div>
+            <div class="bot-details">
+                <h2>Mis Materias (Estudiante)</h2>
+            </div>
+        </div>
+
+        <h3>Materias inscritas</h3>
+        {% if courses %}
+        <table class="course-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Nivel</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in courses %}
+                <tr>
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.level }}</td>
+                    <td>
+                        <a href="{% url 'courses:student_leave' c.id %}" class="btn btn-leave">Salir</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Aún no estás inscrito en ninguna materia.</p>
+        {% endif %}
+
+        <h3 style="margin-top:30px;">Explora y únete a nuevas materias</h3>
+        {% if other_courses %}
+        <table class="course-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Nivel</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in other_courses %}
+                <tr>
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.level }}</td>
+                    <td>
+                        <a href="{% url 'courses:student_join' c.id %}" class="btn btn-join">Unirse</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No hay materias disponibles por ahora.</p>
+        {% endif %}
+    </div>
+</body>
+
+</html>

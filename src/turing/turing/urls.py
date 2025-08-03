@@ -33,6 +33,8 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset/confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset/complete.html'), name='password_reset_complete'),
 
+    path('courses/', include('courses.urls', namespace='courses')),
+
 
     #path('users/', include('users.urls')), <--- Puedes eliminar esto si defines las URLs de users directamente aquí
     #path('users/', include('django.contrib.auth.urls')), <--- También puedes eliminar esto si has definido login, logout, etc. explícitamente
