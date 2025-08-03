@@ -3,8 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import ChatSession, ChatMessage
 from django.views.decorators.csrf import csrf_exempt
-import google.generativeai as genai
 from django.conf import settings
+
+
+import google.generativeai as genai
 
 genai.configure(api_key=settings.GEMINI_API_KEY)  # Asegúrate de tener GEMINI_API_KEY en settings.py
 

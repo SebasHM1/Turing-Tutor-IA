@@ -91,19 +91,52 @@
     </div>
 
     <script>
+        function showTypingEffect(container, text, speed = 30) {
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index < text.length) {
+                    container.innerHTML += text.charAt(index);
+                    index++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, speed);
+        }
+
         document.getElementById('chat-form').onsubmit = async function(e) {
             e.preventDefault();
             const input = document.getElementById('message-input');
             const message = input.value;
             input.value = '';
+
+            // Append user message immediately
+            const chatLog = document.getElementById('chat-log');
+            const userDiv = document.createElement('div');
+            userDiv.className = 'user';
+            userDiv.innerHTML = `<strong>User:</strong> ${message} <small>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>`;
+            chatLog.appendChild(userDiv);
+
+            // Scroll to bottom
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            // Fetch bot response
             const response = await fetch("{% url 'chatbot:send_message' %}", {
                 method: "POST",
                 headers: {"X-CSRFToken": "{{ csrf_token }}"},
                 body: new URLSearchParams({message})
             });
             const data = await response.json();
+
+            // Append bot message with typing effect
             if (data.bot_message) {
-                location.reload(); // O mejor, agrega el mensaje al DOM dinámicamente
+                const botDiv = document.createElement('div');
+                botDiv.className = 'bot';
+                botDiv.innerHTML = `<strong>Bot:</strong> <span class="bot-text"></span> <small>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>`;
+                chatLog.appendChild(botDiv);
+                showTypingEffect(botDiv.querySelector('.bot-text'), data.bot_message, 25);
+
+                // Scroll again
+                chatLog.scrollTop = chatLog.scrollHeight;
             }
         };
     </script>
