@@ -1,0 +1,23 @@
+{% load static %}
+{% block content %}
+<h2>Mis materias</h2>
+<a href="{% url 'courses:crear' %}" class="sign-in-btn">+ Nueva materia</a>
+<ul class="nav-links">
+    {% for materia in materias %}
+    <li>
+        <strong>{{ materia.nombre }}</strong>
+        — <a href="{% url 'courses:salir' materia.pk %}">Salir</a>
+    </li>
+    {% empty %}
+    <li>No estás unido a ninguna materia.</li>
+    {% endfor %}
+</ul>
+<h3>Unirme a otra</h3>
+<ul class="nav-links">
+    {% for materia in otras_materias %} <li>
+        {{ materia.nombre }}
+        — <a href="{% url 'courses:unirse' materia.pk %}">Unirme</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
