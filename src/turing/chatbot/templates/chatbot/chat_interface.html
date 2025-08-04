@@ -51,14 +51,19 @@
                     <a href="{% url 'chatbot:chat_detail' chat.id %}">
                         <div class="chat-info">
                             <span class="chat-name">{{ chat.name }}</span>
-                            <span class="chat-time">{{ chat.last_message_time|date:"H:i" }}</span>
+                            <span class="chat-time">{{ chat.created_at|date:"H:i" }}</span>
                         </div>
                     </a>
+                    <form method="post" action="{% url 'chatbot:delete_session' chat.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" style="border:none;background:none;color:red;">🗑️</button>
+                    </form>
                 </li>
                 {% empty %}
                 <li>No recent chats</li>
                 {% endfor %}
             </ul>
+            <a href="{% url 'chatbot:create_session' %}" class="btn">➕ New Chat</a>
         </div>
     </div>
 
@@ -93,6 +98,8 @@
     </div>
 
     <script>
+
+
         function showTypingEffect(container, text, speed = 30) {
             let index = 0;
             const interval = setInterval(() => {
@@ -125,7 +132,10 @@
             const response = await fetch("{% url 'chatbot:send_message' %}", {
                 method: "POST",
                 headers: { "X-CSRFToken": "{{ csrf_token }}" },
-                body: new URLSearchParams({ message })
+                body: new URLSearchParams({ 
+                    message: message,
+                    session_id: "{{ current_session.id }}"
+                })
             });
             const data = await response.json();
 
@@ -138,6 +148,13 @@
                 showTypingEffect(botDiv.querySelector('.bot-text'), data.bot_message, 25);
 
                 // Scroll again
+                chatLog.scrollTop = chatLog.scrollHeight;
+            } else if (data.error) {
+                // Handle error case
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'bot error';
+                errorDiv.innerHTML = `<strong>Error:</strong> ${data.error} <small>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>`;
+                chatLog.appendChild(errorDiv);
                 chatLog.scrollTop = chatLog.scrollHeight;
             }
         };

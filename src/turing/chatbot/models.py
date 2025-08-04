@@ -9,10 +9,8 @@ class ChatSession(models.Model):
         null=True,      # ← permite NULL por ahora
         blank=True
     )
+    name = models.CharField(max_length=255, default='New Chat')
     created_at = models.DateTimeField(auto_now_add=True)
-
-class Meta:                         
-        db_table = 'courses_materia' 
 
 
 class ChatMessage(models.Model):
