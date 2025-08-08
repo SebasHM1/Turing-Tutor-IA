@@ -13,6 +13,72 @@
 </head>
 
 <body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- User Info -->
+        <div class="user-info">
+            <div class="avatar" style="margin-left: 20px;">
+                {% if user.profile.avatar_url %}
+                <img src="{{ user.profile.avatar_url }}" alt="User Avatar">
+                {% else %}
+                <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+                {% endif %}
+            </div>
+            <div class="user-details" style="margin-left: 40px;">
+                <h3>John Smith</h3>
+                <p>Student ID:</p>
+                <p class="student-id">123456789</p>
+            </div>
+        </div>
+
+        <hr class="sidebar-divider" style="margin: 20px 0;">
+
+        <!-- Navigation -->
+        <ul class="nav-links">
+
+            <!-- Chats -->
+            <li>
+                <a href="{% url 'chatbot:chat_interface' %}"><i class="fas fa-comment"></i> Chats</a>
+            </li>
+
+            <!-- Profile -->
+            {% if user.is_staff or user.role == 'Teacher' %}
+            <li><a href="{% url 'courses:my_courses' %}"><i class="fas fa-user"></i> Profile</a></li>
+            {% elif user.role == 'Student' %}
+            <li><a href="{% url 'courses:my_student_courses' %}"><i class="fas fa-user"></i> Profile</a></li>
+            {% else %}
+            <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
+            {% endif %}
+
+            <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+            <li><a href="#"><i class="fas fa-question-circle"></i> Help Center</a></li>
+        </ul>
+
+
+        <hr class="sidebar-divider" style="margin: 20px 0;">
+
+        <!-- Recent Chats -->
+        <div class="recent-chats">
+            <h3>Recent Chats</h3>
+            <ul>
+                {% for chat in recent_chats %}
+                <li>
+                    <a href="{% url 'chatbot:chat_detail' chat.id %}">
+                        <div class="chat-info">
+                            <span class="chat-name">{{ chat.name }}</span>
+                            <span class="chat-time">{{ chat.last_message_time|date:"H:i" }}</span>
+                        </div>
+                    </a>
+                </li>
+                {% empty %}
+                <li>No recent chats</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!--Main-->>
     <div class="main-chat">
         <div class="chat-header">
             <div class="avatar">

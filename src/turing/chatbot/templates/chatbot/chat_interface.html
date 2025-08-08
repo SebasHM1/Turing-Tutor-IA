@@ -34,8 +34,21 @@
 
         <!-- Navigation -->
         <ul class="nav-links">
-            <li><a href="#"><i class="fas fa-comment"></i> Chats</a></li>
+
+            <!-- Chats -->
+            <li>
+                <a href="{% url 'chatbot:chat_interface' %}"><i class="fas fa-comment"></i> Chats</a>
+            </li>
+
+            <!-- Profile -->
+            {% if user.is_staff or user.role == 'Teacher' %}
+            <li><a href="{% url 'courses:my_courses' %}"><i class="fas fa-user"></i> Profile</a></li>
+            {% elif user.role == 'Student' %}
+            <li><a href="{% url 'courses:my_student_courses' %}"><i class="fas fa-user"></i> Profile</a></li>
+            {% else %}
             <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
+            {% endif %}
+
             <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
             <li><a href="#"><i class="fas fa-question-circle"></i> Help Center</a></li>
         </ul>
