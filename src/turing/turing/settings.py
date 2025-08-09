@@ -39,7 +39,7 @@ STATICFILES_DIRS = [
 
 # Application global variables
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'chatbot:chat_interface'
+LOGIN_REDIRECT_URL = 'chatbot:chatbot'
 LOGOUT_REDIRECT_URL = 'login'
 
 # Email settings
