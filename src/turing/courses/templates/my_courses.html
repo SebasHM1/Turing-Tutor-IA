@@ -52,6 +52,7 @@
             </div>
 
 
+
             <!-- Contenido -->
             <div class="content">
                 <div class="container">
@@ -125,7 +126,7 @@
                     <form class="join-card card join-box" method="post" action="{% url 'courses:join_by_code' %}">
                         {% csrf_token %}
                         <input type="text" name="code" placeholder="Ingresa el código del curso" autocomplete="off">
-                        <button class="btn btn-outline" type="submit">
+                        <button class="btn btn-primary" type="submit">
                             <i class="fa-solid fa-right-to-bracket"></i> Unirse
                         </button>
                     </form>
