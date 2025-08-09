@@ -28,6 +28,6 @@ def redirect_after_login(request):
     basado en su rol.
     """
     if request.user.role == UserRole.TEACHER:
-        return redirect('teachers:dashboard') # Nombre de la URL para el dashboard del profesor
+        return redirect('teachers:dashboard') 
     elif request.user.role == UserRole.STUDENT:
-        return redirect('chatbot') # Nombre de la URL para el chatbot del estudiante
+        return redirect('chatbot:chatbot') 

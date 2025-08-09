@@ -35,7 +35,11 @@ urlpatterns = [
 
     path('courses/', include('courses.urls', namespace='courses')),
 
+    # INCLUYE LAS URLS DE LA NUEVA APP DE PROFESORES
+    path('teachers/', include('teachers.urls', namespace='teachers')),
 
-    #path('users/', include('users.urls')), <--- Puedes eliminar esto si defines las URLs de users directamente aquí
+    # INCLUYE LA URL DE REDIRECCIÓN DE LA APP USERS
+    path('users/', include('users.urls', namespace='users')),
+
     #path('users/', include('django.contrib.auth.urls')), <--- También puedes eliminar esto si has definido login, logout, etc. explícitamente
 ]
