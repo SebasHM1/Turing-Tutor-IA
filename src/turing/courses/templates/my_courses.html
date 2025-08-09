@@ -5,143 +5,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Materias</title>
-
+    <title>Mis Cursos</title>
     <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/courses_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body>
+<body class="dashboard">
+    <div class="page">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand-title">Turing</div>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <!-- User Info -->
-        <div class="user-info">
-            <div class="avatar" style="margin-left: 20px;">
-                {% if user.profile.avatar_url %}
-                <img src="{{ user.profile.avatar_url }}" alt="User Avatar">
-                {% else %}
-                <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
-                {% endif %}
-            </div>
-            <div class="user-details" style="margin-left: 40px;">
-                <h3>John Smith</h3>
-                <p>Student ID:</p>
-                <p class="student-id">123456789</p>
-            </div>
-        </div>
+            <hr class="sidebar-divider">
 
-        <hr class="sidebar-divider" style="margin: 20px 0;">
-
-        <!-- Navigation -->
-        <ul class="nav-links">
-
-            <!-- Chats -->
-            <li>
-                <a href="{% url 'chatbot:chat_interface' %}"><i class="fas fa-comment"></i> Chats</a>
-            </li>
-
-            <!-- Profile -->
-            {% if user.is_staff or user.role == 'Teacher' %}
-            <li><a href="{% url 'courses:my_courses' %}"><i class="fas fa-user"></i> Profile</a></li>
-            {% elif user.role == 'Student' %}
-            <li><a href="{% url 'courses:my_student_courses' %}"><i class="fas fa-user"></i> Profile</a></li>
-            {% else %}
-            <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
-            {% endif %}
-
-            <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
-            <li><a href="#"><i class="fas fa-question-circle"></i> Help Center</a></li>
-        </ul>
-
-
-        <hr class="sidebar-divider" style="margin: 20px 0;">
-
-        <!-- Recent Chats -->
-        <div class="recent-chats">
-            <h3>Recent Chats</h3>
-            <ul>
-                {% for chat in recent_chats %}
-                <li>
-                    <a href="{% url 'chatbot:chat_detail' chat.id %}">
-                        <div class="chat-info">
-                            <span class="chat-name">{{ chat.name }}</span>
-                            <span class="chat-time">{{ chat.last_message_time|date:"H:i" }}</span>
-                        </div>
-                    </a>
-                </li>
-                {% empty %}
-                <li>No recent chats</li>
-                {% endfor %}
+            <ul class="nav-links">
+                <li><a href="#"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+                <li><a class="active" href="{% url 'courses:my_courses' %}"><i class="fa-solid fa-layer-group"></i> Mis
+                        Cursos</a></li>
+                <li><a href="#"><i class="fa-regular fa-calendar"></i> Calendario</a></li>
+                <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
+                <li><a href="#"><i class="fa-regular fa-circle-question"></i> Centro de Ayuda</a></li>
             </ul>
-        </div>
-    </div>
+        </aside>
 
-    <!--Main-->>
-    <div class="main-chat">
-        <div class="chat-header">
-            <div class="avatar">
-                <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+        <!-- Columna principal -->
+        <main>
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="topbar-inner">
+                    <div class="search">
+                        <input type="text" placeholder="Buscar cursos...">
+                    </div>
+                    <div class="topbar-user">
+                        <i class="fa-regular fa-bell"></i>
+                        <span>Prof. {{ user.last_name }}</span>
+                        <div class="avatar-circle">
+                            {% if user.profile.avatar_url %}
+                            <img src="{{ user.profile.avatar_url }}" alt="Avatar">
+                            {% else %}
+                            <i class="fa-regular fa-user"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="bot-details">
-                <h2>Mis Materias (Profesor)</h2>
+
+
+            <!-- Contenido -->
+            <div class="content">
+                <div class="container">
+                    <div class="welcome">
+                        <h1>Bienvenido, Prof. {{ user.last_name }}</h1>
+                        <p>Gestiona tus cursos y clases desde aquí</p>
+                    </div>
+
+                    <!-- KPIs -->
+                    <div class="kpis">
+                        <div class="kpi card">
+                            <div class="icon"><i class="fa-regular fa-bookmark"></i></div>
+                            <div>
+                                <div class="label">Cursos Activos</div>
+                                <div class="value">{{ active_courses }}</div>
+                            </div>
+                        </div>
+                        <div class="kpi card">
+                            <div class="icon"><i class="fa-solid fa-user-group"></i></div>
+                            <div>
+                                <div class="label">Total Estudiantes</div>
+                                <div class="value">{{ total_students }}</div>
+                            </div>
+                        </div>
+                        <div class="kpi card">
+                            <div class="icon"><i class="fa-solid fa-chart-column"></i></div>
+                            <div>
+                                <div class="label">Promedio Asistencia</div>
+                                <div class="value">{% if avg_attendance %}{{ avg_attendance }}%{% else %}92%{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Encabezado sección y CTA -->
+                    <div class="header-row">
+                        <h2>Mis Cursos</h2>
+                        <a href="{% url 'courses:create' %}" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i> Crear Nuevo Curso
+                        </a>
+                    </div>
+
+                    <!-- Grid de cursos -->
+                    <div class="courses-grid">
+                        {% for c in courses %}
+                        <article class="course-card card">
+                            <div class="card-header">
+                                <h3>{{ c.name }}</h3>
+                                <button class="icon-button" type="button" title="Opciones">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                </button>
+                            </div>
+
+                            <div class="course-meta muted">Código: {{ c.code }}</div>
+                            {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
+                            <div class="course-meta muted"><i class="fa-regular fa-user"></i> {{ c.students_count }}
+                                estudiantes</div>
+
+                            <div class="course-actions">
+                                <a href="#" class="btn btn-secondary">Ver detalles</a>
+                                <a href="{% url 'courses:leave' c.id %}" class="btn btn-danger-soft">Salir del curso</a>
+                            </div>
+                        </article>
+                        {% empty %}
+                        <p>No tienes cursos aún.</p>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Unirse por código -->
+                    <h2 class="section-title">Unirse a un Curso</h2>
+                    <form class="join-card card join-box" method="post" action="{% url 'courses:join_by_code' %}">
+                        {% csrf_token %}
+                        <input type="text" name="code" placeholder="Ingresa el código del curso" autocomplete="off">
+                        <button class="btn btn-outline" type="submit">
+                            <i class="fa-solid fa-right-to-bracket"></i> Unirse
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
-
-        <a href="{% url 'courses:create' %}" class="btn btn-new"><i class="fa-solid fa-plus"></i> Nueva materia</a>
-
-        <h3>Materias en las que participo</h3>
-        {% if courses %}
-        <table class="course-table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Nivel</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in courses %}
-                <tr>
-                    <td>{{ c.name }}</td>
-                    <td>{{ c.level }}</td>
-                    <td>
-                        <a href="{% url 'courses:leave' c.id %}" class="btn btn-leave">Salir</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>Aún no estás inscrito en ninguna materia.</p>
-        {% endif %}
-
-        <h3 style="margin-top:30px;">Otras materias disponibles</h3>
-        {% if other_courses %}
-        <table class="course-table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Nivel</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in other_courses %}
-                <tr>
-                    <td>{{ c.name }}</td>
-                    <td>{{ c.level }}</td>
-                    <td>
-                        <a href="{% url 'courses:join' c.id %}" class="btn btn-join">Unirse</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>No hay materias por mostrar.</p>
-        {% endif %}
+        </main>
     </div>
 </body>
 

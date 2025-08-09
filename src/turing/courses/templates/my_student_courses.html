@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Materias</title>
-
     <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/courses_styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -38,9 +37,7 @@
                 <tr>
                     <td>{{ c.name }}</td>
                     <td>{{ c.level }}</td>
-                    <td>
-                        <a href="{% url 'courses:student_leave' c.id %}" class="btn btn-leave">Salir</a>
-                    </td>
+                    <td><a href="{% url 'courses:student_leave' c.id %}" class="btn btn-leave">Salir</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -49,7 +46,7 @@
         <p>Aún no estás inscrito en ninguna materia.</p>
         {% endif %}
 
-        <h3 style="margin-top:30px;">Explora y únete a nuevas materias</h3>
+        <h3 class="mt-30">Explora y únete a nuevas materias</h3>
         {% if other_courses %}
         <table class="course-table">
             <thead>
@@ -64,9 +61,7 @@
                 <tr>
                     <td>{{ c.name }}</td>
                     <td>{{ c.level }}</td>
-                    <td>
-                        <a href="{% url 'courses:student_join' c.id %}" class="btn btn-join">Unirse</a>
-                    </td>
+                    <td><a href="{% url 'courses:student_join' c.id %}" class="btn btn-join">Unirse</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

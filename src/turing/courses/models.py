@@ -1,8 +1,14 @@
 # courses/models.py
 from django.db import models
 from django.conf import settings
+import secrets
+import string
 
 User = settings.AUTH_USER_MODEL
+
+def _gen_course_code(n=6):
+    alnum = string.ascii_uppercase + string.digits
+    return ''.join(secrets.choice(alnum) for _ in range(n))
 
 class Course(models.Model):
     name        = models.CharField(max_length=120, db_column='nombre')
@@ -16,6 +22,17 @@ class Course(models.Model):
         limit_choices_to={'role': 'Teacher'},
         db_column='responsable'
     )
+    code     = models.CharField(max_length=12, unique=True, db_index=True, db_column='codigo', blank=True)
+    schedule = models.CharField(max_length=60, db_column='horario', blank=True)
+
+    def save(self, *args, **kwargs):
+        # genera un código si viene vacío
+        if not self.code:
+            new_code = _gen_course_code()
+            while Course.objects.filter(code=new_code).exists():
+                new_code = _gen_course_code()
+            self.code = new_code
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

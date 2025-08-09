@@ -1,8 +1,8 @@
-/* Tablas de las vistas de materias */
 .course-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    background: #fff;
 }
 
 .course-table th,
@@ -16,7 +16,6 @@
     background: #f4f5f7;
 }
 
-/* Botones */
 .btn {
     display: inline-block;
     padding: 6px 10px;
@@ -25,13 +24,8 @@
     font-size: 0.9em;
 }
 
-.btn-new {
-    background: #28a745;
-    color: #fff;
-}
-
 .btn-join {
-    background: #007bff;
+    background: #1677ff;
     color: #fff;
 }
 
@@ -40,8 +34,21 @@
     color: #fff;
 }
 
-/* Contenedor ancho para el formulario de nueva materia */
 .course-form-container {
     max-width: 420px;
-    /* más ancho que el login por defecto */
+}
+
+.field-error {
+    color: red;
+    font-size: 0.8em;
+    text-align: left;
+    margin: 4px 0 6px 0;
+}
+
+.mt-14 {
+    margin-top: 14px;
+}
+
+.mt-30 {
+    margin-top: 30px;
 }
