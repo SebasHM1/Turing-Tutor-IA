@@ -20,7 +20,8 @@
             <hr class="sidebar-divider">
 
             <ul class="nav-links">
-                <li><a href="#"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+                <li><a href="#"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+
                 <li><a class="active" href="{% url 'courses:my_courses' %}"><i class="fa-solid fa-layer-group"></i> Mis
                         Cursos</a></li>
                 <li><a href="#"><i class="fa-regular fa-calendar"></i> Calendario</a></li>
@@ -37,8 +38,19 @@
                     <div class="search">
                         <input type="text" placeholder="Buscar cursos...">
                     </div>
+
+                    <!-- Form de logout escondido -->
+                    <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
+                        {% csrf_token %}
+                    </form>
+
                     <div class="topbar-user">
-                        <i class="fa-regular fa-bell"></i>
+                        <button type="button" class="btn btn-ghost small js-logout">
+                            <i class="fa-solid fa-right-from-bracket"></i> Salir
+                        </button>
+
+
+                        <i class="fa-regular fa-bell bell"></i>
                         <span>Prof. {{ user.last_name }}</span>
                         <div class="avatar-circle">
                             {% if user.profile.avatar_url %}
@@ -53,23 +65,34 @@
 
 
 
+
             <!-- Contenido -->
             <div class="content">
                 <div class="container">
                     <div class="welcome">
-                        <h1>Bienvenido, Prof. {{ user.last_name }}</h1>
-                        <p>Gestiona tus cursos y clases desde aquí</p>
+                        <div class="welcome-head place-back">
+                            <button type="button" class="btn-back js-back" aria-label="Volver atrás">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <h1>Bienvenido, Prof. {{ user.last_name }}</h1>
+                        </div>
+
+                        <p class="welcome-sub">Gestiona tus cursos y clases desde aquí</p>
                     </div>
+
+
+
 
                     <!-- KPIs -->
                     <div class="kpis">
                         <div class="kpi card">
-                            <div class="icon"><i class="fa-regular fa-bookmark"></i></div>
+                            <div class="icon"><i class="fa-solid fa-book-open"></i></div>
                             <div>
                                 <div class="label">Cursos Activos</div>
                                 <div class="value">{{ active_courses }}</div>
                             </div>
                         </div>
+
                         <div class="kpi card">
                             <div class="icon"><i class="fa-solid fa-user-group"></i></div>
                             <div>
@@ -121,19 +144,23 @@
                         {% endfor %}
                     </div>
 
-                    <!-- Unirse por código -->
-                    <h2 class="section-title">Unirse a un Curso</h2>
-                    <form class="join-card card join-box" method="post" action="{% url 'courses:join_by_code' %}">
-                        {% csrf_token %}
-                        <input type="text" name="code" placeholder="Ingresa el código del curso" autocomplete="off">
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fa-solid fa-right-to-bracket"></i> Unirse
-                        </button>
-                    </form>
+                    <div class="join-card card">
+                        <h2 class="section-title">Unirse a un Curso</h2>
+                        <form class="join-inline" method="post" action="{% url 'courses:join_by_code' %}">
+                            {% csrf_token %}
+                            <input type="text" name="code" placeholder="Ingresa el código del curso" autocomplete="off">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fa-solid fa-right-to-bracket"></i> Unirse
+                            </button>
+                        </form>
+                    </div>
+
                 </div>
             </div>
         </main>
     </div>
+    <script src="{% static 'js/ui.js' %}"></script>
+
 </body>
 
 </html>
