@@ -1,12 +1,10 @@
-<!-- tutor_inteligente/usuarios/templates/registration/login.html -->
-{% load static %} <!-- **PASO 1: Cargar la etiqueta static** -->
+{% load static %} 
 <!DOCTYPE html>
 <html lang="es"> <!-- Cambiado a 'es' por consistencia, ajusta si es necesario -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Turing Tutor - Iniciar Sesión</title>
-    <!-- **PASO 2: Usar la etiqueta static y el nombre correcto del archivo CSS** -->
     <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -16,8 +14,8 @@
             <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
             <span class="brand">Turing Tutor</span>
         </div>
-        <h2>Bienvenido de Nuevo</h2> <!-- Traducido -->
-        <p class="subtitle">Inicia sesión para continuar aprendiendo</p> <!-- Traducido -->
+        <h2>Bienvenido de Nuevo</h2> 
+        <p class="subtitle">Inicia sesión para continuar aprendiendo</p> 
 
         {% if form.errors and not form.non_field_errors %}
             <p style="color: red; text-align:left; margin-bottom:10px;">Tu nombre de usuario y contraseña no coinciden. Inténtalo de nuevo.</p>
@@ -28,14 +26,13 @@
             {% endfor %}
         {% endif %}
 
-        <!-- **PASO 3: Usar el formulario de Django** -->
-        <form method="post" action="{% url 'login' %}"> <!-- Asegúrate que 'login' es el name de tu URL de login -->
-            {% csrf_token %} <!-- **Importante para la seguridad** -->
+        <form method="post" action="{% url 'login' %}"> 
+            {% csrf_token %} 
 
             <label for="{{ form.username.id_for_label }}">Email o Nombre de Usuario</label>
             <div class="input-group">
-                <i class="fa-regular fa-user"></i> <!-- Cambiado a fa-user para username -->
-                {{ form.username }} <!-- Campo de usuario de Django -->
+                <i class="fa-regular fa-user"></i> 
+                {{ form.username }} 
             </div>
             {% if form.username.errors %}
                 {% for error in form.username.errors %}
@@ -47,7 +44,7 @@
             <label for="{{ form.password.id_for_label }}">Contraseña</label>
             <div class="input-group">
                 <i class="fa-solid fa-lock"></i>
-                {{ form.password }} <!-- Campo de contraseña de Django -->
+                {{ form.password }} 
                 <!-- El icono de ojo para mostrar/ocultar contraseña requeriría JavaScript -->
             </div>
             {% if form.password.errors %}
@@ -57,7 +54,7 @@
             {% endif %}
 
             <div class="options">
-                <span style="flex-grow: 1;"></span> <!-- Para empujar 'forgot password' a la derecha si no hay 'remember me' -->
+                <span style="flex-grow: 1;"></span> 
                 <a href="{% url 'password_reset' %}" class="forgot">¿Olvidaste tu contraseña?</a>
             </div>
 
@@ -67,7 +64,6 @@
 
         <div class="register-link">
             ¿No tienes una cuenta? <a href="{% url 'register' %}">Regístrate</a>
-            <!-- Asegúrate que 'registro' es el name de tu URL de registro -->
         </div>
     </div>
 

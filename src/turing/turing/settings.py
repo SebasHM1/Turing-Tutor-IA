@@ -39,7 +39,7 @@ STATICFILES_DIRS = [
 
 # Application global variables
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'chatbot:chatbot'
+LOGIN_REDIRECT_URL = 'users:redirect_after_login'
 LOGOUT_REDIRECT_URL = 'login'
 
 # Email settings
@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'users',
     'chatbot',
     'courses',
+    'teachers',
 ]
 
 MIDDLEWARE = [
