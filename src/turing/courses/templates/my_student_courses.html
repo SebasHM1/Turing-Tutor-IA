@@ -6,75 +6,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Materias</title>
-
-    <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/courses_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body>
-    <div class="main-chat">
-        <div class="chat-header">
-            <div class="avatar">
-                <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
-            </div>
-            <div class="bot-details">
-                <h2>Mis Materias (Estudiante)</h2>
-            </div>
-        </div>
+<body class="dashboard">
+    <div class="page">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="/chatbot/" class="brand-title brand-link">Turing</a>
+            <hr class="sidebar-divider">
+            <ul class="nav-links">
+                <li><a href="#"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a class="active" href="{% url 'courses:my_student_courses' %}">
+                        <i class="fa-solid fa-layer-group"></i> Mis Materias
+                    </a></li>
+                <li><a href="#"><i class="fa-regular fa-calendar"></i> Calendario</a></li>
+                <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
+                <li><a href="#"><i class="fa-regular fa-circle-question"></i> Centro de Ayuda</a></li>
+            </ul>
+        </aside>
 
-        <h3>Materias inscritas</h3>
-        {% if courses %}
-        <table class="course-table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Nivel</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in courses %}
-                <tr>
-                    <td>{{ c.name }}</td>
-                    <td>{{ c.level }}</td>
-                    <td>
-                        <a href="{% url 'courses:student_leave' c.id %}" class="btn btn-leave">Salir</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>Aún no estás inscrito en ninguna materia.</p>
-        {% endif %}
+        <!-- Columna principal -->
+        <main>
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="topbar-inner">
+                    <div class="search">
+                        <input type="text" placeholder="Buscar materias...">
+                    </div>
 
-        <h3 style="margin-top:30px;">Explora y únete a nuevas materias</h3>
-        {% if other_courses %}
-        <table class="course-table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Nivel</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in other_courses %}
-                <tr>
-                    <td>{{ c.name }}</td>
-                    <td>{{ c.level }}</td>
-                    <td>
-                        <a href="{% url 'courses:student_join' c.id %}" class="btn btn-join">Unirse</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>No hay materias disponibles por ahora.</p>
-        {% endif %}
+                    <!-- logout oculto -->
+                    <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
+                        {% csrf_token %}
+                    </form>
+
+                    <div class="topbar-user">
+                        <button type="button" class="btn btn-ghost small js-logout">
+                            <i class="fa-solid fa-right-from-bracket"></i> Salir
+                        </button>
+                        <i class="fa-regular fa-bell bell"></i>
+                        <span>{{ user.name }}</span>
+                        <div class="avatar-circle">
+                            {% if user.profile.avatar_url %}
+                            <img src="{{ user.profile.avatar_url }}" alt="Avatar">
+                            {% else %}
+                            <i class="fa-regular fa-user"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido -->
+            <div class="content">
+                <div class="container">
+                    <!-- Bienvenida -->
+                    <div class="welcome">
+                        <div class="welcome-head place-back">
+                            <button type="button" class="btn-back js-back" aria-label="Volver atrás">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <h1>Bienvenido, {{ user.name }}</h1>
+                        </div>
+                        <p class="welcome-sub">Gestiona tus materias y únete a nuevas clases desde aquí</p>
+                    </div>
+
+                    <!-- KPIs -->
+                    <div class="kpis">
+                        <div class="kpi card">
+                            <div class="icon"><i class="fa-solid fa-book-open"></i></div>
+                            <div>
+                                <div class="label">Materias inscritas</div>
+                                <div class="value">{{ courses|length }}</div>
+                            </div>
+                        </div>
+                        <div class="kpi card">
+                            <div class="icon"><i class="fa-solid fa-compass"></i></div>
+                            <div>
+                                <div class="label">Disponibles para unirse</div>
+                                <div class="value">{{ other_courses|length }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Materias inscritas -->
+                    <div class="header-row">
+                        <h2>Mis Materias</h2>
+                    </div>
+
+                    <div class="courses-grid">
+                        {% for c in courses %}
+                        <article class="course-card card">
+                            <div class="card-header">
+                                <h3>{{ c.name }}</h3>
+                                <button class="icon-button" type="button" title="Opciones">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                </button>
+                            </div>
+                            <div class="course-meta muted">Nivel: {{ c.level }}</div>
+                            {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
+                            <div class="course-actions">
+                                <a href="#" class="btn btn-secondary">Ver detalles</a>
+                                <a href="{% url 'courses:student_leave' c.id %}" class="btn btn-danger-soft">Salir</a>
+                            </div>
+                        </article>
+                        {% empty %}
+                        <p>No estás inscrito en ninguna materia.</p>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Explorar y unirse -->
+                    <div class="header-row" style="margin-top:18px">
+                        <h2>Explora y únete a nuevas materias</h2>
+                    </div>
+
+                    <div class="courses-grid">
+                        {% for c in other_courses %}
+                        <article class="course-card card">
+                            <div class="card-header">
+                                <h3>{{ c.name }}</h3>
+                                <button class="icon-button" type="button" title="Opciones">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                </button>
+                            </div>
+                            <div class="course-meta muted">Nivel: {{ c.level }}</div>
+                            {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
+                            <div class="course-actions">
+                                <a href="#" class="btn btn-outline">Ver detalles</a>
+                                <a href="{% url 'courses:student_join' c.id %}" class="btn btn-primary">
+                                    <i class="fa-solid fa-right-to-bracket"></i> Unirse
+                                </a>
+                            </div>
+                        </article>
+                        {% empty %}
+                        <p>No hay materias disponibles por ahora.</p>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
+        </main>
     </div>
+
+    <script src="{% static 'js/ui.js' %}"></script>
 </body>
 
 </html>
