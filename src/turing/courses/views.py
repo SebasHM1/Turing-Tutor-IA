@@ -1,8 +1,10 @@
 # courses/views.py
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib import messages
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, ListView, RedirectView, FormView
 from django.db.models import Count, Sum
+from django.shortcuts import get_object_or_404
 from django import forms
 
 from .models import Course, TeacherCourse, Enrollment
@@ -37,6 +39,7 @@ class MyCoursesView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
 
     def get_queryset(self):
         return (Course.objects
+                .select_related('owner')
                 .filter(teachers__teacher=self.request.user)
                 .annotate(students_count=Count('enrollments'))
                 .distinct())
@@ -65,7 +68,15 @@ class JoinByCodeTeacherView(LoginRequiredMixin, TeachersOnlyMixin, FormView):
         code = form.cleaned_data['code'].strip().upper()
         course = Course.objects.filter(code=code).first()
         if course:
-            TeacherCourse.objects.get_or_create(teacher=self.request.user, course=course)
+            _, created = TeacherCourse.objects.get_or_create(teacher=self.request.user, course=course)
+            if created:
+                messages.success(self.request, f"Te has unido exitosamente al curso '{course.name}'.")
+            else:
+                messages.info(self.request, f"Ya eras parte del curso '{course.name}'.")
+        else:
+            # Dar feedback si el código es inválido
+            messages.error(self.request, f"El código '{code}' no corresponde a ningún curso existente.")
+        
         return super().form_valid(form)
 
 class JoinCourseTeacherView(LoginRequiredMixin, TeachersOnlyMixin, RedirectView):
@@ -107,7 +118,7 @@ class JoinCourseStudentView(LoginRequiredMixin, StudentsOnlyMixin, RedirectView)
     pattern_name = 'courses:my_student_courses'
 
     def get_redirect_url(self, *args, **kwargs):
-        course = Course.objects.get(pk=kwargs['pk'])
+        course = get_object_or_404(Course, pk=kwargs['pk']) 
         Enrollment.objects.get_or_create(student=self.request.user, course=course)
         return reverse_lazy('courses:my_student_courses')
 
