@@ -117,7 +117,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['name', 'last_name', 'cedula', 'university_code', 'user_group']
 
     class Meta:
-        db_table = 'public.usuarios' # Le dice a Django que use esta tabla existente
+        db_table = 'usuarios' # Le dice a Django que use esta tabla existente
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
 
