@@ -47,6 +47,13 @@ class CustomUserCreationForm(DjangoUserCreationForm):
     # role = forms.ChoiceField(choices=UserRole.choices, initial=UserRole.STUDENT, label="Rol")
     # state = forms.ChoiceField(choices=UserState.choices, initial=UserState.ACTIVE, label="Estado")
 
+    def clean_cedula(self):
+        cedula = self.cleaned_data.get('cedula')
+        # Si la cédula es un CharField, la recibimos como string
+        if cedula:
+            # Elimina cualquier caracter que no sea un dígito
+            return ''.join(filter(str.isdigit, str(cedula)))
+        return cedula
 
     class Meta(DjangoUserCreationForm.Meta):
         model = CustomUser

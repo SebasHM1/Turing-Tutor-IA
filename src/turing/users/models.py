@@ -68,12 +68,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # No es necesario definir 'id = models.BigAutoField(primary_key=True)' aquí.
 
     # Campos de tu tabla 'public.usuarios'
-    cedula = models.BigIntegerField(unique=True, help_text="Cédula de identidad del usuario (única).")
-    name = models.TextField()
-    last_name = models.TextField()
-    email = models.EmailField(unique=True, help_text="Dirección de correo electrónico (única).")
-    university_code = models.TextField(unique=True, help_text="Código universitario (único).")
-    
+    cedula = models.CharField(max_length=20, unique=True, help_text="Cédula de identidad del usuario (única).")
+    # en models.py
+    name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    university_code = models.CharField(max_length=50, unique=True, help_text="...")
+    user_group = models.CharField(max_length=50, db_column='group', help_text="...")
+
     # Mapeo de la columna 'group' de la BD al campo 'user_group' en el modelo
     user_group = models.TextField(db_column='group', help_text="Grupo de clase del usuario.")
 
