@@ -13,7 +13,8 @@ urlpatterns = [
                 redirect_authenticated_user=True
             ), name='login'),
 
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    # TODO - Queda definida la url de logout pero falta la vista
+    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
 
     # URL para el Dashboard
     path('chatbot/', include('chatbot.urls')), # <-- INCLUYE LAS URLS DE CHATBOT AQUÍ
@@ -36,11 +37,8 @@ urlpatterns = [
 
     path('courses/', include('courses.urls')),
 
-    # INCLUYE LAS URLS DE LA NUEVA APP DE PROFESORES
     path('teachers/', include('teachers.urls')),
 
-    # INCLUYE LA URL DE REDIRECCIÓN DE LA APP USERS
     path('users/', include('users.urls')),
 
-    #path('users/', include('django.contrib.auth.urls')), <--- También puedes eliminar esto si has definido login, logout, etc. explícitamente
 ]
