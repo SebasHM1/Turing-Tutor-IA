@@ -19,10 +19,6 @@ urlpatterns = [
     # URL para el Dashboard
     path('chatbot/', include('chatbot.urls')), # <-- INCLUYE LAS URLS DE CHATBOT AQUÍ
 
-    # URL para el Registro
-    path('register/', user_views.register_view, name='register'), # <--- NUEVA URL DE REGISTRO
-
-
     #URLS A IMPLEMENTAR CON RESETEO DE CONTRASENA
     path('password_reset/', auth_views.PasswordResetView.as_view(
         template_name='password_reset/form.html', 
