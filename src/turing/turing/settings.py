@@ -153,5 +153,14 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# tutor_inteligente/turing/settings.py
 AUTH_USER_MODEL = 'users.CustomUser' # 'nombre_app.NombreModelo'
+
+# CAMBIAR PARA LA DURACION DE LA SESIÓN
+SESSION_COOKIE_AGE = 300
+
+# Si quieres que la sesión expire cuando el usuario cierra el navegador.
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# El contador de SESSION_COOKIE_AGE se reinicia con cada petición.
+SESSION_SAVE_EVERY_REQUEST = True
