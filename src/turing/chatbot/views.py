@@ -5,6 +5,7 @@ from .models import ChatSession, ChatMessage
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from datetime import datetime
+from users.decorators import student_required
 
 
 import google.generativeai as genai
@@ -28,7 +29,7 @@ def chatbot_view(request, session_id=None):
         'current_session': session
     })
 
-@csrf_exempt
+@student_required
 @login_required
 def send_message(request):
     if request.method == 'POST':
@@ -55,11 +56,13 @@ def send_message(request):
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+@student_required
 @login_required
 def create_session(request):
     session = ChatSession.objects.create(user=request.user, name=f"Chat {datetime.now().strftime('%H:%M')}")
     return redirect('chatbot:chat_detail', session.id)
 
+@student_required
 @login_required
 def delete_session(request, session_id):
     try:

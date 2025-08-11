@@ -5,21 +5,19 @@ from django.contrib.auth import views as auth_views
 from users import views as user_views # <--- IMPORTANTE: Importa tus vistas de la app 'users'
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # URL para el panel de administración - TODO: Cambia la URL si es necesario
+    path('gestion-secreta-del-sitio/', admin.site.urls),
 
     path('', auth_views.LoginView.as_view(
                 template_name='registration/login.html',
-                redirect_authenticated_user=False
+                redirect_authenticated_user=True
             ), name='login'),
 
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    # TODO - Queda definida la url de logout pero falta la vista
+    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
 
     # URL para el Dashboard
     path('chatbot/', include('chatbot.urls')), # <-- INCLUYE LAS URLS DE CHATBOT AQUÍ
-
-    # URL para el Registro
-    path('register/', user_views.register_view, name='register'), # <--- NUEVA URL DE REGISTRO
-
 
     #URLS A IMPLEMENTAR CON RESETEO DE CONTRASENA
     path('password_reset/', auth_views.PasswordResetView.as_view(
@@ -33,13 +31,10 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset/confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset/complete.html'), name='password_reset_complete'),
 
-    path('courses/', include('courses.urls', namespace='courses')),
+    path('courses/', include('courses.urls')),
 
-    # INCLUYE LAS URLS DE LA NUEVA APP DE PROFESORES
-    path('teachers/', include('teachers.urls', namespace='teachers')),
+    path('teachers/', include('teachers.urls')),
 
-    # INCLUYE LA URL DE REDIRECCIÓN DE LA APP USERS
-    path('users/', include('users.urls', namespace='users')),
+    path('users/', include('users.urls')),
 
-    #path('users/', include('django.contrib.auth.urls')), <--- También puedes eliminar esto si has definido login, logout, etc. explícitamente
 ]

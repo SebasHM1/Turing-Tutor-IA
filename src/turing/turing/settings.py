@@ -18,24 +18,23 @@ load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = str(BASE_DIR / 'staticfiles')
+
+STATICFILES_DIRS = [
+    str(BASE_DIR / 'static'), # BASE_DIR apunta a la raíz de tu proyecto
+]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-d&p7ql89duq!-n91uhlq&nwo@r^mo*o4p3o6_&#xx(r*0j*pnt'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'), # BASE_DIR apunta a la raíz de tu proyecto
-]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # Application global variables
 LOGIN_URL = 'login'
@@ -96,7 +95,7 @@ ROOT_URLCONF = 'turing.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -148,12 +147,20 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# tutor_inteligente/turing/settings.py
 AUTH_USER_MODEL = 'users.CustomUser' # 'nombre_app.NombreModelo'
+
+# CAMBIAR PARA LA DURACION DE LA SESIÓN
+SESSION_COOKIE_AGE = 300
+
+# Si quieres que la sesión expire cuando el usuario cierra el navegador.
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# El contador de SESSION_COOKIE_AGE se reinicia con cada petición.
+SESSION_SAVE_EVERY_REQUEST = True
