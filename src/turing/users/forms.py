@@ -47,7 +47,7 @@ class CustomUserCreationForm(DjangoUserCreationForm):
 
     class Meta(DjangoUserCreationForm.Meta):
         model = CustomUser
-        fields = ('name', 'last_name', 'cedula', 'university_code', 'user_group')
+        fields = ('email', 'name', 'last_name', 'cedula', 'university_code', 'user_group')
 
 class CustomPasswordResetForm(PasswordResetForm):
     email = forms.EmailField(
