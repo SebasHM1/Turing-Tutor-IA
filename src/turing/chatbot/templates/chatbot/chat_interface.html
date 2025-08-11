@@ -112,6 +112,7 @@
 
     <script>
 
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
         function showTypingEffect(container, text, speed = 30) {
             let index = 0;
@@ -144,7 +145,7 @@
             // Fetch bot response
             const response = await fetch("{% url 'chatbot:send_message' %}", {
                 method: "POST",
-                headers: { "X-CSRFToken": "{{ csrf_token }}" },
+                headers: { "X-CSRFToken": csrfToken  },
                 body: new URLSearchParams({ 
                     message: message,
                     session_id: "{{ current_session.id }}"
