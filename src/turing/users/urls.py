@@ -2,7 +2,7 @@ from django.urls import path
 from . import views 
 from .views import register_view, redirect_after_login
 
-app_name = 'usuarios' 
+app_name = 'users' 
 
 urlpatterns = [
 

@@ -1,19 +1,16 @@
-# tutor_inteligente/users/models.py
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 
-# Definición de los ENUMs como TextChoices para Django
 class UserRole(models.TextChoices):
-    STUDENT = 'Student', 'Estudiante' # El segundo valor es el 'human-readable'
+    STUDENT = 'Student', 'Estudiante' 
     TEACHER = 'Teacher', 'Profesor'
 
 class UserState(models.TextChoices):
     ACTIVE = 'ACTIVE', 'Activo'
     INACTIVE = 'INACTIVE', 'Inactivo'
 
-# Manager para el modelo de Usuario Personalizado
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         """
@@ -28,7 +25,6 @@ class CustomUserManager(BaseUserManager):
         # se proporcionen o lanzar un error.
         required_db_fields = ['name', 'last_name', 'cedula', 'university_code', 'user_group']
         for field_name in required_db_fields:
-            # 'user_group' es el nombre en el modelo, no 'group'
             model_field_name = field_name if field_name != 'group' else 'user_group'
             if model_field_name not in extra_fields or extra_fields[model_field_name] is None:
                 raise ValueError(f'El campo "{model_field_name}" es obligatorio para crear un usuario.')
@@ -64,18 +60,14 @@ class CustomUserManager(BaseUserManager):
 
 # Modelo de Usuario Personalizado
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    # Django usará automáticamente la columna 'id' (BIGSERIAL/SERIAL PK) de tu tabla.
-    # No es necesario definir 'id = models.BigAutoField(primary_key=True)' aquí.
-
     # Campos de tu tabla 'public.usuarios'
     cedula = models.CharField(max_length=20, unique=True, help_text="Cédula de identidad del usuario (única).")
-    # en models.py
     name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     university_code = models.CharField(max_length=50, unique=True, help_text="...")
     user_group = models.CharField(max_length=50, db_column='group', help_text="...")
+    email = models.EmailField(unique=True, help_text="Dirección de correo electrónico (única).")
 
-    # Mapeo de la columna 'group' de la BD al campo 'user_group' en el modelo
     user_group = models.TextField(db_column='group', help_text="Grupo de clase del usuario.")
 
     role = models.CharField(
@@ -126,12 +118,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def get_full_name(self):
-        # Un método comúnmente esperado
         return f"{self.name} {self.last_name}".strip()
 
     def get_short_name(self):
-        # Un método comúnmente esperado
         return self.name
-
-    # Los métodos has_perm y has_module_perms son proporcionados por PermissionsMixin
-    # si se usa el sistema de permisos estándar de Django.

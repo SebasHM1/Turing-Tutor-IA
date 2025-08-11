@@ -21,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = BASE_DIR, 'staticfiles'
+STATIC_ROOT = str(BASE_DIR / 'staticfiles')
 
 STATICFILES_DIRS = [
-    (BASE_DIR, 'static'), # BASE_DIR apunta a la raíz de tu proyecto
+    str(BASE_DIR / 'static'), # BASE_DIR apunta a la raíz de tu proyecto
 ]
 
 # Quick-start development settings - unsuitable for production
