@@ -1,6 +1,7 @@
-{% load static %} 
+{% load static %}
 <!DOCTYPE html>
-<html lang="es"> <!-- Cambiado a 'es' por consistencia, ajusta si es necesario -->
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,65 +9,64 @@
     <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <div class="login-container">
         <div class="logo-title">
             <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
             <span class="brand">Turing Tutor</span>
         </div>
-        <h2>Bienvenido de Nuevo</h2> 
-        <p class="subtitle">Inicia sesión para continuar aprendiendo</p> 
+        <h2>Bienvenido de Nuevo</h2>
+        <p class="subtitle">Inicia sesión para continuar aprendiendo</p>
 
         {% if form.errors and not form.non_field_errors %}
-            <p style="color: red; text-align:left; margin-bottom:10px;">Tu nombre de usuario y contraseña no coinciden. Inténtalo de nuevo.</p>
+        <p style="color: red; text-align:left; margin-bottom:10px;">Tu nombre de usuario y contraseña no coinciden.
+            Inténtalo de nuevo.</p>
         {% endif %}
         {% if form.non_field_errors %}
-            {% for error in form.non_field_errors %}
-                <p style="color: red; text-align:left; margin-bottom:10px;">{{ error }}</p>
-            {% endfor %}
+        {% for error in form.non_field_errors %}
+        <p style="color: red; text-align:left; margin-bottom:10px;">{{ error }}</p>
+        {% endfor %}
         {% endif %}
 
-        <form method="post" action="{% url 'login' %}"> 
-            {% csrf_token %} 
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
 
             <label for="{{ form.username.id_for_label }}">Email o Nombre de Usuario</label>
             <div class="input-group">
-                <i class="fa-regular fa-user"></i> 
-                {{ form.username }} 
+                <i class="fa-regular fa-user"></i>
+                {{ form.username }}
             </div>
             {% if form.username.errors %}
-                {% for error in form.username.errors %}
-                    <p style="color:red; font-size:0.8em; text-align:left;">{{ error }}</p>
-                {% endfor %}
+            {% for error in form.username.errors %}
+            <p style="color:red; font-size:0.8em; text-align:left;">{{ error }}</p>
+            {% endfor %}
             {% endif %}
-
 
             <label for="{{ form.password.id_for_label }}">Contraseña</label>
             <div class="input-group">
                 <i class="fa-solid fa-lock"></i>
-                {{ form.password }} 
-                <!-- El icono de ojo para mostrar/ocultar contraseña requeriría JavaScript -->
+                {{ form.password }}
             </div>
             {% if form.password.errors %}
-                {% for error in form.password.errors %}
-                    <p style="color:red; font-size:0.8em; text-align:left;">{{ error }}</p>
-                {% endfor %}
+            {% for error in form.password.errors %}
+            <p style="color:red; font-size:0.8em; text-align:left;">{{ error }}</p>
+            {% endfor %}
             {% endif %}
 
             <div class="options">
-                <span style="flex-grow: 1;"></span> 
+                <span style="flex-grow: 1;"></span>
                 <a href="{% url 'password_reset' %}" class="forgot">¿Olvidaste tu contraseña?</a>
             </div>
 
             <button type="submit" class="sign-in-btn">Iniciar Sesión</button>
-            <input type="hidden" name="next" value="{{ next }}"> 
+            <!-- Eliminado el input hidden de next para no forzar redirecciones previas -->
         </form>
 
         <div class="register-link">
             ¿No tienes una cuenta? <a href="{% url 'users:register' %}">Regístrate</a>
         </div>
     </div>
-
-
 </body>
+
 </html>
