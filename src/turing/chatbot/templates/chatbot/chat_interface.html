@@ -24,9 +24,11 @@
                 {% endif %}
             </div>
             <div class="user-details" style="margin-left: 40px;">
-                <h3>John Smith</h3>
+                <div class="brand-title"><a href="{% url 'courses:my_student_courses' %}" class="brand-link">Turing
+                        IA</a></div>
+                <h3>{{ user.get_full_name|default:user.email }}</h3>
                 <p>Student ID:</p>
-                <p class="student-id">123456789</p>
+                <p class="student-id">{{ user.university_code }}</p>
             </div>
         </div>
 
@@ -34,30 +36,41 @@
 
         <!-- Navigation -->
         <ul class="nav-links">
-
-            <!-- Chats -->
             <li>
-                <a href="{% url 'chatbot:chatbot' %}"><i class="fas fa-comment"></i> Chats</a>
+                {% if current_course %}
+                <a class="active" href="{% url 'chatbot:course_chat' current_course.id %}">
+                    <i class="fas fa-comment"></i> Chats
+                </a>
+                {% else %}
+                <a class="active" href="{% url 'chatbot:chatbot' %}">
+                    <i class="fas fa-comment"></i> Chats
+                </a>
+                {% endif %}
             </li>
 
-            <!-- Profile -->
             {% if user.is_staff or user.role == 'Teacher' %}
-            <li><a href="{% url 'courses:my_courses' %}"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="{% url 'courses:my_courses' %}"><i class="fas fa-user"></i> Perfil</a></li>
             {% elif user.role == 'Student' %}
-            <li><a href="{% url 'courses:my_student_courses' %}"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="{% url 'courses:my_student_courses' %}"><i class="fas fa-user"></i> Perfil</a></li>
             {% else %}
-            <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="#"><i class="fas fa-user"></i> Perfil</a></li>
             {% endif %}
 
-            <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
-            <li><a href="#"><i class="fas fa-question-circle"></i> Help Center</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Ajustes</a></li>
+            <li><a href="#"><i class="fas fa-question-circle"></i> Centro de ayuda</a></li>
         </ul>
 
         <hr class="sidebar-divider" style="margin: 20px 0;">
 
-        <!-- Recent Chats -->
+        <!-- Recent Chats-->
         <div class="recent-chats">
-            <h3>Recent Chats</h3>
+            <h3>
+                {% if current_course %}
+                Chats de {{ current_course.name }}
+                {% else %}
+                Chats recientes
+                {% endif %}
+            </h3>
             <ul>
                 {% for chat in recent_chats %}
                 <li>
@@ -73,10 +86,15 @@
                     </form>
                 </li>
                 {% empty %}
-                <li>No recent chats</li>
+                <li>No tienes chats recientes</li>
                 {% endfor %}
             </ul>
-            <a href="{% url 'chatbot:create_session' %}" class="btn">➕ New Chat</a>
+
+            {% if current_course %}
+            <a href="{% url 'chatbot:create_session_course' current_course.id %}" class="btn">Nuevo Chat</a>
+            {% else %}
+            <a href="{% url 'chatbot:create_session_course' current_session.course.id %}" class="btn">Nuevo Chat</a>
+            {% endif %}
         </div>
     </div>
 
@@ -89,7 +107,11 @@
             </div>
             <div class="bot-details" style="margin-left: 10px;">
                 <h2>Turing Tutor</h2>
-                <p>AI Learning Assistant</p>
+                {% if current_course %}
+                <p>AI Asistente de aprendizaje • {{ current_course.name }} ({{ current_course.code }})</p>
+                {% else %}
+                <p>AI Asistente de aprendizaje</p>
+                {% endif %}
             </div>
         </div>
 
@@ -104,75 +126,15 @@
         </div>
 
         <!-- Message Input Form -->
-        <form id="chat-form">
-            <input type="text" id="message-input" autocomplete="off" placeholder="Type your message..." required>
+        <form id="chat-form" data-send-url="{% url 'chatbot:send_message' %}"
+            data-session-id="{{ current_session.id }}">
+            {% csrf_token %}
+            <input type="text" id="message-input" autocomplete="off" placeholder="Escribe tu mensaje..." required>
             <button type="submit"><i class="fas fa-paper-plane"></i></button>
         </form>
+
+        <script src="{% static 'js/chatbot.js' %}"></script>
     </div>
-
-    <script>
-
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-        function showTypingEffect(container, text, speed = 30) {
-            let index = 0;
-            const interval = setInterval(() => {
-                if (index < text.length) {
-                    container.innerHTML += text.charAt(index);
-                    index++;
-                } else {
-                    clearInterval(interval);
-                }
-            }, speed);
-        }
-
-        document.getElementById('chat-form').onsubmit = async function (e) {
-            e.preventDefault();
-            const input = document.getElementById('message-input');
-            const message = input.value;
-            input.value = '';
-
-            // Append user message immediately
-            const chatLog = document.getElementById('chat-log');
-            const userDiv = document.createElement('div');
-            userDiv.className = 'user';
-            userDiv.innerHTML = `<strong>User:</strong> ${message} <small>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>`;
-            chatLog.appendChild(userDiv);
-
-            // Scroll to bottom
-            chatLog.scrollTop = chatLog.scrollHeight;
-
-            // Fetch bot response
-            const response = await fetch("{% url 'chatbot:send_message' %}", {
-                method: "POST",
-                headers: { "X-CSRFToken": csrfToken  },
-                body: new URLSearchParams({ 
-                    message: message,
-                    session_id: "{{ current_session.id }}"
-                })
-            });
-            const data = await response.json();
-
-            // Append bot message with typing effect
-            if (data.bot_message) {
-                const botDiv = document.createElement('div');
-                botDiv.className = 'bot';
-                botDiv.innerHTML = `<strong>Bot:</strong> <span class="bot-text"></span> <small>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>`;
-                chatLog.appendChild(botDiv);
-                showTypingEffect(botDiv.querySelector('.bot-text'), data.bot_message, 25);
-
-                // Scroll again
-                chatLog.scrollTop = chatLog.scrollHeight;
-            } else if (data.error) {
-                // Handle error case
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'bot error';
-                errorDiv.innerHTML = `<strong>Error:</strong> ${data.error} <small>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>`;
-                chatLog.appendChild(errorDiv);
-                chatLog.scrollTop = chatLog.scrollHeight;
-            }
-        };
-    </script>
 </body>
 
 </html>

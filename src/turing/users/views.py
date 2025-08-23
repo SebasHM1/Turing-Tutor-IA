@@ -1,9 +1,20 @@
+# users/views.py
 from django.shortcuts import render, redirect
-from django.contrib.auth import login 
-from django.contrib.auth.decorators import login_required 
-from .forms import CustomUserCreationForm 
-from .models import UserState 
-from .models import UserRole
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
+from django.urls import reverse_lazy
+from .forms import CustomUserCreationForm
+from .models import UserState, UserRole
+
+class TuringLoginView(LoginView):
+    template_name = 'registration/login.html'
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        user = self.request.user
+        if getattr(user, 'role', None) == UserRole.TEACHER:
+            return reverse_lazy('teachers:dashboard')
+        return reverse_lazy('courses:my_student_courses')
 
 def register_view(request):
     if request.method == 'POST':
@@ -16,17 +27,10 @@ def register_view(request):
             return redirect('login')
     else:
         form = CustomUserCreationForm()
-
     return render(request, 'registration/register.html', {'form': form})
-
 
 @login_required
 def redirect_after_login(request):
-    """
-    Redirige a los usuarios a su dashboard correspondiente
-    basado en su rol.
-    """
-    if request.user.role == UserRole.TEACHER:
-        return redirect('teachers:dashboard') 
-    elif request.user.role == UserRole.STUDENT:
-        return redirect('chatbot:chatbot') 
+    if getattr(request.user, 'role', None) == UserRole.TEACHER:
+        return redirect('teachers:dashboard')
+    return redirect('courses:my_student_courses')

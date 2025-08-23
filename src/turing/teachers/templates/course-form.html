@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Materia</title>
+    <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/courses_styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="login-container course-form-container">
+        <div class="logo-title">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+            <span class="brand">Crear Materia</span>
+        </div>
+
+        <h2>Nueva materia</h2>
+        <p class="subtitle">Completa el formulario y haz clic en Guardar</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label for="{{ form.name.id_for_label }}">Nombre</label>
+            <div class="input-group"><i class="fa-regular fa-bookmark"></i>{{ form.name }}</div>
+            {% for error in form.name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+
+            <label for="{{ form.description.id_for_label }}">Descripción</label>
+            <div class="input-group"><i class="fa-solid fa-align-left"></i>{{ form.description }}</div>
+            {% for error in form.description.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+
+            <label for="{{ form.level.id_for_label }}">Nivel</label>
+            <div class="input-group"><i class="fa-solid fa-layer-group"></i>{{ form.level }}</div>
+            {% for error in form.level.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+
+            {% if form.schedule %}
+            <label for="{{ form.schedule.id_for_label }}">Horario</label>
+            <div class="input-group"><i class="fa-regular fa-clock"></i>{{ form.schedule }}</div>
+            {% for error in form.schedule.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            {% endif %}
+
+            <button type="submit" class="sign-in-btn mt-14">Guardar</button>
+        </form>
+
+        <div class="register-link">
+            <a href="{% url 'teachers:dashboard' %}">← Volver a mis materias</a>
+        </div>
+
+    </div>
+</body>
+
+</html>
