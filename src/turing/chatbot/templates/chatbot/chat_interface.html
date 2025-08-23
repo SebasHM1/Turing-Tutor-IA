@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-</head>
 
 <body>
     <!-- Sidebar -->
@@ -25,7 +24,8 @@
                 {% endif %}
             </div>
             <div class="user-details" style="margin-left: 40px;">
-                <div class="brand-title"><a href="{% url 'chatbot:chatbot' %}" class="brand-link">Turing IA</a></div>
+                <div class="brand-title"><a href="{% url 'courses:my_student_courses' %}" class="brand-link">Turing
+                        IA</a></div>
                 <h3>{{ user.get_full_name|default:user.email }}</h3>
                 <p>Student ID:</p>
                 <p class="student-id">{{ user.university_code }}</p>
@@ -36,13 +36,18 @@
 
         <!-- Navigation -->
         <ul class="nav-links">
-
-            <!-- Chats -->
             <li>
-                <a href="{% url 'chatbot:chatbot' %}"><i class="fas fa-comment"></i> Chats</a>
+                {% if current_course %}
+                <a class="active" href="{% url 'chatbot:course_chat' current_course.id %}">
+                    <i class="fas fa-comment"></i> Chats
+                </a>
+                {% else %}
+                <a class="active" href="{% url 'chatbot:chatbot' %}">
+                    <i class="fas fa-comment"></i> Chats
+                </a>
+                {% endif %}
             </li>
 
-            <!-- Profile -->
             {% if user.is_staff or user.role == 'Teacher' %}
             <li><a href="{% url 'courses:my_courses' %}"><i class="fas fa-user"></i> Perfil</a></li>
             {% elif user.role == 'Student' %}
@@ -57,9 +62,15 @@
 
         <hr class="sidebar-divider" style="margin: 20px 0;">
 
-        <!-- Recent Chats -->
+        <!-- Recent Chats-->
         <div class="recent-chats">
-            <h3>Chats recientes</h3>
+            <h3>
+                {% if current_course %}
+                Chats de {{ current_course.name }}
+                {% else %}
+                Chats recientes
+                {% endif %}
+            </h3>
             <ul>
                 {% for chat in recent_chats %}
                 <li>
@@ -78,7 +89,12 @@
                 <li>No tienes chats recientes</li>
                 {% endfor %}
             </ul>
-            <a href="{% url 'chatbot:create_session' %}" class="btn">➕ Nuevo Chat</a>
+
+            {% if current_course %}
+            <a href="{% url 'chatbot:create_session_course' current_course.id %}" class="btn">Nuevo Chat</a>
+            {% else %}
+            <a href="{% url 'chatbot:create_session_course' current_session.course.id %}" class="btn">Nuevo Chat</a>
+            {% endif %}
         </div>
     </div>
 
@@ -91,7 +107,11 @@
             </div>
             <div class="bot-details" style="margin-left: 10px;">
                 <h2>Turing Tutor</h2>
+                {% if current_course %}
+                <p>AI Asistente de aprendizaje • {{ current_course.name }} ({{ current_course.code }})</p>
+                {% else %}
                 <p>AI Asistente de aprendizaje</p>
+                {% endif %}
             </div>
         </div>
 
@@ -106,12 +126,14 @@
         </div>
 
         <!-- Message Input Form -->
-        <form id="chat-form">
-            <input type="text" id="message-input" autocomplete="off" placeholder="Type your message..." required>
+        <form id="chat-form" data-send-url="{% url 'chatbot:send_message' %}"
+            data-session-id="{{ current_session.id }}">
+            {% csrf_token %}
+            <input type="text" id="message-input" autocomplete="off" placeholder="Escribe tu mensaje..." required>
             <button type="submit"><i class="fas fa-paper-plane"></i></button>
         </form>
-        <script src="{% static 'js/chatbot.js' %}"></script>
 
+        <script src="{% static 'js/chatbot.js' %}"></script>
     </div>
 </body>
 

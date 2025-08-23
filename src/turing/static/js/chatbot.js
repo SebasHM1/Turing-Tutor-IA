@@ -7,7 +7,6 @@
     const sendUrl = form.dataset.sendUrl || '';
     const sessionId = form.dataset.sessionId || '';
 
-    // CSRF seguro, toma del input si existe o del cookie si no
     const getCookie = name => {
         const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
         return m ? m.pop() : '';
@@ -33,7 +32,6 @@
         if (!message) return;
         input.value = '';
 
-        // Agrega el mensaje del usuario
         const userDiv = document.createElement('div');
         userDiv.className = 'user';
         userDiv.innerHTML = `<strong>User:</strong> ${message} <small>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>`;

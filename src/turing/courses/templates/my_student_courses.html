@@ -12,7 +12,6 @@
 
 <body class="dashboard">
     <div class="page">
-        <!-- Sidebar -->
         <aside class="sidebar">
             <a href="/chatbot/" class="brand-title brand-link">Turing</a>
             <hr class="sidebar-divider">
@@ -27,20 +26,15 @@
             </ul>
         </aside>
 
-        <!-- Columna principal -->
         <main>
-            <!-- Topbar -->
             <div class="topbar">
                 <div class="topbar-inner">
                     <div class="search">
                         <input type="text" placeholder="Buscar materias...">
                     </div>
-
-                    <!-- logout oculto -->
                     <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
                         {% csrf_token %}
                     </form>
-
                     <div class="topbar-user">
                         <button type="button" class="btn btn-ghost small js-logout">
                             <i class="fa-solid fa-right-from-bracket"></i> Salir
@@ -58,10 +52,8 @@
                 </div>
             </div>
 
-            <!-- Contenido -->
             <div class="content">
                 <div class="container">
-                    <!-- Bienvenida -->
                     <div class="welcome">
                         <div class="welcome-head place-back">
                             <button type="button" class="btn-back js-back" aria-label="Volver atrás">
@@ -72,7 +64,6 @@
                         <p class="welcome-sub">Gestiona tus materias y únete a nuevas clases desde aquí</p>
                     </div>
 
-                    <!-- KPIs -->
                     <div class="kpis">
                         <div class="kpi card">
                             <div class="icon"><i class="fa-solid fa-book-open"></i></div>
@@ -90,7 +81,6 @@
                         </div>
                     </div>
 
-                    <!-- Materias inscritas -->
                     <div class="header-row">
                         <h2>Mis Materias</h2>
                     </div>
@@ -108,6 +98,7 @@
                             {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
                             <div class="course-actions">
                                 <a href="#" class="btn btn-secondary">Ver detalles</a>
+                                <a href="{% url 'chatbot:course_chat' c.id %}" class="btn btn-primary">Abrir chat</a>
                                 <a href="{% url 'courses:student_leave' c.id %}" class="btn btn-danger-soft">Salir</a>
                             </div>
                         </article>
@@ -116,7 +107,6 @@
                         {% endfor %}
                     </div>
 
-                    <!-- Explorar y unirse -->
                     <div class="header-row" style="margin-top:18px">
                         <h2>Explora y únete a nuevas materias</h2>
                     </div>

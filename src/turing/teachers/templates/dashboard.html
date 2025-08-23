@@ -13,33 +13,25 @@
 
 <body class="dashboard">
     <div class="page">
-        <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="brand-title">Turing</div>
-
+            <div class="brand-title"><a href="/chatbot/" class="brand-link">Turing</a></div>
             <hr class="sidebar-divider">
-
             <ul class="nav-links">
-                <li><a href="#"><i class="fa-solid fa-house"></i> Dashboard</a></li>
-
-                <li><a class="active" href="{% url 'courses:my_courses' %}"><i class="fa-solid fa-layer-group"></i> Mis
-                        Cursos</a></li>
+                <li><a class="active" href="{% url 'teachers:dashboard' %}"><i class="fa-solid fa-house"></i>
+                        Dashboard</a></li>
                 <li><a href="#"><i class="fa-regular fa-calendar"></i> Calendario</a></li>
                 <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
                 <li><a href="#"><i class="fa-regular fa-circle-question"></i> Centro de Ayuda</a></li>
             </ul>
         </aside>
 
-        <!-- Columna principal -->
         <main>
-            <!-- Topbar -->
             <div class="topbar">
                 <div class="topbar-inner">
                     <div class="search">
                         <input type="text" placeholder="Buscar cursos...">
                     </div>
 
-                    <!-- Form de logout escondido -->
                     <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
                         {% csrf_token %}
                     </form>
@@ -48,8 +40,6 @@
                         <button type="button" class="btn btn-ghost small js-logout">
                             <i class="fa-solid fa-right-from-bracket"></i> Salir
                         </button>
-
-
                         <i class="fa-regular fa-bell bell"></i>
                         <span>Prof. {{ user.last_name }}</span>
                         <div class="avatar-circle">
@@ -63,10 +53,6 @@
                 </div>
             </div>
 
-
-
-
-            <!-- Contenido -->
             <div class="content">
                 <div class="container">
                     <div class="welcome">
@@ -76,14 +62,9 @@
                             </button>
                             <h1>Bienvenido, Prof. {{ user.last_name }}</h1>
                         </div>
-
                         <p class="welcome-sub">Gestiona tus cursos y clases desde aquí</p>
                     </div>
 
-
-
-
-                    <!-- KPIs -->
                     <div class="kpis">
                         <div class="kpi card">
                             <div class="icon"><i class="fa-solid fa-book-open"></i></div>
@@ -92,7 +73,6 @@
                                 <div class="value">{{ active_courses }}</div>
                             </div>
                         </div>
-
                         <div class="kpi card">
                             <div class="icon"><i class="fa-solid fa-user-group"></i></div>
                             <div>
@@ -110,15 +90,13 @@
                         </div>
                     </div>
 
-                    <!-- Encabezado sección y CTA -->
                     <div class="header-row">
                         <h2>Mis Cursos</h2>
-                        <a href="{% url 'courses:create' %}" class="btn btn-primary">
+                        <a href="{% url 'teachers:create' %}" class="btn btn-primary">
                             <i class="fa-solid fa-plus"></i> Crear Nuevo Curso
                         </a>
                     </div>
 
-                    <!-- Grid de cursos -->
                     <div class="courses-grid">
                         {% for c in courses %}
                         <article class="course-card card">
@@ -136,7 +114,8 @@
 
                             <div class="course-actions">
                                 <a href="#" class="btn btn-secondary">Ver detalles</a>
-                                <a href="{% url 'courses:leave' c.id %}" class="btn btn-danger-soft">Salir del curso</a>
+                                <a href="{% url 'teachers:leave' c.id %}" class="btn btn-danger-soft">Salir del
+                                    curso</a>
                             </div>
                         </article>
                         {% empty %}
@@ -146,7 +125,7 @@
 
                     <div class="join-card card">
                         <h2 class="section-title">Unirse a un Curso</h2>
-                        <form class="join-inline" method="post" action="{% url 'courses:join_by_code' %}">
+                        <form class="join-inline" method="post" action="{% url 'teachers:join_by_code' %}">
                             {% csrf_token %}
                             <input type="text" name="code" placeholder="Ingresa el código del curso" autocomplete="off">
                             <button class="btn btn-primary" type="submit">
@@ -160,7 +139,6 @@
         </main>
     </div>
     <script src="{% static 'js/ui.js' %}"></script>
-
 </body>
 
 </html>

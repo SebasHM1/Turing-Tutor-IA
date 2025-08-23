@@ -6,15 +6,14 @@ class ChatSession(models.Model):
     course = models.ForeignKey(
         'courses.Course',
         on_delete=models.CASCADE,
-        null=True,      # ← permite NULL por ahora
+        null=True,
         blank=True
     )
     name = models.CharField(max_length=255, default='New Chat')
     created_at = models.DateTimeField(auto_now_add=True)
 
-
 class ChatMessage(models.Model):
     session = models.ForeignKey(ChatSession, on_delete=models.CASCADE, related_name='messages')
-    sender = models.CharField(max_length=20)  # 'user' o 'bot'
+    sender = models.CharField(max_length=20)
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
