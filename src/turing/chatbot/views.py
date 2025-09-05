@@ -9,12 +9,15 @@ from users.decorators import student_required
 from .models import ChatSession, ChatMessage
 from courses.models import Enrollment, Course
 
-import google.generativeai as genai
+
+import os
+import json
+from openai import OpenAI
 
 import markdown
 from markdown.extensions import codehilite
 
-genai.configure(api_key=settings.GEMINI_API_KEY)
+
 
 
 @login_required
@@ -84,26 +87,35 @@ def send_message(request):
             session = ChatSession.objects.select_related('course').get(id=session_id, user=request.user)
             ChatMessage.objects.create(session=session, sender='user', message=user_message)
 
+
             try:
-                model = genai.GenerativeModel('gemini-2.0-flash')
+                # Configura la API Key de OpenAI
+                os.environ['OPENAI_API_KEY'] = getattr(settings, 'OPENAI_API_KEY', None) or os.getenv('OPENAI_API_KEY')
+                client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-                #Conversation memory
+                # Memoria de conversación
                 context = get_chat_context(session, limit=5)
+                full_prompt = f"{context}{user_message}"
 
-                #Combine context
-                full_prompt  = f"{context}{user_message}"
+                completion = client.chat.completions.create(
+                    model="gpt-4o-mini",  # Puedes cambiar el modelo si lo deseas
+                    messages=[
+                        {"role": "system", "content": "Eres un asistente de IA útil para estudiantes universitarios."},
+                        {"role": "user", "content": full_prompt}
+                    ]
+                )
 
-                response = model.generate_content(full_prompt)
-                bot_message = response.text
+                data = json.loads(completion.model_dump_json())
+                bot_message = data['choices'][0]['message']['content']
 
-                # Process markdown to HTML with syntax highlighting
+                # Procesar markdown a HTML con resaltado de sintaxis
                 md = markdown.Markdown(extensions=[
                     'codehilite',
                     'fenced_code'
                 ])
                 bot_message = md.convert(bot_message)
             except Exception as e:
-                print(f"Error with Gemini API: {e}")
+                print(f"Error with OpenAI API: {e}")
                 bot_message = "Sorry, there was an error with the AI service."
 
             ChatMessage.objects.create(session=session, sender='bot', message=bot_message)
@@ -145,18 +157,16 @@ def delete_session(request, session_id):
     return redirect('chatbot:chatbot')
 
 
-def get_chat_context(session, limit):
+def get_chat_context(session, limit=5):
     """
-    Get recent user messages for context (simpler approach)
+    Devuelve los últimos mensajes en formato messages para OpenAI
     """
-    recent_user_messages = ChatMessage.objects.filter(
-        session=session,
-        sender='user'
+    recent_messages = ChatMessage.objects.filter(
+        session=session
     ).order_by('-timestamp')[:limit]
-    
-    if not recent_user_messages:
-        return ""
-    
-    recent_user_messages = reversed(recent_user_messages)
-    user_context = "Previous chat history: " + " | ".join([msg.message for msg in recent_user_messages])
-    return user_context + "\n\nNew question: "
+
+    messages = []
+    for msg in reversed(recent_messages):
+        role = 'assistant' if msg.sender == 'bot' else 'user'
+        messages.append({"role": role, "content": msg.message})
+    return messages
