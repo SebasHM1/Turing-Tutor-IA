@@ -10,6 +10,10 @@ from .models import ChatSession, ChatMessage
 from courses.models import Enrollment, Course
 
 import google.generativeai as genai
+
+import markdown
+from markdown.extensions import codehilite
+
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
 
@@ -69,7 +73,6 @@ def chatbot_view(request, session_id=None, course_id=None):
         'current_course': course,
     })
 
-
 @student_required
 @login_required
 def send_message(request):
@@ -77,15 +80,30 @@ def send_message(request):
         try:
             user_message = request.POST.get('message') or ''
             session_id = request.POST.get('session_id')
-            session = ChatSession.objects.select_related('course').get(id=session_id, user=request.user)
 
+            session = ChatSession.objects.select_related('course').get(id=session_id, user=request.user)
             ChatMessage.objects.create(session=session, sender='user', message=user_message)
 
             try:
                 model = genai.GenerativeModel('gemini-2.0-flash')
-                response = model.generate_content(user_message)
+
+                #Conversation memory
+                context = get_chat_context(session, limit=5)
+
+                #Combine context
+                full_prompt  = f"{context}{user_message}"
+
+                response = model.generate_content(full_prompt)
                 bot_message = response.text
-            except Exception:
+
+                # Process markdown to HTML with syntax highlighting
+                md = markdown.Markdown(extensions=[
+                    'codehilite',
+                    'fenced_code'
+                ])
+                bot_message = md.convert(bot_message)
+            except Exception as e:
+                print(f"Error with Gemini API: {e}")
                 bot_message = "Sorry, there was an error with the AI service."
 
             ChatMessage.objects.create(session=session, sender='bot', message=bot_message)
@@ -125,3 +143,20 @@ def delete_session(request, session_id):
     except ChatSession.DoesNotExist:
         pass
     return redirect('chatbot:chatbot')
+
+
+def get_chat_context(session, limit):
+    """
+    Get recent user messages for context (simpler approach)
+    """
+    recent_user_messages = ChatMessage.objects.filter(
+        session=session,
+        sender='user'
+    ).order_by('-timestamp')[:limit]
+    
+    if not recent_user_messages:
+        return ""
+    
+    recent_user_messages = reversed(recent_user_messages)
+    user_context = "Previous chat history: " + " | ".join([msg.message for msg in recent_user_messages])
+    return user_context + "\n\nNew question: "
