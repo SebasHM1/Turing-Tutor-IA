@@ -2,9 +2,13 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, Sum
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, ListView, RedirectView, FormView
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import CreateView, ListView, RedirectView, FormView, UpdateView
 from courses.models import Course, TeacherCourse
 from courses.forms import CourseForm, JoinByCodeTeacherForm
+from .models import PromptConfig
+from .forms import PromptForm
+
 
 class TeachersOnlyMixin(UserPassesTestMixin):
     def test_func(self):
@@ -75,3 +79,20 @@ class LeaveCourseTeacherView(LoginRequiredMixin, TeachersOnlyMixin, RedirectView
     def get_redirect_url(self, *args, **kwargs):
         TeacherCourse.objects.filter(teacher=self.request.user, course_id=kwargs['pk']).delete()
         return reverse_lazy('teachers:dashboard')
+
+class PromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
+    model = PromptConfig
+    form_class = PromptForm
+    template_name = 'prompt_edit.html'
+    success_url = reverse_lazy('teachers:prompt_edit')
+
+    def get_object(self, queryset=None):
+        obj, _ = PromptConfig.objects.get_or_create(key="global")
+        return obj
+
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.updated_by = self.request.user
+        obj.save()
+        messages.success(self.request, _("¡Prompt actualizado!"))
+        return super().form_valid(form)
