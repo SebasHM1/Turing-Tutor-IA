@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>Prompt del profesor</title>
+    <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+
+<body class="dashboard">
+    <div class="page">
+        <aside class="sidebar">
+            <div class="brand-title"><a href="/chatbot/" class="brand-link">Turing</a></div>
+            <hr class="sidebar-divider">
+            <ul class="nav-links">
+                <li><a href="{% url 'teachers:dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a class="active" href="{% url 'teachers:prompt_edit' %}"><i
+                            class="fa-solid fa-wand-magic-sparkles"></i> Prompt del profesor</a></li>
+            </ul>
+        </aside>
+
+        <main>
+            <div class="topbar">
+                <div class="topbar-inner">
+                    <div></div>
+                    <div class="topbar-user">
+                        <span>Prof. {{ user.last_name }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="container">
+                    <div class="header-row">
+                        <h1>Prompt del profesor</h1>
+                        <a href="{% url 'teachers:dashboard' %}" class="btn btn-secondary">← Volver</a>
+                    </div>
+
+                    {% if messages %}
+                    {% for m in messages %}
+                    <div class="alert success">{{ m }}</div>
+                    {% endfor %}
+                    {% endif %}
+
+
+                    <form method="post" class="card" style="padding:16px;">
+                        {% csrf_token %}
+                        <label for="{{ form.content.id_for_label }}" class="label">System Prompt (compartido)</label>
+                        {{ form.content }}
+                        <div style="margin-top:12px; display:flex; gap:8px;">
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                            <a class="btn btn-ghost" href="{% url 'teachers:dashboard' %}">Cancelar</a>
+                        </div>
+                    </form>
+
+                    {% if object and object.updated_at %}
+                    <p class="muted" style="margin-top:8px;">
+                        Última actualización: {{ object.updated_at|date:"Y-m-d H:i" }}
+                        {% if object.updated_by %}
+                        por {{ object.updated_by.get_full_name|default:object.updated_by.email }}
+                        {% endif %}
+                    </p>
+                    {% endif %}
+
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
