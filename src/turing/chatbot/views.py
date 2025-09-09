@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from users.decorators import student_required
 from .models import ChatSession, ChatMessage
 from courses.models import Enrollment, Course
+from teachers.models import PromptConfig 
 
 import google.generativeai as genai
 genai.configure(api_key=settings.GEMINI_API_KEY)
@@ -78,11 +79,14 @@ def send_message(request):
             user_message = request.POST.get('message') or ''
             session_id = request.POST.get('session_id')
             session = ChatSession.objects.select_related('course').get(id=session_id, user=request.user)
-
             ChatMessage.objects.create(session=session, sender='user', message=user_message)
 
             try:
-                model = genai.GenerativeModel('gemini-2.0-flash')
+                system_prompt = _get_system_prompt()
+                model = genai.GenerativeModel(
+                    'gemini-2.0-flash',
+                    system_instruction=system_prompt 
+                )
                 response = model.generate_content(user_message)
                 bot_message = response.text
             except Exception:
@@ -125,3 +129,7 @@ def delete_session(request, session_id):
     except ChatSession.DoesNotExist:
         pass
     return redirect('chatbot:chatbot')
+
+def _get_system_prompt() -> str:
+    cfg = PromptConfig.objects.filter(key="global").first()
+    return (cfg.content or "").strip() or "Eres un tutor académico claro, paciente y preciso."
