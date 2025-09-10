@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Curso</title>
+    <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard">
+    <div class="page">
+        {% include '_sidebar_course.html' with course=course active_page='course_detail' %}
+        <main>
+            <div class="topbar">
+                <div class="topbar-inner">
+                    <div></div>
+                    <div class="topbar-user">
+                        <span>Prof. {{ user.last_name }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="container">
+                    <div class="header-row">
+                        <h1>Detalles del curso: {{ course.name }}</h1>
+                        <a href="{% url 'teachers:dashboard' %}" class="btn btn-secondary">← Volver</a>
+                    </div>
+                    <div class="card" style="padding:16px;">
+                        <p><strong>Nombre:</strong> {{ course.name }}</p>
+                        <p><strong>Descripción:</strong> {{ course.description }}</p>
+                        <p><strong>Nivel:</strong> {{ course.level }}</p>
+                        <p><strong>Horario:</strong> {{ course.schedule }}</p>
+                        <p><strong>Código:</strong> {{ course.code }}</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

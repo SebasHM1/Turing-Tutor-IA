@@ -85,3 +85,21 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return f'{self.student.email} ↔ {self.course.name}'
+
+class CoursePrompt(models.Model):
+    course = models.OneToOneField(Course, on_delete=models.CASCADE, related_name='prompt')
+    content = models.TextField("Prompt del profesor", default="", blank=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="updated_course_prompts"
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Prompt de Curso"
+        verbose_name_plural = "Prompts de Curso"
+
+    def __str__(self):
+        return f"Prompt de {self.course.name} (actualizado {self.updated_at:%Y-%m-%d %H:%M})"
