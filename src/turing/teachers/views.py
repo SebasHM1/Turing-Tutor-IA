@@ -48,9 +48,6 @@ class CourseCreateView(LoginRequiredMixin, TeachersOnlyMixin, CreateView):
         form.instance.owner = self.request.user
         response = super().form_valid(form)
         TeacherCourse.objects.get_or_create(teacher=self.request.user, course=self.object)
-        # Crear prompt vacío para el curso
-        from courses.models_prompt import CoursePrompt
-        CoursePrompt.objects.get_or_create(course=self.object)
         return response
 
 class JoinByCodeTeacherView(LoginRequiredMixin, TeachersOnlyMixin, FormView):
