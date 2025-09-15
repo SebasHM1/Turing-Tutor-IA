@@ -13,11 +13,3 @@ class PromptForm(forms.ModelForm):
                 "style": "width:100%;font-family:monospace;font-size:14px;"
             })
         }
-
-class TutoringScheduleForm(forms.ModelForm):
-    class Meta:
-        model = TutoringSchedule
-        fields = ['file']
-        widgets = {
-            'file': forms.FileInput(attrs={'accept': '.pdf'}),
-        }
