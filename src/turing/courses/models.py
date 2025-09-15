@@ -85,3 +85,41 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return f'{self.student.email} ↔ {self.course.name}'
+
+class TutoringSchedule(models.Model):
+    """
+    Almacena el archivo PDF con el horario de monitorías para un curso.
+    """
+    course = models.OneToOneField(
+        Course,
+        on_delete=models.CASCADE,
+        primary_key=True, 
+        related_name='tutoring_schedule'
+    )
+    file = models.FileField(
+        upload_to='tutoring_schedules/',
+        verbose_name="Archivo de Monitorías (PDF)"
+    )
+    uploaded_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Fecha de subida"
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Última actualización"
+    )
+
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='+'
+    )
+
+    def __str__(self):
+        return f"Horario de monitorías para {self.course.name}"
+
+    class Meta:
+        verbose_name = "Horario de Monitoría"
+        verbose_name_plural = "Horarios de Monitorías"

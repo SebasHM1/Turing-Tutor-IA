@@ -1,11 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, Sum
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, ListView, RedirectView, FormView, UpdateView
-from courses.models import Course, TeacherCourse
-from courses.forms import CourseForm, JoinByCodeTeacherForm
+from courses.models import Course, TeacherCourse, TutoringSchedule
+from courses.forms import CourseForm, JoinByCodeTeacherForm, TutoringScheduleForm
 from .models import PromptConfig
 from .forms import PromptForm
 
@@ -95,4 +96,45 @@ class PromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
         obj.updated_by = self.request.user
         obj.save()
         messages.success(self.request, _("¡Prompt actualizado!"))
+        return super().form_valid(form)
+
+class TutoringScheduleListView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
+    template_name = 'tutoring_schedule_list.html'
+    context_object_name = 'courses'
+
+    def get_queryset(self):
+        # Obtenemos los cursos del profesor, y con prefetch_related, traemos
+        # el horario de monitorías si existe en una sola consulta adicional.
+        return (Course.objects
+                .filter(teachers__teacher=self.request.user)
+                .prefetch_related('tutoring_schedule')
+                .distinct())
+
+class TutoringScheduleUploadView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
+    model = TutoringSchedule
+    form_class = TutoringScheduleForm
+    template_name = 'tutoring_schedule_form.html'
+    
+    def get_success_url(self):
+        return reverse('teachers:tutoring_schedules')
+
+    def get_object(self, queryset=None):
+        # Obtenemos el curso desde la URL
+        self.course = get_object_or_404(Course, pk=self.kwargs['course_pk'])
+        
+        # Intentamos obtener el horario existente. Si no existe, lo creamos.
+        # Esto nos permite usar UpdateView tanto para crear como para actualizar.
+        schedule, created = TutoringSchedule.objects.get_or_create(course=self.course)
+        return schedule
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['course'] = self.course
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Horario de monitorías para el curso '{self.course.name}' actualizado correctamente.")
+        schedule = form.save(commit=False)
+        schedule.updated_by = self.request.user
+        schedule.save()
         return super().form_valid(form)

@@ -164,3 +164,15 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # El contador de SESSION_COOKIE_AGE se reinicia con cada petición.
 SESSION_SAVE_EVERY_REQUEST = True
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_ACCESS_KEY_ID = os.environ.get('SUPABASE_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('SUPABASE_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('SUPABASE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = f"https://{os.environ.get('SUPABASE_PROJECT_ID')}.supabase.co/storage/v1"
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_LOCATION = 'public' # Carpeta principal en el bucket
+AWS_DEFAULT_ACL = 'public-read' # O 'private' si se controla el acceso
