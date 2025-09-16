@@ -54,7 +54,7 @@
                     </div>
                 </div>
             </div>
-
+            {% block content %}
             <div class="content">
                 <div class="container">
                     <div class="welcome">
@@ -138,6 +138,7 @@
 
                 </div>
             </div>
+            {% endblock content %}
         </main>
     </div>
     <script src="{% static 'js/ui.js' %}"></script>

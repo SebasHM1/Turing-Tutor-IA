@@ -1,7 +1,8 @@
+import traceback
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, Sum
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, ListView, RedirectView, FormView, UpdateView
@@ -138,3 +139,37 @@ class TutoringScheduleUploadView(LoginRequiredMixin, TeachersOnlyMixin, UpdateVi
         schedule.updated_by = self.request.user
         schedule.save()
         return super().form_valid(form)
+    
+    # --- MÉTODO MODIFICADO PARA DEPURACIÓN ---
+    # Sobrescribimos el método post para un control detallado y captura de errores.
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+
+        if form.is_valid():
+            try:
+                # Intentamos ejecutar el guardado normal del formulario
+                instance = form.save(commit=False)
+                instance.updated_by = self.request.user
+                
+                # La siguiente línea es la que intenta la subida del archivo a Supabase.
+                # Aquí es donde debe estar ocurriendo el error silencioso.
+                instance.save() 
+                
+                messages.success(self.request, f"Horario de monitorías para el curso '{self.course.name}' actualizado correctamente.")
+                return redirect(self.get_success_url())
+
+            except Exception as e:
+                # Si CUALQUIER cosa falla durante el .save(), lo capturamos aquí.
+                print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                print("!!! ERROR CAPTURADO DURANTE LA SUBIDA DEL ARCHIVO !!!")
+                print(f"!!! TIPO DE EXCEPCIÓN: {type(e).__name__}")
+                print(f"!!! MENSAJE: {e}")
+                print("--- TRACEBACK COMPLETO ---")
+                traceback.print_exc()
+                print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                
+                messages.error(self.request, "Ocurrió un error interno muy específico al subir el archivo. Revisa la consola del servidor.")
+                return self.form_invalid(form)
+        else:
+            return self.form_invalid(form)

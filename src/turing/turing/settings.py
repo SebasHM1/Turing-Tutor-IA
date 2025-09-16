@@ -174,5 +174,10 @@ AWS_S3_ENDPOINT_URL = f"https://{os.environ.get('SUPABASE_PROJECT_ID')}.supabase
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
-AWS_LOCATION = 'public' # Carpeta principal en el bucket
-AWS_DEFAULT_ACL = 'public-read' # O 'private' si se controla el acceso
+AWS_LOCATION = ''
+AWS_DEFAULT_ACL = 'public-read'
+
+MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/object/public/{AWS_STORAGE_BUCKET_NAME}/"
+
+# Directorio local (no se usará para la subida, pero es buena práctica tenerlo)
+MEDIA_ROOT = BASE_DIR / 'media'
