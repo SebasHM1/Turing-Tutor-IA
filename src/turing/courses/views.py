@@ -1,10 +1,10 @@
 # courses/views.py
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
-from django.views.generic import ListView, RedirectView, DetailView, UpdateView
+from django.views.generic import ListView, RedirectView, DetailView, UpdateView, FormView
 from django.shortcuts import get_object_or_404
-from .models import Course, Enrollment, CoursePrompt
-from .forms import CoursePromptForm
+from .models import Course, Enrollment, CoursePrompt, KnowledgeBaseFile
+from .forms import CoursePromptForm, KnowledgeBaseFileForm
 
 
 class StudentsOnlyMixin(UserPassesTestMixin):
@@ -73,3 +73,28 @@ class CoursePromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
         obj.updated_by = self.request.user
         obj.save()
         return super().form_valid(form)
+
+
+class KnowledgeBaseView(LoginRequiredMixin, TeachersOnlyMixin, FormView, ListView):
+    template_name = 'knowledge_base.html'
+    form_class = KnowledgeBaseFileForm
+    context_object_name = 'files'
+
+    def get_queryset(self):
+        return KnowledgeBaseFile.objects.filter(course_id=self.kwargs['pk'])
+
+    def form_valid(self, form):
+        course = Course.objects.get(pk=self.kwargs['pk'])
+        file_obj = form.save(commit=False)
+        file_obj.course = course
+        file_obj.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('courses:knowledge_base', kwargs={'pk': self.kwargs['pk']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['course'] = Course.objects.get(pk=self.kwargs['pk'])
+        context['active_page'] = 'knowledge_base'
+        return context

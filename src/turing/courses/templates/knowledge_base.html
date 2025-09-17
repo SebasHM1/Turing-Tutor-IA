@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Conocimiento</title>
+    <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard">
+    <div class="page">
+        {% include '_sidebar_course.html' with course=course active_page='knowledge_base' %}
+        <main>
+            <div class="topbar">
+                <div class="topbar-inner">
+                    <div></div>
+                    <div class="topbar-user">
+                        <span>Prof. {{ user.last_name }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="container">
+                    <div class="header-row">
+                        <h1>Base de Conocimiento: {{ course.name }}</h1>
+                        <a href="{% url 'courses:detail' course.id %}" class="btn btn-secondary">← Volver</a>
+                    </div>
+                    <div class="card" style="padding:16px; margin-bottom:24px;">
+                        <h2>Subir nuevo archivo PDF</h2>
+                        <form method="post" enctype="multipart/form-data" style="display:flex; gap:12px; align-items:center;">
+                            {% csrf_token %}
+                            {{ form.file }}
+                            {{ form.name }}
+                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-upload"></i> Subir</button>
+                        </form>
+                    </div>
+                    <div class="card" style="padding:16px;">
+                        <h2>Archivos subidos</h2>
+                        {% if files %}
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Archivo</th>
+                                    <th>Subido</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for f in files %}
+                                <tr>
+                                    <td>{{ f.name|default:f.file.name }}</td>
+                                    <td><a href="{{ f.file.url }}" target="_blank">Ver PDF</a></td>
+                                    <td>{{ f.uploaded_at|date:"Y-m-d H:i" }}</td>
+                                    <td>
+                                        <form method="post" action="{% url 'courses:knowledge_base_delete' course.id f.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger-soft" onclick="return confirm('¿Eliminar este archivo?')">
+                                                <i class="fa-solid fa-trash"></i> Eliminar
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="muted">No hay archivos subidos aún.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

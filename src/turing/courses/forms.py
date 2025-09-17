@@ -1,6 +1,6 @@
 # courses/forms.py
 from django import forms
-from .models import Course, CoursePrompt
+from .models import Course, CoursePrompt, KnowledgeBaseFile
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -22,3 +22,8 @@ class CoursePromptForm(forms.ModelForm):
             'content': forms.Textarea(attrs={'rows': 6, 'placeholder': 'Escribe el prompt para este curso...'}),
         }
 
+
+class KnowledgeBaseFileForm(forms.ModelForm):
+    class Meta:
+        model = KnowledgeBaseFile
+        fields = ['file', 'name']

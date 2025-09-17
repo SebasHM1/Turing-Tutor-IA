@@ -103,3 +103,13 @@ class CoursePrompt(models.Model):
 
     def __str__(self):
         return f"Prompt de {self.course.name} (actualizado {self.updated_at:%Y-%m-%d %H:%M})"
+    
+
+class KnowledgeBaseFile(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='knowledge_files')
+    file = models.FileField(upload_to='knowledge_base/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return self.name or self.file.name
