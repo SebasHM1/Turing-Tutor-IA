@@ -134,42 +134,25 @@ class TutoringScheduleUploadView(LoginRequiredMixin, TeachersOnlyMixin, UpdateVi
         return context
 
     def form_valid(self, form):
-        messages.success(self.request, f"Horario de monitorías para el curso '{self.course.name}' actualizado correctamente.")
+        # Obtenemos la instancia del modelo sin guardarla en la BBDD todavía
         schedule = form.save(commit=False)
         schedule.updated_by = self.request.user
+
+        # --- INICIO DEL BLOQUE DE DEPURACIÓN DEFINITIVO ---
+        # Accedemos al campo de archivo de nuestra instancia
+        file_field = schedule.file
+        # Y le preguntamos qué sistema de almacenamiento está gestionándolo
+        storage_in_use = file_field.storage
+
+        print("========================================================")
+        print("!!! DIAGNÓSTICO DEL SISTEMA DE ALMACENAMIENTO !!!")
+        print(f"!!! La clase de storage en uso es: {storage_in_use.__class__.__name__}")
+        print(f"!!! Objeto de storage: {storage_in_use}")
+        print("========================================================")
+        # --- FIN DEL BLOQUE DE DEPURACIÓN ---
+
+        # Ahora sí, intentamos guardar.
         schedule.save()
+        
+        messages.success(self.request, f"Horario de monitorías para el curso '{self.course.name}' actualizado correctamente.")
         return super().form_valid(form)
-    
-    # --- MÉTODO MODIFICADO PARA DEPURACIÓN ---
-    # Sobrescribimos el método post para un control detallado y captura de errores.
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form()
-
-        if form.is_valid():
-            try:
-                # Intentamos ejecutar el guardado normal del formulario
-                instance = form.save(commit=False)
-                instance.updated_by = self.request.user
-                
-                # La siguiente línea es la que intenta la subida del archivo a Supabase.
-                # Aquí es donde debe estar ocurriendo el error silencioso.
-                instance.save() 
-                
-                messages.success(self.request, f"Horario de monitorías para el curso '{self.course.name}' actualizado correctamente.")
-                return redirect(self.get_success_url())
-
-            except Exception as e:
-                # Si CUALQUIER cosa falla durante el .save(), lo capturamos aquí.
-                print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                print("!!! ERROR CAPTURADO DURANTE LA SUBIDA DEL ARCHIVO !!!")
-                print(f"!!! TIPO DE EXCEPCIÓN: {type(e).__name__}")
-                print(f"!!! MENSAJE: {e}")
-                print("--- TRACEBACK COMPLETO ---")
-                traceback.print_exc()
-                print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                
-                messages.error(self.request, "Ocurrió un error interno muy específico al subir el archivo. Revisa la consola del servidor.")
-                return self.form_invalid(form)
-        else:
-            return self.form_invalid(form)

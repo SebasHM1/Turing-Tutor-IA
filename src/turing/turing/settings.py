@@ -165,19 +165,30 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # El contador de SESSION_COOKIE_AGE se reinicia con cada petición.
 SESSION_SAVE_EVERY_REQUEST = True
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'turing.storage_backends.SupabaseStorage'
 
-AWS_ACCESS_KEY_ID = os.environ.get('SUPABASE_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('SUPABASE_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.environ.get('SUPABASE_BUCKET_NAME')
-AWS_S3_ENDPOINT_URL = f"https://{os.environ.get('SUPABASE_PROJECT_ID')}.supabase.co/storage/v1"
-AWS_S3_OBJECT_PARAMETERS = {
-    'CacheControl': 'max-age=86400',
-}
-AWS_LOCATION = ''
-AWS_DEFAULT_ACL = 'public-read'
+DEFAULT_FILE_STORAGE = 'turing.storage_backends.SupabaseStorage'
 
-MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/object/public/{AWS_STORAGE_BUCKET_NAME}/"
+# --- INICIO DEL BLOQUE DE DEPURACIÓN ATÓMICA ---
+print("\n" + "="*50)
+print("=== INICIANDO DEPURACIÓN ATÓMICA DE STORAGE ===")
+print(f"=== Django intentará cargar: {DEFAULT_FILE_STORAGE}")
 
-# Directorio local (no se usará para la subida, pero es buena práctica tenerlo)
-MEDIA_ROOT = BASE_DIR / 'media'
+try:
+    from django.utils.module_loading import import_string
+    # Usamos la misma función que Django usa internamente para cargar la clase
+    storage_class = import_string(DEFAULT_FILE_STORAGE)
+    print("=== ÉXITO: La clase de almacenamiento fue importada correctamente.")
+    print(f"=== Clase Cargada: {storage_class}")
+except Exception as e:
+    # Si CUALQUIER COSA sale mal al importar, lo capturaremos aquí
+    import traceback
+    print("=== ¡¡¡ERROR CRÍTICO!!! No se pudo importar la clase de almacenamiento.")
+    print(f"=== TIPO DE ERROR: {type(e).__name__}")
+    print(f"=== MENSAJE: {e}")
+    print("--- TRACEBACK DEL ERROR DE IMPORTACIÓN ---")
+    traceback.print_exc()
+    print("--- FIN DEL TRACEBACK ---")
+
+print("="*50 + "\n")
+# --- FIN DEL BLOQUE DE DEPURACIÓN ATÓMICA ---
