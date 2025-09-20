@@ -9,7 +9,7 @@ from django.views.generic import CreateView, ListView, RedirectView, FormView, U
 from courses.models import Course, TeacherCourse, TutoringSchedule
 from courses.forms import CourseForm, JoinByCodeTeacherForm, TutoringScheduleForm
 from .models import PromptConfig
-from .forms import PromptForm
+from .forms import PromptForm, TutoringDetailsForm 
 
 
 class TeachersOnlyMixin(UserPassesTestMixin):
@@ -156,3 +156,36 @@ class TutoringScheduleUploadView(LoginRequiredMixin, TeachersOnlyMixin, UpdateVi
         
         messages.success(self.request, f"Horario de monitorías para el curso '{self.course.name}' actualizado correctamente.")
         return super().form_valid(form)
+
+class EditTutoringDetailsView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
+    model = TeacherCourse
+    form_class = TutoringDetailsForm
+    template_name = 'teachers/edit_tutoring.html' # <-- Nueva plantilla que crearemos
+    
+    def get_success_url(self):
+        # Redirigimos al dashboard tras guardar
+        return reverse_lazy('teachers:dashboard')
+
+    def get_object(self, queryset=None):
+        """
+        Esta es la parte clave de la seguridad.
+        Obtenemos el objeto TeacherCourse asegurándonos de que coincida
+        con el curso de la URL y con el profesor que ha iniciado sesión.
+        Esto evita que un profesor edite las monitorías de otro.
+        """
+        course_pk = self.kwargs.get('course_pk')
+        return get_object_or_404(
+            TeacherCourse,
+            course_id=course_pk,
+            teacher=self.request.user
+        )
+
+    def form_valid(self, form):
+        messages.success(self.request, "Los detalles de tu monitoría han sido actualizados exitosamente.")
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Añadimos el curso al contexto para mostrar su nombre en la plantilla
+        context['course'] = self.get_object().course
+        return context

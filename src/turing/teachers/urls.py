@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (
     TeacherDashboardView, CourseCreateView,
     JoinCourseTeacherView, LeaveCourseTeacherView, JoinByCodeTeacherView, PromptEditView,
-    TutoringScheduleUploadView, TutoringScheduleListView
+    TutoringScheduleUploadView, TutoringScheduleListView, EditTutoringDetailsView
 )
 
 app_name = 'teachers'
@@ -18,4 +18,5 @@ urlpatterns = [
 
     path('tutoring-schedules/', TutoringScheduleListView.as_view(), name='tutoring_schedules'),
     path('course/<int:course_pk>/upload-schedule/', TutoringScheduleUploadView.as_view(), name='upload_schedule'),
+    path('course/<int:course_pk>/edit-tutoring/', EditTutoringDetailsView.as_view(), name='edit_tutoring'),
 ]

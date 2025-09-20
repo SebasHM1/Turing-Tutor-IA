@@ -1,0 +1,40 @@
+{% extends "teachers/dashboard.html" %}
+
+{% block content %}
+<div class="content">
+    <div class="container">
+        <div class="welcome">
+            <div class="welcome-head place-back">
+                <a href="{% url 'teachers:dashboard' %}" class="btn-back" aria-label="Volver atrás">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <h1>Gestionar Monitoría</h1>
+            </div>
+            <p class="welcome-sub">Para el curso: <strong>{{ course.name }}</strong></p>
+        </div>
+
+        <div class="card" style="max-width: 700px; margin-top: 2rem;">
+            <form method="post" class="form-stacked">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="{{ form.tutoring_details.id_for_label }}">
+                        {{ form.tutoring_details.label }}
+                    </label>
+                    {{ form.tutoring_details }}
+                    <small class="form-text muted">{{ form.tutoring_details.help_text }}</small>
+                    {% if form.tutoring_details.errors %}
+                        <div class="form-error">{{ form.tutoring_details.errors|first }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'teachers:dashboard' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

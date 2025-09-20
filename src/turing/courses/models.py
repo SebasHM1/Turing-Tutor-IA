@@ -52,6 +52,14 @@ class TeacherCourse(models.Model):
         related_name='teachers',
         db_column='materia'
     )
+
+    tutoring_details = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Detalles de la Monitoría",
+        help_text="Añade aquí el horario, enlace de la reunión, ubicación, etc."
+    )
+    
     joined_at = models.DateTimeField(auto_now_add=True, db_column='fecha_union')
 
     class Meta:
