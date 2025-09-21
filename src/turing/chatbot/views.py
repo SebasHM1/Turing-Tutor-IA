@@ -2,13 +2,16 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
 
 from users.decorators import student_required
 from .models import ChatSession, ChatMessage
 from courses.models import Enrollment, Course
 from teachers.models import PromptConfig 
+
+
 
 import google.generativeai as genai
 genai.configure(api_key=settings.GEMINI_API_KEY)
@@ -106,7 +109,6 @@ def send_message(request):
 @student_required
 @login_required
 def create_session_course(request, course_id):
-    # Garantiza que el usuario pertenece a la materia
     if not Enrollment.objects.filter(student=request.user, course_id=course_id).exists():
         return redirect('courses:my_student_courses')
     session = ChatSession.objects.create(
@@ -133,3 +135,18 @@ def delete_session(request, session_id):
 def _get_system_prompt() -> str:
     cfg = PromptConfig.objects.filter(key="global").first()
     return (cfg.content or "").strip() or "Eres un tutor académico claro, paciente y preciso."
+
+@login_required
+@require_POST
+def rename_session(request, pk):
+    name = (request.POST.get('name') or '').strip()
+    if not name:
+        return HttpResponseBadRequest('Nombre requerido')
+    
+    session = get_object_or_404(ChatSession, id=pk, user=request.user)
+    session.name = name[:80]
+    session.save(update_fields=['name'])
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'ok': True, 'name': session.name})
+    return redirect('chatbot:chat_detail', pk=session.id)
