@@ -2,14 +2,16 @@ import traceback
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, Sum
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, ListView, RedirectView, FormView, UpdateView
-from courses.models import Course, TeacherCourse, TutoringSchedule
+from django.forms import inlineformset_factory
+
+from courses.models import Course, TeacherCourse, TutoringSchedule, TutoringSlot 
 from courses.forms import CourseForm, JoinByCodeTeacherForm, TutoringScheduleForm
 from .models import PromptConfig
-from .forms import PromptForm, TutoringDetailsForm 
+from .forms import PromptForm, TutoringSlotForm 
 
 
 class TeachersOnlyMixin(UserPassesTestMixin):
@@ -157,35 +159,39 @@ class TutoringScheduleUploadView(LoginRequiredMixin, TeachersOnlyMixin, UpdateVi
         messages.success(self.request, f"Horario de monitorías para el curso '{self.course.name}' actualizado correctamente.")
         return super().form_valid(form)
 
-class EditTutoringDetailsView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
-    model = TeacherCourse
-    form_class = TutoringDetailsForm
-    template_name = 'teachers/edit_tutoring.html' # <-- Nueva plantilla que crearemos
-    
-    def get_success_url(self):
-        # Redirigimos al dashboard tras guardar
-        return reverse_lazy('teachers:dashboard')
+# --- REEMPLAZA LA CLASE EditTutoringDetailsView POR ESTA FUNCIÓN ---
+def manage_tutoring_slots(request, course_pk):
+    # Paso 1: Seguridad y obtención del objeto padre (TeacherCourse)
+    # Nos aseguramos de que el profesor que hace la petición sea el correcto para este curso.
+    teacher_course = get_object_or_404(
+        TeacherCourse,
+        course_id=course_pk,
+        teacher=request.user
+    )
 
-    def get_object(self, queryset=None):
-        """
-        Esta es la parte clave de la seguridad.
-        Obtenemos el objeto TeacherCourse asegurándonos de que coincida
-        con el curso de la URL y con el profesor que ha iniciado sesión.
-        Esto evita que un profesor edite las monitorías de otro.
-        """
-        course_pk = self.kwargs.get('course_pk')
-        return get_object_or_404(
-            TeacherCourse,
-            course_id=course_pk,
-            teacher=self.request.user
-        )
+    # Paso 2: Crear el Formset
+    # Conectamos el modelo padre (TeacherCourse) con el hijo (TutoringSlot)
+    TutoringSlotFormSet = inlineformset_factory(
+        TeacherCourse,
+        TutoringSlot,
+        form=TutoringSlotForm,
+        extra=1,  # Muestra 1 formulario vacío extra para añadir nuevas filas
+        can_delete=True # Permite eliminar filas existentes
+    )
 
-    def form_valid(self, form):
-        messages.success(self.request, "Los detalles de tu monitoría han sido actualizados exitosamente.")
-        return super().form_valid(form)
+    if request.method == 'POST':
+        # Paso 3: Procesar los datos enviados
+        formset = TutoringSlotFormSet(request.POST, instance=teacher_course)
+        if formset.is_valid():
+            formset.save()
+            messages.success(request, "Horarios de monitoría actualizados exitosamente.")
+            return redirect('teachers:dashboard')
+    else:
+        # Paso 4: Mostrar los formularios existentes
+        formset = TutoringSlotFormSet(instance=teacher_course)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Añadimos el curso al contexto para mostrar su nombre en la plantilla
-        context['course'] = self.get_object().course
-        return context
+    context = {
+        'formset': formset,
+        'course': teacher_course.course
+    }
+    return render(request, 'teachers/manage_tutoring.html', context)

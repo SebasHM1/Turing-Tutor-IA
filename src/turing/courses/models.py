@@ -1,6 +1,7 @@
 # courses/models.py
 from django.db import models
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 import secrets
 import string
 
@@ -53,13 +54,6 @@ class TeacherCourse(models.Model):
         db_column='materia'
     )
 
-    tutoring_details = models.TextField(
-        blank=True,
-        null=True,
-        verbose_name="Detalles de la Monitoría",
-        help_text="Añade aquí el horario, enlace de la reunión, ubicación, etc."
-    )
-    
     joined_at = models.DateTimeField(auto_now_add=True, db_column='fecha_union')
 
     class Meta:
@@ -69,6 +63,43 @@ class TeacherCourse(models.Model):
     def __str__(self):
         return f'{self.teacher.email} ↔ {self.course.name}'
 
+class TutoringSlot(models.Model):
+    """Representa una única franja horaria de monitoría."""
+    
+    class DaysOfWeek(models.TextChoices):
+        MONDAY = 'MON', _('Lunes')
+        TUESDAY = 'TUE', _('Martes')
+        WEDNESDAY = 'WED', _('Miércoles')
+        THURSDAY = 'THU', _('Jueves')
+        FRIDAY = 'FRI', _('Viernes')
+        SATURDAY = 'SAT', _('Sábado')
+        SUNDAY = 'SUN', _('Domingo')
+
+    teacher_course = models.ForeignKey(
+        TeacherCourse, 
+        on_delete=models.CASCADE, 
+        related_name='tutoring_slots'
+    )
+    day = models.CharField(
+        max_length=3,
+        choices=DaysOfWeek.choices,
+        verbose_name="Día de la semana"
+    )
+    start_time = models.TimeField(verbose_name="Hora de inicio")
+    end_time = models.TimeField(verbose_name="Hora de finalización")
+    location = models.CharField(
+        max_length=255, 
+        verbose_name="Ubicación o Enlace",
+        help_text="Ej: Oficina 301, Laboratorio B, o enlace de Zoom/Meet"
+    )
+
+    class Meta:
+        # Asegura que no haya dos horarios idénticos para el mismo profesor/curso
+        unique_together = ('teacher_course', 'day', 'start_time')
+        ordering = ['day', 'start_time']
+
+    def __str__(self):
+        return f"{self.get_day_display()}: {self.start_time.strftime('%H:%M')} - {self.end_time.strftime('%H:%M')}"
 
 class Enrollment(models.Model):
     """Relación estudiante ↔ course."""

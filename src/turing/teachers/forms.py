@@ -1,6 +1,6 @@
 from django import forms
 from .models import PromptConfig
-from courses.models import TeacherCourse
+from courses.models import TeacherCourse, TutoringSlot
 
 class PromptForm(forms.ModelForm):
     class Meta:
@@ -14,13 +14,12 @@ class PromptForm(forms.ModelForm):
             })
         }
 
-class TutoringDetailsForm(forms.ModelForm):
+class TutoringSlotForm(forms.ModelForm):
     class Meta:
-        model = TeacherCourse
-        fields = ['tutoring_details']
+        model = TutoringSlot
+        fields = ['day', 'start_time', 'end_time', 'location']
         widgets = {
-            'tutoring_details': forms.Textarea(attrs={
-                'rows': 5, 
-                'placeholder': 'Ej: Lunes y Miércoles de 10am a 12pm.\nOficina: 301\nEnlace Zoom: https://...'
-            }),
+            # Usamos widgets de HTML5 para una mejor experiencia de usuario
+            'start_time': forms.TimeInput(attrs={'type': 'time'}),
+            'end_time': forms.TimeInput(attrs={'type': 'time'}),
         }

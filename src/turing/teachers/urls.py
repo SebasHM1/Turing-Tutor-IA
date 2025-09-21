@@ -3,7 +3,8 @@ from django.urls import path
 from .views import (
     TeacherDashboardView, CourseCreateView,
     JoinCourseTeacherView, LeaveCourseTeacherView, JoinByCodeTeacherView, PromptEditView,
-    TutoringScheduleUploadView, TutoringScheduleListView, EditTutoringDetailsView
+    TutoringScheduleUploadView, TutoringScheduleListView,
+    manage_tutoring_slots
 )
 
 app_name = 'teachers'
@@ -17,6 +18,5 @@ urlpatterns = [
     path('prompt/',                   PromptEditView.as_view(),         name='prompt_edit'),
 
     path('tutoring-schedules/', TutoringScheduleListView.as_view(), name='tutoring_schedules'),
-    path('course/<int:course_pk>/upload-schedule/', TutoringScheduleUploadView.as_view(), name='upload_schedule'),
-    path('course/<int:course_pk>/edit-tutoring/', EditTutoringDetailsView.as_view(), name='edit_tutoring'),
+    path('course/<int:course_pk>/edit-tutoring/', manage_tutoring_slots, name='edit_tutoring'),
 ]
