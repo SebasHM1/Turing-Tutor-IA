@@ -1,12 +1,14 @@
 import traceback
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, ListView, RedirectView, FormView, UpdateView
 from django.forms import inlineformset_factory
+
 
 from courses.models import Course, TeacherCourse, TutoringSchedule, TutoringSlot 
 from courses.forms import CourseForm, JoinByCodeTeacherForm, TutoringScheduleForm
@@ -159,7 +161,8 @@ class TutoringScheduleUploadView(LoginRequiredMixin, TeachersOnlyMixin, UpdateVi
         messages.success(self.request, f"Horario de monitorías para el curso '{self.course.name}' actualizado correctamente.")
         return super().form_valid(form)
 
-# --- REEMPLAZA LA CLASE EditTutoringDetailsView POR ESTA FUNCIÓN ---
+@login_required
+@user_passes_test(lambda u: u.role == 'Teacher')
 def manage_tutoring_slots(request, course_pk):
     # Paso 1: Seguridad y obtención del objeto padre (TeacherCourse)
     # Nos aseguramos de que el profesor que hace la petición sea el correcto para este curso.
@@ -194,4 +197,4 @@ def manage_tutoring_slots(request, course_pk):
         'formset': formset,
         'course': teacher_course.course
     }
-    return render(request, 'teachers/manage_tutoring.html', context)
+    return render(request, 'manage_tutoring.html', context)
