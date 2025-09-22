@@ -1,6 +1,6 @@
 # courses/forms.py
 from django import forms
-from .models import Course
+from .models import Course, TutoringSchedule
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -12,3 +12,11 @@ class CourseForm(forms.ModelForm):
 
 class JoinByCodeTeacherForm(forms.Form):
     code = forms.CharField(max_length=12)
+
+class TutoringScheduleForm(forms.ModelForm):
+    class Meta:
+        model = TutoringSchedule
+        fields = ['file']
+        widgets = {
+            'file': forms.FileInput(attrs={'accept': '.pdf'}),
+        }

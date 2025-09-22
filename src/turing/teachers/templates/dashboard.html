@@ -21,7 +21,7 @@
                         Dashboard</a></li>
                 <li><a href="{% url 'teachers:prompt_edit' %}"><i class="fa-solid fa-wand-magic-sparkles"></i> Prompt
                         del profesor</a></li>
-                <li><a href="#"><i class="fa-regular fa-calendar"></i> Calendario</a></li>
+                <li><a href="{% url 'teachers:tutoring_schedules' %}"><i class="fa-regular fa-calendar"></i> Monitorías</a></li>
                 <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
                 <li><a href="#"><i class="fa-regular fa-circle-question"></i> Centro de Ayuda</a></li>
             </ul>
@@ -51,8 +51,7 @@
                     </div>
                 </div>
             </div>
-
-
+            {% block content %}
             <div class="content">
                 <div class="container">
                     {% if messages %}
@@ -132,9 +131,11 @@
 
                             <div class="course-actions">
                                 <a href="#" class="btn btn-secondary">Ver detalles</a>
+                                <a href="{% url 'teachers:edit_tutoring' c.pk %}" class="btn btn-primary-soft">Gestionar Monitoría</a>
                                 <a href="{% url 'teachers:leave' c.id %}" class="btn btn-danger-soft">Salir del
                                     curso</a>
                             </div>
+                            
                         </article>
                         {% empty %}
                         <p>No tienes cursos aún.</p>
@@ -175,6 +176,7 @@
 
                 </div>
             </div>
+            {% endblock content %}
         </main>
     </div>
     <script src="{% static 'js/ui.js' %}"></script>

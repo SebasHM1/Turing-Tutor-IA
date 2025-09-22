@@ -1,8 +1,10 @@
 # teachers/urls.py
 from django.urls import path
 from .views import (
-    CourseDeleteView, TeacherDashboardView, CourseCreateView,
-    JoinCourseTeacherView, LeaveCourseTeacherView, JoinByCodeTeacherView, PromptEditView
+    TeacherDashboardView, CourseCreateView,
+    JoinCourseTeacherView, LeaveCourseTeacherView, JoinByCodeTeacherView, PromptEditView,
+    TutoringScheduleUploadView, TutoringScheduleListView, CourseDeleteView,
+    manage_tutoring_slots
 )
 
 app_name = 'teachers'
@@ -14,5 +16,9 @@ urlpatterns = [
     path('courses/<int:pk>/leave/',   LeaveCourseTeacherView.as_view(), name='leave'),
     path('courses/join-by-code/',     JoinByCodeTeacherView.as_view(),  name='join_by_code'),
     path('prompt/',                   PromptEditView.as_view(),         name='prompt_edit'),
+
+    path('course/<int:course_pk>/upload-schedule/', TutoringScheduleUploadView.as_view(), name='upload_schedule'),
+    path('tutoring-schedules/', TutoringScheduleListView.as_view(), name='tutoring_schedules'),
+    path('course/<int:course_pk>/edit-tutoring/', manage_tutoring_slots, name='edit_tutoring'),
     path('courses/<int:pk>/delete/', CourseDeleteView.as_view(), name='delete'),
 ]

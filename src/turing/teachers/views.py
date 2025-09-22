@@ -1,15 +1,20 @@
+import traceback
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Sum
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy, reverse
 from django.db import transaction, connection
-from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, ListView, RedirectView, FormView, UpdateView
-from courses.models import Course, TeacherCourse
-from courses.forms import CourseForm, JoinByCodeTeacherForm
+from django.forms import inlineformset_factory
+
+
+from courses.models import Course, TeacherCourse, TutoringSchedule, TutoringSlot 
+from courses.forms import CourseForm, JoinByCodeTeacherForm, TutoringScheduleForm
 from .models import PromptConfig
-from .forms import PromptForm
+from .forms import PromptForm, TutoringSlotForm 
 
 
 class TeachersOnlyMixin(UserPassesTestMixin):
@@ -112,6 +117,97 @@ class PromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
         obj.save()
         messages.success(self.request, _("¡Prompt actualizado!"))
         return super().form_valid(form)
+
+class TutoringScheduleListView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
+    template_name = 'tutoring_schedule_list.html'
+    context_object_name = 'courses'
+
+    def get_queryset(self):
+        # Obtenemos los cursos del profesor, y con prefetch_related, traemos
+        # el horario de monitorías si existe en una sola consulta adicional.
+        return (Course.objects
+                .filter(teachers__teacher=self.request.user)
+                .prefetch_related('tutoring_schedule')
+                .distinct())
+
+class TutoringScheduleUploadView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
+    model = TutoringSchedule
+    form_class = TutoringScheduleForm
+    template_name = 'tutoring_schedule_form.html'
+    
+    def get_success_url(self):
+        return reverse('teachers:tutoring_schedules')
+
+    def get_object(self, queryset=None):
+        # Obtenemos el curso desde la URL
+        self.course = get_object_or_404(Course, pk=self.kwargs['course_pk'])
+        
+        # Intentamos obtener el horario existente. Si no existe, lo creamos.
+        # Esto nos permite usar UpdateView tanto para crear como para actualizar.
+        schedule, created = TutoringSchedule.objects.get_or_create(course=self.course)
+        return schedule
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['course'] = self.course
+        return context
+
+    def form_valid(self, form):
+        # Obtenemos la instancia del modelo sin guardarla en la BBDD todavía
+        schedule = form.save(commit=False)
+        schedule.updated_by = self.request.user
+
+        # --- INICIO DEL BLOQUE DE DEPURACIÓN DEFINITIVO ---
+        # Accedemos al campo de archivo de nuestra instancia
+        file_field = schedule.file
+        # Y le preguntamos qué sistema de almacenamiento está gestionándolo
+        storage_in_use = file_field.storage
+
+        print("========================================================")
+        print("!!! DIAGNÓSTICO DEL SISTEMA DE ALMACENAMIENTO !!!")
+        print(f"!!! La clase de storage en uso es: {storage_in_use.__class__.__name__}")
+        print(f"!!! Objeto de storage: {storage_in_use}")
+        print("========================================================")
+        # --- FIN DEL BLOQUE DE DEPURACIÓN ---
+
+        # Ahora sí, intentamos guardar.
+        schedule.save()
+        
+        messages.success(self.request, f"Horario de monitorías para el curso '{self.course.name}' actualizado correctamente.")
+        return super().form_valid(form)
+
+@login_required
+@user_passes_test(lambda u: u.role == 'Teacher')
+def manage_tutoring_slots(request, course_pk):
+    teacher_course = get_object_or_404(
+        TeacherCourse,
+        course_id=course_pk,
+        teacher=request.user
+    )
+
+    TutoringSlotFormSet = inlineformset_factory(
+        TeacherCourse,
+        TutoringSlot,
+        form=TutoringSlotForm,
+        extra=1,  # Muestra 1 formulario vacío extra para añadir nuevas filas
+        can_delete=True # Permite eliminar filas existentes
+    )
+
+    if request.method == 'POST':
+
+        formset = TutoringSlotFormSet(request.POST, instance=teacher_course)
+        if formset.is_valid():
+            formset.save()
+            messages.success(request, "Horarios de monitoría actualizados exitosamente.")
+            return redirect('teachers:dashboard')
+    else:
+        formset = TutoringSlotFormSet(instance=teacher_course)
+
+    context = {
+        'formset': formset,
+        'course': teacher_course.course
+    }
+    return render(request, 'manage_tutoring.html', context)
     
 class CourseDeleteView(LoginRequiredMixin, TeachersOnlyMixin, RedirectView):
     pattern_name = 'teachers:dashboard'
