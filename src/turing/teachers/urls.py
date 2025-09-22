@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (
     TeacherDashboardView, CourseCreateView,
     JoinCourseTeacherView, LeaveCourseTeacherView, JoinByCodeTeacherView, PromptEditView,
-    TutoringScheduleUploadView, TutoringScheduleListView,
+    TutoringScheduleUploadView, TutoringScheduleListView, CourseDeleteView,
     manage_tutoring_slots
 )
 
