@@ -6,9 +6,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Cursos</title>
-    <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 
 <body class="dashboard">
@@ -30,10 +30,6 @@
         <main>
             <div class="topbar">
                 <div class="topbar-inner">
-                    <div class="search">
-                        <input type="text" placeholder="Buscar cursos...">
-                    </div>
-
                     <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
                         {% csrf_token %}
                     </form>
@@ -44,6 +40,7 @@
                         </button>
                         <i class="fa-regular fa-bell bell"></i>
                         <span>Prof. {{ user.last_name }}</span>
+
                         <div class="avatar-circle">
                             {% if user.profile.avatar_url %}
                             <img src="{{ user.profile.avatar_url }}" alt="Avatar">
@@ -55,8 +52,16 @@
                 </div>
             </div>
 
+
             <div class="content">
                 <div class="container">
+                    {% if messages %}
+                    <div class="flash-stack" style="margin-bottom:10px;">
+                        {% for m in messages %}
+                        <div class="alert {{ m.tags }}">{{ m }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                     <div class="welcome">
                         <div class="welcome-head place-back">
                             <button type="button" class="btn-back js-back" aria-label="Volver atrás">
@@ -104,10 +109,21 @@
                         <article class="course-card card">
                             <div class="card-header">
                                 <h3>{{ c.name }}</h3>
-                                <button class="icon-button" type="button" title="Opciones">
-                                    <i class="fa-solid fa-ellipsis"></i>
-                                </button>
+                                <div class="menu">
+                                    <button class="icon-button" type="button" title="Opciones"
+                                        onclick="this.nextElementSibling.classList.toggle('open')">
+                                        <i class="fa-solid fa-ellipsis"></i>
+                                    </button>
+                                    <div class="menu-pop">
+                                        <a href="{% url 'teachers:leave' c.id %}">Salir</a>
+                                        {% if c.owner_id == user.id %}
+                                        <a href="{% url 'teachers:delete' c.id %}"
+                                            onclick="return confirm('¿Eliminar curso? Esta acción no se puede deshacer.');">Eliminar</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
+
 
                             <div class="course-meta muted">Código: {{ c.code }}</div>
                             {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
@@ -134,7 +150,28 @@
                                 <i class="fa-solid fa-right-to-bracket"></i> Unirse
                             </button>
                         </form>
+
+                        {% if other_courses %}
+                        <div class="courses-grid" style="margin-top:10px;">
+                            {% for oc in other_courses %}
+                            <article class="course-card card">
+                                <div class="card-header">
+                                    <h3>{{ oc.name }}</h3>
+                                </div>
+                                <div class="course-meta muted">Código: {{ oc.code }}</div>
+                                {% if oc.schedule %}<div class="course-meta muted">{{ oc.schedule }}</div>{% endif %}
+                                <div class="course-actions">
+                                    <a href="{% url 'teachers:join' oc.id %}" class="btn btn-primary">
+                                        <i class="fa-solid fa-right-to-bracket"></i> Unirse
+                                    </a>
+                                </div>
+                            </article>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
+
+
 
                 </div>
             </div>

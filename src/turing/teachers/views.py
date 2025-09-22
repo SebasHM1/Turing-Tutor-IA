@@ -1,7 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, Sum
-from django.urls import reverse_lazy, reverse
+from django.shortcuts import get_object_or_404
+from django.db import transaction, connection
+from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, ListView, RedirectView, FormView, UpdateView
 from courses.models import Course, TeacherCourse
@@ -15,7 +17,7 @@ class TeachersOnlyMixin(UserPassesTestMixin):
         return self.request.user.role == 'Teacher'
 
 class TeacherDashboardView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
-    template_name = 'dashboard.html'   # <-- aquí el cambio
+    template_name = 'dashboard.html' 
     context_object_name = 'courses'
 
     def get_queryset(self):
@@ -40,7 +42,7 @@ class TeacherDashboardView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
 class CourseCreateView(LoginRequiredMixin, TeachersOnlyMixin, CreateView):
     model = Course
     form_class = CourseForm
-    template_name = 'course_form.html'   # reutilizamos tu template existente
+    template_name = 'course_form.html'   
     success_url = reverse_lazy('teachers:dashboard')
 
     def form_valid(self, form):
@@ -51,7 +53,7 @@ class CourseCreateView(LoginRequiredMixin, TeachersOnlyMixin, CreateView):
 
 class JoinByCodeTeacherView(LoginRequiredMixin, TeachersOnlyMixin, FormView):
     form_class = JoinByCodeTeacherForm
-    template_name = 'dashboard.html'   # mismo dashboard tras enviar el código
+    template_name = 'dashboard.html'   
     success_url = reverse_lazy('teachers:dashboard')
 
     def form_valid(self, form):
@@ -76,8 +78,22 @@ class JoinCourseTeacherView(LoginRequiredMixin, TeachersOnlyMixin, RedirectView)
 
 class LeaveCourseTeacherView(LoginRequiredMixin, TeachersOnlyMixin, RedirectView):
     pattern_name = 'teachers:dashboard'
+
     def get_redirect_url(self, *args, **kwargs):
-        TeacherCourse.objects.filter(teacher=self.request.user, course_id=kwargs['pk']).delete()
+        tc = get_object_or_404(TeacherCourse,
+                               teacher=self.request.user,
+                               course_id=kwargs['pk'])
+        try:
+            from courses.models import TutoringSlot
+            TutoringSlot.objects.filter(teacher_course=tc).delete()
+        except Exception:
+            with connection.cursor() as cur:
+                cur.execute("DELETE FROM courses_tutoringslot WHERE teacher_course_id = %s", [tc.id])
+
+        with transaction.atomic():
+            tc.delete()
+
+        messages.success(self.request, "Has salido del curso.")
         return reverse_lazy('teachers:dashboard')
 
 class PromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
@@ -96,3 +112,17 @@ class PromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
         obj.save()
         messages.success(self.request, _("¡Prompt actualizado!"))
         return super().form_valid(form)
+    
+class CourseDeleteView(LoginRequiredMixin, TeachersOnlyMixin, RedirectView):
+    pattern_name = 'teachers:dashboard'
+
+    def get_redirect_url(self, *args, **kwargs):
+        course = get_object_or_404(Course, pk=kwargs['pk'], owner=self.request.user)
+        from courses.models import TeacherCourse, Enrollment
+        TeacherCourse.objects.filter(course=course).delete()
+        Enrollment.objects.filter(course=course).delete()
+        with connection.cursor() as cur:
+            cur.execute("DELETE FROM courses_tutoringslot WHERE teacher_course_id IN (SELECT id FROM courses_profesor_materia WHERE materia_id=%s)", [course.id])
+        course.delete()
+        messages.success(self.request, "Curso eliminado.")
+        return reverse_lazy('teachers:dashboard')

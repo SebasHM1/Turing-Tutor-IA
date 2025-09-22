@@ -29,9 +29,7 @@
         <main>
             <div class="topbar">
                 <div class="topbar-inner">
-                    <div class="search">
-                        <input type="text" placeholder="Buscar materias...">
-                    </div>
+
                     <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
                         {% csrf_token %}
                     </form>
@@ -94,7 +92,7 @@
                                     <i class="fa-solid fa-ellipsis"></i>
                                 </button>
                             </div>
-                            <div class="course-meta muted">Nivel: {{ c.level }}</div>
+                            <div class="course-meta muted">Semestre: {{ c.level }}</div>
                             {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
                             <div class="course-actions">
                                 <a href="#" class="btn btn-secondary">Ver detalles</a>
