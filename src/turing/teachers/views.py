@@ -164,16 +164,12 @@ class TutoringScheduleUploadView(LoginRequiredMixin, TeachersOnlyMixin, UpdateVi
 @login_required
 @user_passes_test(lambda u: u.role == 'Teacher')
 def manage_tutoring_slots(request, course_pk):
-    # Paso 1: Seguridad y obtención del objeto padre (TeacherCourse)
-    # Nos aseguramos de que el profesor que hace la petición sea el correcto para este curso.
     teacher_course = get_object_or_404(
         TeacherCourse,
         course_id=course_pk,
         teacher=request.user
     )
 
-    # Paso 2: Crear el Formset
-    # Conectamos el modelo padre (TeacherCourse) con el hijo (TutoringSlot)
     TutoringSlotFormSet = inlineformset_factory(
         TeacherCourse,
         TutoringSlot,
@@ -183,14 +179,13 @@ def manage_tutoring_slots(request, course_pk):
     )
 
     if request.method == 'POST':
-        # Paso 3: Procesar los datos enviados
+
         formset = TutoringSlotFormSet(request.POST, instance=teacher_course)
         if formset.is_valid():
             formset.save()
             messages.success(request, "Horarios de monitoría actualizados exitosamente.")
             return redirect('teachers:dashboard')
     else:
-        # Paso 4: Mostrar los formularios existentes
         formset = TutoringSlotFormSet(instance=teacher_course)
 
     context = {
