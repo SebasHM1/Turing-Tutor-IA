@@ -50,6 +50,8 @@
                 </div>
             </div>
 
+            {% block content %}
+
             <div class="content">
                 <div class="container">
                     <div class="welcome">
@@ -95,7 +97,7 @@
                             <div class="course-meta muted">Semestre: {{ c.level }}</div>
                             {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
                             <div class="course-actions">
-                                <a href="#" class="btn btn-secondary">Ver detalles</a>
+                                <a href="{% url 'courses:student_course_detail' c.pk %}" class="btn btn-secondary">Ver detalles</a>
                                 <a href="{% url 'chatbot:course_chat' c.id %}" class="btn btn-primary">Abrir chat</a>
                                 <a href="{% url 'courses:student_leave' c.id %}" class="btn btn-danger-soft">Salir</a>
                             </div>
@@ -121,7 +123,7 @@
                             <div class="course-meta muted">Nivel: {{ c.level }}</div>
                             {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
                             <div class="course-actions">
-                                <a href="#" class="btn btn-outline">Ver detalles</a>
+                                <a href="{% url 'courses:student_course_detail' c.pk %}" class="btn btn-outline">Ver detalles</a>
                                 <a href="{% url 'courses:student_join' c.id %}" class="btn btn-primary">
                                     <i class="fa-solid fa-right-to-bracket"></i> Unirse
                                 </a>
@@ -134,6 +136,9 @@
 
                 </div>
             </div>
+
+            {% endblock content %}
+
         </main>
     </div>
 

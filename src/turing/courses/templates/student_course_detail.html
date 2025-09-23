@@ -1,0 +1,56 @@
+{% extends "my_student_courses.html" %}
+
+{% block content %}
+<div class="content">
+    <div class="container">
+        <div class="welcome">
+            <div class="welcome-head place-back">
+                <a href="{% url 'courses:my_student_courses' %}" class="btn-back" aria-label="Volver atrás">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <h1>{{ course.name }}</h1>
+            </div>
+            <p class="welcome-sub">{{ course.description }}</p>
+        </div>
+
+        <div class="card" style="margin-top: 2rem;">
+            <h3><i class="fa-solid fa-circle-info"></i> Información General</h3>
+            <div class="course-meta"><strong>Nivel:</strong> {{ course.level }}</div>
+            <div class="course-meta"><strong>Horario:</strong> {{ course.schedule }}</div>
+            <div class="course-meta"><strong>Código:</strong> {{ course.code }}</div>
+        </div>
+
+        <div class="header-row" style="margin-top: 2rem;">
+            <h2><i class="fa-regular fa-clock"></i> Horarios de Monitoría</h2>
+        </div>
+        
+        {% for assignment in teacher_assignments %}
+            {% if assignment.tutoring_slots.all %}
+                <div class="card" style="margin-top: 1rem;">
+                    <h4>Profesor(a): {{ assignment.teacher.name }} {{ assignment.teacher.last_name }}</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Día</th>
+                                <th>Horario</th>
+                                <th>Ubicación / Enlace</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for slot in assignment.tutoring_slots.all %}
+                                <tr>
+                                    <td>{{ slot.get_day_display }}</td>
+                                    <td>{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</td>
+                                    <td>{{ slot.location }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        {% empty %}
+            <p class="muted">Aún no se han publicado horarios de monitoría para este curso.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

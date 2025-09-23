@@ -1,7 +1,7 @@
 # courses/urls.py
 from django.urls import path
 from .views import (
-    MyStudentCoursesView, JoinCourseStudentView, LeaveCourseStudentView
+    MyStudentCoursesView, JoinCourseStudentView, LeaveCourseStudentView, StudentCourseDetailView
 )
 
 app_name = 'courses'
@@ -11,5 +11,6 @@ urlpatterns = [
     path('my/',         MyStudentCoursesView.as_view(),  name='my_courses'),
     path('<int:pk>/student/join/',  JoinCourseStudentView.as_view(),  name='student_join'),
     path('<int:pk>/student/leave/', LeaveCourseStudentView.as_view(), name='student_leave'),
+    path('course/<int:pk>/', StudentCourseDetailView.as_view(), name='student_course_detail'),
 ]
 
