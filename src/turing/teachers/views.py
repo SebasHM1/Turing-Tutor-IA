@@ -141,9 +141,7 @@ class TutoringScheduleUploadView(LoginRequiredMixin, TeachersOnlyMixin, UpdateVi
     def get_object(self, queryset=None):
         # Obtenemos el curso desde la URL
         self.course = get_object_or_404(Course, pk=self.kwargs['course_pk'])
-        
-        # Intentamos obtener el horario existente. Si no existe, lo creamos.
-        # Esto nos permite usar UpdateView tanto para crear como para actualizar.
+
         schedule, created = TutoringSchedule.objects.get_or_create(course=self.course)
         return schedule
 
@@ -194,12 +192,20 @@ def manage_tutoring_slots(request, course_pk):
     )
 
     if request.method == 'POST':
-
         formset = TutoringSlotFormSet(request.POST, instance=teacher_course)
+
+
         if formset.is_valid():
+
+            # Intentamos guardar
             formset.save()
+
             messages.success(request, "Horarios de monitoría actualizados exitosamente.")
             return redirect('teachers:dashboard')
+        else:
+            # Si el formset NO es válido, imprimimos los errores
+            messages.error(request, "Por favor corrige los errores en el formulario.")
+
     else:
         formset = TutoringSlotFormSet(instance=teacher_course)
 
