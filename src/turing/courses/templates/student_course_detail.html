@@ -1,8 +1,10 @@
 {% extends "my_student_courses.html" %}
 {% load static %}
+
 {% block content %}
 <div class="content">
     <div class="container">
+        <!-- ... (Sección de bienvenida e Información General, se queda igual) ... -->
         <div class="welcome">
             <div class="welcome-head place-back">
                 <a href="{% url 'courses:my_student_courses' %}" class="btn-back" aria-label="Volver atrás">
@@ -20,10 +22,13 @@
             <div class="course-meta"><strong>Código:</strong> {{ course.code }}</div>
         </div>
 
-        <div class="header-row" style="margin-top: 2rem;">
-            <h2><i class="fa-regular fa-clock"></i> Horarios de Monitoría</h2>
-        </div>
+        {# --- INICIO: SECCIÓN UNIFICADA DE MONITORÍAS --- #}
         
+        {# --- 1. MONITORÍAS POR PROFESOR (TABLA ESTRUCTURADA) --- #}
+        <div class="header-row" style="margin-top: 2rem;">
+            <h2><i class="fa-regular fa-user"></i> Monitorías por Profesor</h2>
+        </div>
+
         {% for assignment in teacher_assignments %}
             {% if assignment.tutoring_slots.all %}
                 <div class="card" style="margin-top: 1rem;">
@@ -48,22 +53,35 @@
                     </table>
                 </div>
             {% endif %}
-        {% empty %}
-            <p class="muted">Aún no se han publicado horarios de monitoría para este curso.</p>
         {% endfor %}
 
-        {% if course.tutoringschedule and course.tutoringschedule.file %}
+        {# --- 2. HORARIO GENERAL DEL CURSO (VISOR DE PDF) --- #}
+        {% if course.tutoring_schedule and course.tutoring_schedule.file.url %}
             <div class="pdf-viewer-container card">
-                <iframe 
-                    src="{% static 'web/viewer.html' %}?file={{ course.tutoringschedule.file.url|urlencode }}" 
-                    width="100%" 
-                    height="800px" 
-                    frameborder="0">
+                <iframe id="pdf-viewer-iframe" 
+                        width="100%" 
+                        height="800px" 
+                        frameborder="0">
                 </iframe>
             </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const pdfUrl = "{{ course.tutoring_schedule.file.url }}";
+                    
+                    const viewerUrl = "{% static 'web/viewer.html' %}";
+                    const encodedPdfUrl = encodeURIComponent(pdfUrl);
+                    const finalUrl = `${viewerUrl}?file=${encodedPdfUrl}`;
+                    
+                    document.getElementById('pdf-viewer-iframe').src = finalUrl;
+                });
+            </script>
+
         {% else %}
             <p class="muted">Aún no se ha publicado un horario de monitorías para este curso.</p>
         {% endif %}
+
+    {# --- FIN: SECCIÓN UNIFICADA DE MONITORÍAS --- #}
     </div>
 </div>
 {% endblock content %}

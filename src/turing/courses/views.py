@@ -38,4 +38,20 @@ class LeaveCourseStudentView(LoginRequiredMixin, StudentsOnlyMixin, RedirectView
 class StudentCourseDetailView(LoginRequiredMixin, StudentsOnlyMixin, DetailView):
     model = Course
     template_name = 'student_course_detail.html'
-    context_object_name = 'course' 
+    context_object_name = 'course'
+
+    def get_context_data(self, **kwargs):
+        # Primero, obtenemos el contexto base de DetailView (que incluye el objeto 'course')
+        context = super().get_context_data(**kwargs)
+        course = self.get_object()
+        
+        # Ahora, añadimos la información extra de las monitorías de los profesores.
+        # Esta consulta es muy eficiente gracias a select_related y prefetch_related.
+        teacher_assignments = (TeacherCourse.objects
+                                  .filter(course=course)
+                                  .select_related('teacher')
+                                  .prefetch_related('tutoring_slots'))
+        
+        # Añadimos los resultados al contexto para que la plantilla pueda usarlos.
+        context['teacher_assignments'] = teacher_assignments
+        return context 
