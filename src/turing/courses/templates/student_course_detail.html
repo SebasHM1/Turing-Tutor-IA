@@ -1,5 +1,5 @@
 {% extends "my_student_courses.html" %}
-
+{% load static %}
 {% block content %}
 <div class="content">
     <div class="container">
@@ -51,6 +51,19 @@
         {% empty %}
             <p class="muted">Aún no se han publicado horarios de monitoría para este curso.</p>
         {% endfor %}
+
+        {% if course.tutoringschedule and course.tutoringschedule.file %}
+            <div class="pdf-viewer-container card">
+                <iframe 
+                    src="{% static 'web/viewer.html' %}?file={{ course.tutoringschedule.file.url|urlencode }}" 
+                    width="100%" 
+                    height="800px" 
+                    frameborder="0">
+                </iframe>
+            </div>
+        {% else %}
+            <p class="muted">Aún no se ha publicado un horario de monitorías para este curso.</p>
+        {% endif %}
     </div>
 </div>
 {% endblock content %}

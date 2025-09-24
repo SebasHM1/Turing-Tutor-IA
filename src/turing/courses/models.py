@@ -129,6 +129,24 @@ class Enrollment(models.Model):
     def __str__(self):
         return f'{self.student.email} ↔ {self.course.name}'
 
+
+def sanitized_upload_to(instance, filename):
+    """
+    Renombra el archivo subido a un formato seguro y único.
+    Ej: 'Monitorías del 20%.pdf' -> 'monitorias-del-20-a1b2c3d4.pdf'
+    """
+    path, extension = os.path.splitext(filename)
+    
+    ascii_name = unidecode(path)
+    
+    slug_name = slugify(ascii_name)
+    
+    unique_id = uuid.uuid4().hex[:8]
+    
+    safe_filename = f"{slug_name}-{unique_id}{extension}"
+    
+    return os.path.join('tutoring_schedules', safe_filename)
+
 class TutoringSchedule(models.Model):
     """
     Almacena el archivo PDF con el horario de monitorías para un curso.
@@ -140,7 +158,7 @@ class TutoringSchedule(models.Model):
         related_name='tutoring_schedule'
     )
     file = models.FileField(
-        upload_to='tutoring_schedules/',
+        upload_to=sanitized_upload_to,
         verbose_name="Archivo de Monitorías (PDF)"
     )
     uploaded_at = models.DateTimeField(
@@ -167,19 +185,3 @@ class TutoringSchedule(models.Model):
         verbose_name = "Horario de Monitoría"
         verbose_name_plural = "Horarios de Monitorías"
 
-def sanitized_upload_to(instance, filename):
-    """
-    Renombra el archivo subido a un formato seguro y único.
-    Ej: 'Monitorías del 20%.pdf' -> 'monitorias-del-20-a1b2c3d4.pdf'
-    """
-    path, extension = os.path.splitext(filename)
-    
-    ascii_name = unidecode(path)
-    
-    slug_name = slugify(ascii_name)
-    
-    unique_id = uuid.uuid4().hex[:8]
-    
-    safe_filename = f"{slug_name}-{unique_id}{extension}"
-    
-    return os.path.join('tutoring_schedules', safe_filename)

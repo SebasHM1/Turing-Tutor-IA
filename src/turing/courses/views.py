@@ -35,20 +35,7 @@ class LeaveCourseStudentView(LoginRequiredMixin, StudentsOnlyMixin, RedirectView
         Enrollment.objects.filter(student=self.request.user, course_id=kwargs['pk']).delete()
         return reverse_lazy('courses:my_student_courses')
 
-# --- NUEVA VISTA A AÑADIR AL FINAL ---
 class StudentCourseDetailView(LoginRequiredMixin, StudentsOnlyMixin, DetailView):
     model = Course
-    template_name = 'student_course_detail.html' # <-- Nueva plantilla que crearemos
-    context_object_name = 'course' # Nombre más claro para la plantilla
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        course = self.get_object()
-        
-        teacher_assignments = (TeacherCourse.objects
-                                  .filter(course=course)
-                                  .select_related('teacher')
-                                  .prefetch_related('tutoring_slots'))
-        
-        context['teacher_assignments'] = teacher_assignments
-        return context
+    template_name = 'student_course_detail.html'
+    context_object_name = 'course' 
