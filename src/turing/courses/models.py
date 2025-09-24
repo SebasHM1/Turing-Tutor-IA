@@ -1,4 +1,8 @@
 # courses/models.py
+import os
+import uuid
+from unidecode import unidecode
+from django.utils.text import slugify
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -162,3 +166,20 @@ class TutoringSchedule(models.Model):
     class Meta:
         verbose_name = "Horario de Monitoría"
         verbose_name_plural = "Horarios de Monitorías"
+
+def sanitized_upload_to(instance, filename):
+    """
+    Renombra el archivo subido a un formato seguro y único.
+    Ej: 'Monitorías del 20%.pdf' -> 'monitorias-del-20-a1b2c3d4.pdf'
+    """
+    path, extension = os.path.splitext(filename)
+    
+    ascii_name = unidecode(path)
+    
+    slug_name = slugify(ascii_name)
+    
+    unique_id = uuid.uuid4().hex[:8]
+    
+    safe_filename = f"{slug_name}-{unique_id}{extension}"
+    
+    return os.path.join('tutoring_schedules', safe_filename)

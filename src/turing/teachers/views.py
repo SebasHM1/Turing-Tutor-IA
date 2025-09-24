@@ -155,7 +155,7 @@ class TutoringScheduleUploadView(LoginRequiredMixin, TeachersOnlyMixin, UpdateVi
         schedule = form.save(commit=False)
         schedule.updated_by = self.request.user
 
-        # --- INICIO DEL BLOQUE DE DEPURACIÓN DEFINITIVO ---
+        # --- INICIO DEL BLOQUE DE DEPURACIÓN ---
         # Accedemos al campo de archivo de nuestra instancia
         file_field = schedule.file
         # Y le preguntamos qué sistema de almacenamiento está gestionándolo
