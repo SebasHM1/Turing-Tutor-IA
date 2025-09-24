@@ -66,15 +66,15 @@
             </div>
 
             <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const pdfUrl = "{{ course.tutoring_schedule.file.url }}";
-                    
-                    const viewerUrl = "{% static 'web/viewer.html' %}";
-                    const encodedPdfUrl = encodeURIComponent(pdfUrl);
-                    const finalUrl = `${viewerUrl}?file=${encodedPdfUrl}`;
-                    
-                    document.getElementById('pdf-viewer-iframe').src = finalUrl;
-                });
+            document.addEventListener('DOMContentLoaded', function() {
+                const viewerUrl = "{% static 'web/viewer.html' %}";
+
+                const proxyUrl = "{% url 'courses:tutoring_schedule_proxy' course.pk %}";
+
+                const finalUrl = `${viewerUrl}?file=${encodeURIComponent(proxyUrl)}`;
+
+                document.getElementById('pdf-viewer-iframe').src = finalUrl;
+            });
             </script>
 
         {% else %}

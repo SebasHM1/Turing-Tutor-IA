@@ -185,3 +185,5 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # El contador de SESSION_COOKIE_AGE se reinicia con cada petición.
 SESSION_SAVE_EVERY_REQUEST = True
+
+SUPABASE_ALLOWED_HOST = "bxvduwertvebzbamjjki.supabase.co"
