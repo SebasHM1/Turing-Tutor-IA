@@ -11,7 +11,8 @@
             
             <div class="form-group">
                 <label for="{{ form.file.id_for_label }}">Selecciona un archivo PDF</label>
-                {{ form.file }}
+                <input type="file" name="{{ form.file.name }}" accept=".pdf" required id="{{ form.file.id_for_label }}">
+                
                 {% if form.file.errors %}
                     <div class="form-error">{{ form.file.errors|first }}</div>
                 {% endif %}

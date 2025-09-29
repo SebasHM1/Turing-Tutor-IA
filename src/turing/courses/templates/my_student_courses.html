@@ -1,143 +1,91 @@
+{% extends "student_base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Materias</title>
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+{% block content %}
 
-<body class="dashboard">
-    <div class="page">
-        <aside class="sidebar">
-            <a href="/chatbot/" class="brand-title brand-link">Turing</a>
-            <hr class="sidebar-divider">
-            <ul class="nav-links">
-                <li><a href="#"><i class="fa-solid fa-house"></i> Dashboard</a></li>
-                <li><a class="active" href="{% url 'courses:my_student_courses' %}">
-                        <i class="fa-solid fa-layer-group"></i> Mis Materias
-                    </a></li>
-                <li><a href="#"><i class="fa-regular fa-calendar"></i> Calendario</a></li>
-                <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
-                <li><a href="#"><i class="fa-regular fa-circle-question"></i> Centro de Ayuda</a></li>
-            </ul>
-        </aside>
+<div class="content">
+    <div class="container">
+        <div class="welcome">
+            <div class="welcome-head place-back">
+                <button type="button" class="btn-back js-back" aria-label="Volver atrás">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <h1>Bienvenido, {{ user.name }}</h1>
+            </div>
+            <p class="welcome-sub">Gestiona tus materias y únete a nuevas clases desde aquí</p>
+        </div>
 
-        <main>
-            <div class="topbar">
-                <div class="topbar-inner">
-
-                    <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
-                        {% csrf_token %}
-                    </form>
-                    <div class="topbar-user">
-                        <button type="button" class="btn btn-ghost small js-logout">
-                            <i class="fa-solid fa-right-from-bracket"></i> Salir
-                        </button>
-                        <i class="fa-regular fa-bell bell"></i>
-                        <span>{{ user.name }}</span>
-                        <div class="avatar-circle">
-                            {% if user.profile.avatar_url %}
-                            <img src="{{ user.profile.avatar_url }}" alt="Avatar">
-                            {% else %}
-                            <i class="fa-regular fa-user"></i>
-                            {% endif %}
-                        </div>
-                    </div>
+        <div class="kpis">
+            <div class="kpi card">
+                <div class="icon"><i class="fa-solid fa-book-open"></i></div>
+                <div>
+                    <div class="label">Materias inscritas</div>
+                    <div class="value">{{ courses|length }}</div>
                 </div>
             </div>
-
-            <div class="content">
-                <div class="container">
-                    <div class="welcome">
-                        <div class="welcome-head place-back">
-                            <button type="button" class="btn-back js-back" aria-label="Volver atrás">
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </button>
-                            <h1>Bienvenido, {{ user.name }}</h1>
-                        </div>
-                        <p class="welcome-sub">Gestiona tus materias y únete a nuevas clases desde aquí</p>
-                    </div>
-
-                    <div class="kpis">
-                        <div class="kpi card">
-                            <div class="icon"><i class="fa-solid fa-book-open"></i></div>
-                            <div>
-                                <div class="label">Materias inscritas</div>
-                                <div class="value">{{ courses|length }}</div>
-                            </div>
-                        </div>
-                        <div class="kpi card">
-                            <div class="icon"><i class="fa-solid fa-compass"></i></div>
-                            <div>
-                                <div class="label">Disponibles para unirse</div>
-                                <div class="value">{{ other_courses|length }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="header-row">
-                        <h2>Mis Materias</h2>
-                    </div>
-
-                    <div class="courses-grid">
-                        {% for c in courses %}
-                        <article class="course-card card">
-                            <div class="card-header">
-                                <h3>{{ c.name }}</h3>
-                                <button class="icon-button" type="button" title="Opciones">
-                                    <i class="fa-solid fa-ellipsis"></i>
-                                </button>
-                            </div>
-                            <div class="course-meta muted">Semestre: {{ c.level }}</div>
-                            {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
-                            <div class="course-actions">
-                                <a href="#" class="btn btn-secondary">Ver detalles</a>
-                                <a href="{% url 'chatbot:course_chat' c.id %}" class="btn btn-primary">Abrir chat</a>
-                                <a href="{% url 'courses:student_leave' c.id %}" class="btn btn-danger-soft">Salir</a>
-                            </div>
-                        </article>
-                        {% empty %}
-                        <p>No estás inscrito en ninguna materia.</p>
-                        {% endfor %}
-                    </div>
-
-                    <div class="header-row" style="margin-top:18px">
-                        <h2>Explora y únete a nuevas materias</h2>
-                    </div>
-
-                    <div class="courses-grid">
-                        {% for c in other_courses %}
-                        <article class="course-card card">
-                            <div class="card-header">
-                                <h3>{{ c.name }}</h3>
-                                <button class="icon-button" type="button" title="Opciones">
-                                    <i class="fa-solid fa-ellipsis"></i>
-                                </button>
-                            </div>
-                            <div class="course-meta muted">Nivel: {{ c.level }}</div>
-                            {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
-                            <div class="course-actions">
-                                <a href="#" class="btn btn-outline">Ver detalles</a>
-                                <a href="{% url 'courses:student_join' c.id %}" class="btn btn-primary">
-                                    <i class="fa-solid fa-right-to-bracket"></i> Unirse
-                                </a>
-                            </div>
-                        </article>
-                        {% empty %}
-                        <p>No hay materias disponibles por ahora.</p>
-                        {% endfor %}
-                    </div>
-
+            <div class="kpi card">
+                <div class="icon"><i class="fa-solid fa-compass"></i></div>
+                <div>
+                    <div class="label">Disponibles para unirse</div>
+                    <div class="value">{{ other_courses|length }}</div>
                 </div>
             </div>
-        </main>
+        </div>
+
+        <div class="header-row">
+            <h2>Mis Materias</h2>
+        </div>
+
+        <div class="courses-grid">
+            {% for c in courses %}
+            <article class="course-card card">
+                <div class="card-header">
+                    <h3>{{ c.name }}</h3>
+                    <button class="icon-button" type="button" title="Opciones">
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </button>
+                </div>
+                <div class="course-meta muted">Semestre: {{ c.level }}</div>
+                {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
+                <div class="course-actions">
+                    <a href="{% url 'courses:student_course_detail' c.pk %}" class="btn btn-secondary">Ver detalles</a>
+                    <a href="{% url 'chatbot:course_chat' c.id %}" class="btn btn-primary">Abrir chat</a>
+                    <a href="{% url 'courses:student_leave' c.id %}" class="btn btn-danger-soft">Salir</a>
+                </div>
+            </article>
+            {% empty %}
+            <p>No estás inscrito en ninguna materia.</p>
+            {% endfor %}
+        </div>
+
+        <div class="header-row" style="margin-top:18px">
+            <h2>Explora y únete a nuevas materias</h2>
+        </div>
+
+        <div class="courses-grid">
+            {% for c in other_courses %}
+            <article class="course-card card">
+                <div class="card-header">
+                    <h3>{{ c.name }}</h3>
+                    <button class="icon-button" type="button" title="Opciones">
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </button>
+                </div>
+                <div class="course-meta muted">Nivel: {{ c.level }}</div>
+                {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
+                <div class="course-actions">
+                    <a href="{% url 'courses:student_course_detail' c.pk %}" class="btn btn-outline">Ver detalles</a>
+                    <a href="{% url 'courses:student_join' c.id %}" class="btn btn-primary">
+                        <i class="fa-solid fa-right-to-bracket"></i> Unirse
+                    </a>
+                </div>
+            </article>
+            {% empty %}
+            <p>No hay materias disponibles por ahora.</p>
+            {% endfor %}
+        </div>
+
     </div>
+</div>
 
-    <script src="{% static 'js/ui.js' %}"></script>
-</body>
-
-</html>
+{% endblock content %}

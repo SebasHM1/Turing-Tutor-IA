@@ -1,7 +1,12 @@
 # courses/models.py
+import os
+import uuid
+from unidecode import unidecode
+from django.utils.text import slugify
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import FileExtensionValidator
 import secrets
 import string
 
@@ -125,6 +130,24 @@ class Enrollment(models.Model):
     def __str__(self):
         return f'{self.student.email} ↔ {self.course.name}'
 
+
+def sanitized_upload_to(instance, filename):
+    """
+    Renombra el archivo subido a un formato seguro y único.
+    Ej: 'Monitorías del 20%.pdf' -> 'monitorias-del-20-a1b2c3d4.pdf'
+    """
+    path, extension = os.path.splitext(filename)
+    
+    ascii_name = unidecode(path)
+    
+    slug_name = slugify(ascii_name)
+    
+    unique_id = uuid.uuid4().hex[:8]
+    
+    safe_filename = f"{slug_name}-{unique_id}{extension}"
+    
+    return os.path.join('tutoring_schedules', safe_filename)
+
 class TutoringSchedule(models.Model):
     """
     Almacena el archivo PDF con el horario de monitorías para un curso.
@@ -132,12 +155,13 @@ class TutoringSchedule(models.Model):
     course = models.OneToOneField(
         Course,
         on_delete=models.CASCADE,
-        primary_key=True, 
+        primary_key=True,
         related_name='tutoring_schedule'
     )
     file = models.FileField(
-        upload_to='tutoring_schedules/',
-        verbose_name="Archivo de Monitorías (PDF)"
+        upload_to=sanitized_upload_to,
+        verbose_name="Archivo de Monitorías (PDF)",
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])]
     )
     uploaded_at = models.DateTimeField(
         auto_now_add=True,
@@ -155,6 +179,23 @@ class TutoringSchedule(models.Model):
         blank=True,
         related_name='+'
     )
+
+    def save(self, *args, **kwargs):
+        # Primero, verifica si este objeto ya existe en la base de datos.
+        if self.pk:
+            try:
+                # Obtiene la instancia antigua de la base de datos.
+                old_instance = TutoringSchedule.objects.get(pk=self.pk)
+                # Si el archivo ha cambiado, elimina el antiguo.
+                if old_instance.file and old_instance.file != self.file:
+                    old_instance.file.delete(save=False)
+            except TutoringSchedule.DoesNotExist:
+                # Esto no debería ocurrir si self.pk está definido, pero es bueno manejarlo.
+                pass
+        
+        # Llama al método save original para guardar la nueva instancia (y el nuevo archivo).
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         return f"Horario de monitorías para {self.course.name}"

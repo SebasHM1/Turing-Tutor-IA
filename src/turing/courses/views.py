@@ -1,9 +1,9 @@
 # courses/views.py
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
-from django.views.generic import ListView, RedirectView
+from django.views.generic import ListView, RedirectView, DetailView
 from django.shortcuts import get_object_or_404
-from .models import Course, Enrollment
+from .models import Course, Enrollment, TeacherCourse, TutoringSlot
 
 class StudentsOnlyMixin(UserPassesTestMixin):
     def test_func(self):
@@ -34,3 +34,20 @@ class LeaveCourseStudentView(LoginRequiredMixin, StudentsOnlyMixin, RedirectView
     def get_redirect_url(self, *args, **kwargs):
         Enrollment.objects.filter(student=self.request.user, course_id=kwargs['pk']).delete()
         return reverse_lazy('courses:my_student_courses')
+
+class StudentCourseDetailView(LoginRequiredMixin, StudentsOnlyMixin, DetailView):
+    model = Course
+    template_name = 'student_course_detail.html'
+    context_object_name = 'course'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        course = self.get_object()
+        
+        teacher_assignments = (TeacherCourse.objects
+                                  .filter(course=course)
+                                  .select_related('teacher')
+                                  .prefetch_related('tutoring_slots'))
+        
+        context['teacher_assignments'] = teacher_assignments
+        return context 
