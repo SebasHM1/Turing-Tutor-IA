@@ -6,6 +6,7 @@ from django.utils.text import slugify
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import FileExtensionValidator
 import secrets
 import string
 
@@ -154,12 +155,13 @@ class TutoringSchedule(models.Model):
     course = models.OneToOneField(
         Course,
         on_delete=models.CASCADE,
-        primary_key=True, 
+        primary_key=True,
         related_name='tutoring_schedule'
     )
     file = models.FileField(
         upload_to=sanitized_upload_to,
-        verbose_name="Archivo de Monitorías (PDF)"
+        verbose_name="Archivo de Monitorías (PDF)",
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])]
     )
     uploaded_at = models.DateTimeField(
         auto_now_add=True,
@@ -178,10 +180,26 @@ class TutoringSchedule(models.Model):
         related_name='+'
     )
 
+    def save(self, *args, **kwargs):
+        # Primero, verifica si este objeto ya existe en la base de datos.
+        if self.pk:
+            try:
+                # Obtiene la instancia antigua de la base de datos.
+                old_instance = TutoringSchedule.objects.get(pk=self.pk)
+                # Si el archivo ha cambiado, elimina el antiguo.
+                if old_instance.file and old_instance.file != self.file:
+                    old_instance.file.delete(save=False)
+            except TutoringSchedule.DoesNotExist:
+                # Esto no debería ocurrir si self.pk está definido, pero es bueno manejarlo.
+                pass
+        
+        # Llama al método save original para guardar la nueva instancia (y el nuevo archivo).
+        super().save(*args, **kwargs)
+
+
     def __str__(self):
         return f"Horario de monitorías para {self.course.name}"
 
     class Meta:
         verbose_name = "Horario de Monitoría"
         verbose_name_plural = "Horarios de Monitorías"
-
