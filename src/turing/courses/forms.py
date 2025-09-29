@@ -27,6 +27,10 @@ class KnowledgeBaseFileForm(forms.ModelForm):
     class Meta:
         model = KnowledgeBaseFile
         fields = ['file', 'name']
+        widgets = {
+            'file': forms.FileInput(attrs={'accept': '.pdf'}),
+            'name': forms.TextInput(attrs={'placeholder': 'Nombre del archivo (opcional)'}),
+        }
         
 class TutoringScheduleForm(forms.ModelForm):
     class Meta:

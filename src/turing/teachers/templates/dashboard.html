@@ -130,7 +130,7 @@
                                 estudiantes</div>
 
                             <div class="course-actions">
-                                <a href="#" class="btn btn-secondary">Ver detalles</a>
+                                <a href="{% url 'courses:detail' c.pk %}" class="btn btn-secondary">Ver detalles</a>
                                 <a href="{% url 'teachers:edit_tutoring' c.pk %}" class="btn btn-primary-soft">Gestionar Monitoría</a>
                                 <a href="{% url 'teachers:leave' c.id %}" class="btn btn-danger-soft">Salir del
                                     curso</a>

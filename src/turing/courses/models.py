@@ -146,12 +146,18 @@ class CoursePrompt(models.Model):
 
 class KnowledgeBaseFile(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='knowledge_files')
-    file = models.FileField(upload_to='knowledge_base/')
+    file = models.FileField(upload_to='knowledge_base/', max_length=500)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=255, blank=True)
+    extracted_text = models.TextField(blank=True, help_text="Text extracted from PDF")
+    text_chunks = models.JSONField(default=list, blank=True, help_text="Text chunks for RAG")
+    embeddings = models.JSONField(default=list, blank=True, help_text="Vector embeddings for chunks")
+    processed = models.BooleanField(default=False, help_text="Whether the file has been processed for RAG")
+    processing_error = models.TextField(blank=True, help_text="Error message if processing failed")
 
     def __str__(self):
         return self.name or self.file.name
+    
 class TutoringSchedule(models.Model):
     """
     Almacena el archivo PDF con el horario de monitorías para un curso.

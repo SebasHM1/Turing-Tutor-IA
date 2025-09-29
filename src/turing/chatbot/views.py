@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from users.decorators import student_required
 from .models import ChatSession, ChatMessage
 from courses.models import Enrollment, Course
+from courses.rag_utils import rag_processor
 
 
 import os
@@ -95,15 +96,45 @@ def send_message(request):
                 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
                 # Memoria de conversación
-                context = get_chat_context(session, limit=5)
-                full_prompt = f"{context}{user_message}"
+                context_messages = get_chat_context(session, limit=5)
+                
+                # RAG: Buscar contexto relevante de la base de conocimiento
+                rag_context = ""
+                if session.course_id:
+                    print(f"DEBUG RAG: Buscando contexto para curso ID: {session.course_id}")
+                    print(f"DEBUG RAG: Pregunta del usuario: {user_message}")
+                    try:
+                        rag_context = rag_processor.create_rag_context(user_message, session.course_id)
+                        if rag_context:
+                            print(f"DEBUG RAG: Contexto encontrado, longitud: {len(rag_context)} caracteres")
+                            print(f"DEBUG RAG: Primeros 200 caracteres del contexto: {rag_context[:200]}...")
+                        else:
+                            print("DEBUG RAG: No se encontró contexto relevante")
+                    except Exception as rag_error:
+                        print(f"DEBUG RAG: Error en RAG: {rag_error}")
+                        # Continue without RAG context if there's an error
+                else:
+                    print("DEBUG RAG: Sin curso asociado, no se usará RAG")
+                
+                # Construir el prompt del sistema base
+                system_prompt = "Eres un asistente de IA útil para estudiantes universitarios."
+                
+                # Preparar mensajes para OpenAI
+                messages_for_api = [{"role": "system", "content": system_prompt}]
+                
+                # Añadir contexto de conversación (incluye prompt del curso si existe)
+                messages_for_api.extend(context_messages)
+                
+                # Añadir contexto RAG si está disponible
+                if rag_context:
+                    messages_for_api.append({"role": "system", "content": rag_context})
+                
+                # Añadir mensaje del usuario
+                messages_for_api.append({"role": "user", "content": user_message})
 
                 completion = client.chat.completions.create(
                     model="gpt-4o-mini",  # Puedes cambiar el modelo si lo deseas
-                    messages=[
-                        {"role": "system", "content": "Eres un asistente de IA útil para estudiantes universitarios."},
-                        {"role": "user", "content": full_prompt}
-                    ]
+                    messages=messages_for_api
                 )
 
                 data = json.loads(completion.model_dump_json())
@@ -159,16 +190,38 @@ def delete_session(request, session_id):
 
 def get_chat_context(session, limit=5):
     """
-    Devuelve los últimos mensajes en formato messages para OpenAI
+    Devuelve los últimos mensajes en formato messages para OpenAI,
+    incluyendo siempre el prompt del curso si existe
     """
     recent_messages = ChatMessage.objects.filter(
         session=session
     ).order_by('-timestamp')[:limit]
 
     messages = []
+    
+    # Añadir prompt del curso al inicio del contexto si existe
+    if session.course_id:
+        try:
+            from courses.models import CoursePrompt
+            course_prompt = CoursePrompt.objects.get(course_id=session.course_id)
+            if course_prompt.content.strip():
+                # Incluir el prompt del curso como contexto del sistema
+                course_context = f"""Instrucciones específicas para el curso {session.course.name}:
+{course_prompt.content}
+
+Recuerda seguir estas instrucciones en todas tus respuestas para este curso."""
+                messages.append({"role": "system", "content": course_context})
+        except CoursePrompt.DoesNotExist:
+            # No hay prompt personalizado para este curso
+            pass
+        except Exception as e:
+            print(f"Error loading course prompt: {e}")
+    
+    # Añadir historial de conversación
     for msg in reversed(recent_messages):
         role = 'assistant' if msg.sender == 'bot' else 'user'
         messages.append({"role": role, "content": msg.message})
+        
     return messages
 
 @login_required

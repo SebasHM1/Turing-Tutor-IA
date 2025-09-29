@@ -29,6 +29,14 @@
                     </div>
                     <div class="card" style="padding:16px; margin-bottom:24px;">
                         <h2>Subir nuevo archivo PDF</h2>
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <h4>Errores en el formulario:</h4>
+                            {{ form.errors }}
+                        </div>
+                        {% endif %}
+                        
                         <form method="post" enctype="multipart/form-data" style="display:flex; gap:12px; align-items:center;">
                             {% csrf_token %}
                             {{ form.file }}
@@ -36,14 +44,24 @@
                             <button type="submit" class="btn btn-primary"><i class="fa-solid fa-upload"></i> Subir</button>
                         </form>
                     </div>
+                    
+                    <!-- Debug Info -->
+                    <div class="card" style="padding:16px; margin-bottom:24px; background:#f0f8ff;">
+                        <h3>Información de Debug</h3>
+                        <p><strong>ID del Curso:</strong> {{ course.id }}</p>
+                        <p><strong>Nombre del Curso:</strong> {{ course.name }}</p>
+                        <p><strong>Total archivos en este curso:</strong> {{ files|length }}</p>
+                    </div>
                     <div class="card" style="padding:16px;">
                         <h2>Archivos subidos</h2>
                         {% if files %}
+                        <p><strong>Total de archivos encontrados: {{ files|length }}</strong></p>
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
                                     <th>Archivo</th>
+                                    <th>Estado</th>
                                     <th>Subido</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -53,8 +71,33 @@
                                 <tr>
                                     <td>{{ f.name|default:f.file.name }}</td>
                                     <td><a href="{{ f.file.url }}" target="_blank">Ver PDF</a></td>
+                                    <td>
+                                        {% if f.processed %}
+                                            <span class="badge badge-success">
+                                                <i class="fa-solid fa-check"></i> Procesado 
+                                                ({{ f.text_chunks|length }} fragmentos)
+                                            </span>
+                                        {% elif f.processing_error %}
+                                            <span class="badge badge-danger">
+                                                <i class="fa-solid fa-exclamation-triangle"></i> Error
+                                            </span>
+                                            <br><small class="text-muted">{{ f.processing_error|truncatechars:100 }}</small>
+                                        {% else %}
+                                            <span class="badge badge-warning">
+                                                <i class="fa-solid fa-clock"></i> Sin procesar
+                                            </span>
+                                        {% endif %}
+                                    </td>
                                     <td>{{ f.uploaded_at|date:"Y-m-d H:i" }}</td>
                                     <td>
+                                        {% if not f.processed or f.processing_error %}
+                                        <form method="post" action="{% url 'courses:knowledge_base_reprocess' course.id f.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-primary-soft" title="Reprocesar para RAG">
+                                                <i class="fa-solid fa-sync"></i> Reprocesar
+                                            </button>
+                                        </form>
+                                        {% endif %}
                                         <form method="post" action="{% url 'courses:knowledge_base_delete' course.id f.id %}" style="display:inline;">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-danger-soft" onclick="return confirm('¿Eliminar este archivo?')">
@@ -67,7 +110,8 @@
                             </tbody>
                         </table>
                         {% else %}
-                        <p class="muted">No hay archivos subidos aún.</p>
+                        <p class="muted">No hay archivos subidos aún para el curso ID: {{ course.id }}</p>
+                        <p class="muted">Información de debug: Se están buscando archivos para course_id={{ course.id }}</p>
                         {% endif %}
                     </div>
                 </div>
