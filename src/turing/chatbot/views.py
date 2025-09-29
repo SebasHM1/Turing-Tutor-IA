@@ -170,3 +170,18 @@ def get_chat_context(session, limit=5):
         role = 'assistant' if msg.sender == 'bot' else 'user'
         messages.append({"role": role, "content": msg.message})
     return messages
+
+@login_required
+@require_POST
+def rename_session(request, pk):
+    name = (request.POST.get('name') or '').strip()
+    if not name:
+        return HttpResponseBadRequest('Nombre requerido')
+    
+    session = get_object_or_404(ChatSession, id=pk, user=request.user)
+    session.name = name[:80]
+    session.save(update_fields=['name'])
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'ok': True, 'name': session.name})
+    return redirect('chatbot:chat_detail', pk=session.id)
