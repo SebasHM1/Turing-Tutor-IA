@@ -2,7 +2,8 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
 
 from users.decorators import student_required
@@ -132,7 +133,6 @@ def send_message(request):
 @student_required
 @login_required
 def create_session_course(request, course_id):
-    # Garantiza que el usuario pertenece a la materia
     if not Enrollment.objects.filter(student=request.user, course_id=course_id).exists():
         return redirect('courses:my_student_courses')
     session = ChatSession.objects.create(

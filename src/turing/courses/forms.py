@@ -1,14 +1,14 @@
 # courses/forms.py
 from django import forms
-from .models import Course, CoursePrompt, KnowledgeBaseFile
+from .models import Course, CoursePrompt, KnowledgeBaseFile, TutoringSchedule
 
 class CourseForm(forms.ModelForm):
     class Meta:
         model  = Course
         fields = ['name', 'description', 'level', 'schedule']
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 3}),
-        }
+        labels = {'level': 'Semestre'}
+        widgets = {'description': forms.Textarea(attrs={'rows': 3})}
+
 
 class JoinByCodeTeacherForm(forms.Form):
     code = forms.CharField(max_length=12)
@@ -27,3 +27,11 @@ class KnowledgeBaseFileForm(forms.ModelForm):
     class Meta:
         model = KnowledgeBaseFile
         fields = ['file', 'name']
+        
+class TutoringScheduleForm(forms.ModelForm):
+    class Meta:
+        model = TutoringSchedule
+        fields = ['file']
+        widgets = {
+            'file': forms.FileInput(attrs={'accept': '.pdf'}),
+        }

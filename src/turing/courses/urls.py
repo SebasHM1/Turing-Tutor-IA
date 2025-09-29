@@ -14,4 +14,6 @@ urlpatterns = [
     path('<int:pk>/',                  CourseDetailView.as_view(),       name='detail'),
     path('<int:pk>/prompt/',           CoursePromptEditView.as_view(),   name='prompt_edit'),
     path('<int:pk>/knowledge/', KnowledgeBaseView.as_view(), name='knowledge_base'),
+    path('my/',         MyStudentCoursesView.as_view(),  name='my_courses'),
 ]
+

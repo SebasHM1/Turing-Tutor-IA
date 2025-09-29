@@ -3,11 +3,10 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chatbot</title>
     <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <script>
@@ -27,7 +26,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
-<body>
+<body class="chat-page">
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- User Info -->
@@ -40,8 +39,9 @@
                 {% endif %}
             </div>
             <div class="user-details" style="margin-left: 40px;">
-                <div class="brand-title"><a href="{% url 'courses:my_student_courses' %}" class="brand-link">Turing
-                        IA</a></div>
+                <div class="brand-title">
+                    <a href="{% url 'courses:my_student_courses' %}" class="brand-link">Turing IA</a>
+                </div>
                 <h3>{{ user.get_full_name|default:user.email }}</h3>
                 <p>Student ID:</p>
                 <p class="student-id">{{ user.university_code }}</p>
@@ -81,11 +81,7 @@
         <!-- Recent Chats-->
         <div class="recent-chats">
             <h3>
-                {% if current_course %}
-                Chats de {{ current_course.name }}
-                {% else %}
-                Chats recientes
-                {% endif %}
+                {% if current_course %}Chats de {{ current_course.name }}{% else %}Chats recientes{% endif %}
             </h3>
             <ul>
                 {% for chat in recent_chats %}
@@ -96,11 +92,15 @@
                             <span class="chat-time">{{ chat.created_at|date:"H:i" }}</span>
                         </div>
                     </a>
+                    <button type="button" class="rename-chat" data-id="{{ chat.id }}" title="Renombrar"
+                        style="border:none;background:none;cursor:pointer;">✏️</button>
                     <form method="post" action="{% url 'chatbot:delete_session' chat.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" style="border:none;background:none;color:red;">🗑️</button>
+                        {% csrf_token %}<button type="submit"
+                            style="border:none;background:none;color:red;">🗑️</button>
                     </form>
                 </li>
+
+
                 {% empty %}
                 <li>No tienes chats recientes</li>
                 {% endfor %}
@@ -131,6 +131,13 @@
             </div>
         </div>
 
+        <form id="chat-form" data-send-url="{% url 'chatbot:send_message' %}"
+            data-session-id="{{ current_session.id }}">
+            {% csrf_token %}
+            <input type="text" id="message-input" autocomplete="off" placeholder="Escribe tu mensaje..." required>
+            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+        </form>
+
         <!-- Chat Log -->
         <div id="chat-log">
             {% for msg in messages %}
@@ -140,14 +147,6 @@
             </div>
             {% endfor %}
         </div>
-
-        <!-- Message Input Form -->
-        <form id="chat-form" data-send-url="{% url 'chatbot:send_message' %}"
-            data-session-id="{{ current_session.id }}">
-            {% csrf_token %}
-            <input type="text" id="message-input" autocomplete="off" placeholder="Escribe tu mensaje..." required>
-            <button type="submit"><i class="fas fa-paper-plane"></i></button>
-        </form>
 
         <script src="{% static 'js/chatbot.js' %}"></script>
     </div>

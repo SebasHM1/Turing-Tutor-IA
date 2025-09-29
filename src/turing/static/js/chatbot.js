@@ -111,3 +111,29 @@ document.addEventListener('DOMContentLoaded', function() {
         MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err.message));
     }
 });
+
+
+requestAnimationFrame(() => { chatLog.scrollTop = chatLog.scrollHeight; });
+
+
+document.querySelectorAll('.rename-chat').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const current = (btn.parentElement.querySelector('.chat-name')?.textContent || '').trim();
+        const name = prompt('Nuevo nombre del chat:', current);
+        if (!name) return;
+
+        const res = await fetch(`/chatbot/session/${id}/rename/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'X-Requested-With': 'XMLHttpRequest' },
+            body: new URLSearchParams({ name })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const label = btn.parentElement.querySelector('.chat-name');
+            if (data.name && label) label.textContent = data.name;
+        } else {
+            alert('No se pudo renombrar el chat.');
+        }
+    }, { passive: true });
+});
