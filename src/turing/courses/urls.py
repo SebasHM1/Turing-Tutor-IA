@@ -3,10 +3,10 @@ from django.urls import path
 from .views import (
     MyStudentCoursesView, JoinCourseStudentView, LeaveCourseStudentView, 
     CourseDetailView, CoursePromptEditView, KnowledgeBaseView,
-    KnowledgeBaseDeleteView, KnowledgeBaseReprocessView
+    KnowledgeBaseDeleteView, KnowledgeBaseReprocessView, StudentCourseDetailView
 )
 
-
+from .views_proxy import tutoring_schedule_proxy
 app_name = 'courses'
 
 urlpatterns = [
@@ -19,5 +19,7 @@ urlpatterns = [
     path('<int:course_pk>/knowledge/<int:file_pk>/delete/', KnowledgeBaseDeleteView.as_view(), name='knowledge_base_delete'),
     path('<int:course_pk>/knowledge/<int:file_pk>/reprocess/', KnowledgeBaseReprocessView.as_view(), name='knowledge_base_reprocess'),
     path('my/',         MyStudentCoursesView.as_view(),  name='my_courses'),
+    path('course/<int:pk>/', StudentCourseDetailView.as_view(), name='student_course_detail'),
+    path( "courses/<int:pk>/tutoring_schedule_proxy/", tutoring_schedule_proxy, name="tutoring_schedule_proxy"),
 ]
 

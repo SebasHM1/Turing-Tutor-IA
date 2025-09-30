@@ -12,6 +12,14 @@
     --danger-text: #B91C1C;
 }
 
+.pdf-viewer-container {
+    margin-top: 1rem;
+    padding: 0; 
+    overflow: hidden; 
+    height: 800px; 
+    resize: vertical; 
+}
+
 body.dashboard {
     display: block;
     background: var(--bg-app);
