@@ -5,18 +5,11 @@ import json
 from typing import List, Dict, Any, Tuple
 from django.conf import settings
 from openai import OpenAI
-
-try:
-    import PyPDF2
-    import numpy as np
-    from sklearn.feature_extraction.text import TfidfVectorizer
-    from sklearn.metrics.pairwise import cosine_similarity
-except ImportError as e:
-    print(f"Warning: Missing dependencies for RAG functionality: {e}")
-    PyPDF2 = None
-    np = None
-    cosine_similarity = None
-    TfidfVectorizer = None
+import PyPDF2
+import numpy as np
+from .models import KnowledgeBaseFile
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 class RAGProcessor:
@@ -27,34 +20,23 @@ class RAGProcessor:
         self.chunk_overlap = 200  # Characters to overlap between chunks
         self.max_chunks_for_context = 3  # Maximum chunks to include in context
         
-    def extract_text_from_pdf(self, pdf_path: str) -> str:
+    def extract_text_from_pdf(self, pdf_file) -> str:
         """Extract text content from a PDF file."""
         if not PyPDF2:
-            print("DEBUG RAG: ERROR - PyPDF2 no está disponible")
             raise ImportError("PyPDF2 is required for PDF processing")
             
         try:
-            print(f"DEBUG RAG: Intentando abrir PDF: {pdf_path}")
-            print(f"DEBUG RAG: ¿Archivo existe? {os.path.exists(pdf_path)}")
+            # Read the file content directly from the Django file field
+            pdf_file.seek(0)  # Make sure we're at the beginning of the file
+            reader = PyPDF2.PdfReader(pdf_file)
             
-            with open(pdf_path, 'rb') as file:
-                reader = PyPDF2.PdfReader(file)
-                print(f"DEBUG RAG: PDF abierto, número de páginas: {len(reader.pages)}")
-                
-                text = ""
-                for i, page in enumerate(reader.pages):
-                    page_text = page.extract_text()
-                    text += page_text + "\n"
-                    if i < 3:  # Solo mostrar las primeras 3 páginas para debug
-                        print(f"DEBUG RAG: Página {i+1}, texto extraído: {len(page_text)} caracteres")
-                        if page_text:
-                            print(f"DEBUG RAG: Primeros 100 chars de página {i+1}: {page_text[:100]}")
-                
-                print(f"DEBUG RAG: Extracción completada, total: {len(text)} caracteres")
-                return text.strip()
+            text = ""
+            for page in reader.pages:
+                page_text = page.extract_text()
+                text += page_text + "\n"
+            
+            return text.strip()
         except Exception as e:
-            print(f"DEBUG RAG: Error en extract_text_from_pdf: {str(e)}")
-            print(f"DEBUG RAG: Tipo de error: {type(e).__name__}")
             raise Exception(f"Error extracting text from PDF: {str(e)}")
     
     def clean_text(self, text: str) -> str:
@@ -114,7 +96,6 @@ class RAGProcessor:
             
             return embeddings
         except Exception as e:
-            print(f"Error getting OpenAI embeddings: {e}")
             # Fallback to TF-IDF if OpenAI fails
             return self.get_embeddings_tfidf(texts)
     
@@ -130,34 +111,22 @@ class RAGProcessor:
     def process_pdf_file(self, knowledge_file) -> Dict[str, Any]:
         """Process a KnowledgeBaseFile: extract text, chunk it, and create embeddings."""
         try:
-            print(f"DEBUG RAG: Iniciando procesamiento del archivo ID: {knowledge_file.id}")
-            print(f"DEBUG RAG: Archivo: {knowledge_file.file.name}")
-            
             # Extract text from PDF
-            pdf_path = knowledge_file.file.path
-            print(f"DEBUG RAG: Ruta del PDF: {pdf_path}")
-            
-            extracted_text = self.extract_text_from_pdf(pdf_path)
-            print(f"DEBUG RAG: Texto extraído, longitud: {len(extracted_text)} caracteres")
+            extracted_text = self.extract_text_from_pdf(knowledge_file.file)
             
             cleaned_text = self.clean_text(extracted_text)
-            print(f"DEBUG RAG: Texto limpiado, longitud: {len(cleaned_text)} caracteres")
             
             # Create chunks
             chunks = self.chunk_text(cleaned_text)
-            print(f"DEBUG RAG: Chunks creados: {len(chunks)}")
             
             if not chunks:
-                print("DEBUG RAG: ERROR - No se pudieron crear chunks")
                 return {
                     'success': False,
                     'error': 'No text could be extracted from the PDF'
                 }
             
             # Get embeddings
-            print("DEBUG RAG: Generando embeddings...")
             embeddings = self.get_embeddings_openai(chunks)
-            print(f"DEBUG RAG: Embeddings generados: {len(embeddings)}")
             
             # Update the knowledge file
             knowledge_file.extracted_text = cleaned_text
@@ -167,8 +136,6 @@ class RAGProcessor:
             knowledge_file.processing_error = ""
             knowledge_file.save()
             
-            print(f"DEBUG RAG: Archivo procesado exitosamente - {len(chunks)} chunks, {len(embeddings)} embeddings")
-            
             return {
                 'success': True,
                 'chunks_count': len(chunks),
@@ -176,11 +143,6 @@ class RAGProcessor:
             }
             
         except Exception as e:
-            print(f"DEBUG RAG: ERROR en procesamiento: {str(e)}")
-            print(f"DEBUG RAG: Tipo de error: {type(e).__name__}")
-            import traceback
-            print(f"DEBUG RAG: Traceback completo: {traceback.format_exc()}")
-            
             # Save error information
             knowledge_file.processing_error = str(e)
             knowledge_file.processed = False
@@ -193,14 +155,11 @@ class RAGProcessor:
     
     def find_relevant_chunks(self, query: str, course_id: int, limit: int = None) -> List[Tuple[str, float]]:
         """Find the most relevant text chunks for a given query."""
-        from .models import KnowledgeBaseFile
         
         if limit is None:
             limit = self.max_chunks_for_context
             
         try:
-            print(f"DEBUG RAG: Buscando chunks para curso {course_id} con query: '{query}'")
-            
             # Get all processed files for the course
             knowledge_files = KnowledgeBaseFile.objects.filter(
                 course_id=course_id,
@@ -208,16 +167,11 @@ class RAGProcessor:
                 text_chunks__len__gt=0
             )
             
-            print(f"DEBUG RAG: Archivos procesados encontrados: {knowledge_files.count()}")
-            
             if not knowledge_files.exists():
-                print("DEBUG RAG: No hay archivos procesados para este curso")
                 return []
             
             # Get query embedding
-            print("DEBUG RAG: Generando embedding para la query...")
             query_embedding = self.get_embeddings_openai([query])[0]
-            print(f"DEBUG RAG: Embedding generado, dimensiones: {len(query_embedding)}")
             
             relevant_chunks = []
             
@@ -225,10 +179,7 @@ class RAGProcessor:
                 chunks = kf.text_chunks
                 embeddings = kf.embeddings
                 
-                print(f"DEBUG RAG: Procesando archivo '{kf.name}' con {len(chunks)} chunks")
-                
                 if not chunks or not embeddings or len(chunks) != len(embeddings):
-                    print(f"DEBUG RAG: Saltando archivo '{kf.name}' - datos inconsistentes")
                     continue
                 
                 # Calculate similarities
@@ -247,29 +198,21 @@ class RAGProcessor:
             
             # Sort by similarity and return top chunks
             relevant_chunks.sort(key=lambda x: x[1], reverse=True)
-            print(f"DEBUG RAG: Total chunks encontrados: {len(relevant_chunks)}")
-            if relevant_chunks:
-                print(f"DEBUG RAG: Mejor similitud: {relevant_chunks[0][1]:.4f}")
-                print(f"DEBUG RAG: Peor similitud en top {limit}: {relevant_chunks[min(limit-1, len(relevant_chunks)-1)][1]:.4f}")
             
             return relevant_chunks[:limit]
             
         except Exception as e:
-            print(f"DEBUG RAG: Error finding relevant chunks: {e}")
             return []
     
     def create_rag_context(self, query: str, course_id: int) -> str:
         """Create context from relevant knowledge base chunks."""
-        print(f"DEBUG RAG: create_rag_context llamado para curso {course_id}")
         relevant_chunks = self.find_relevant_chunks(query, course_id)
         
         if not relevant_chunks:
-            print("DEBUG RAG: No se encontraron chunks relevantes")
             return ""
         
         context_parts = []
         for i, (chunk, similarity) in enumerate(relevant_chunks, 1):
-            print(f"DEBUG RAG: Chunk {i} - Similitud: {similarity:.4f}, Longitud: {len(chunk)} chars")
             context_parts.append(f"[Fuente {i}]: {chunk}")
         
         context = "\n\n".join(context_parts)
@@ -284,7 +227,6 @@ Pregunta del estudiante: {query}
 
 Por favor, responde la pregunta utilizando la información de la base de conocimiento cuando sea relevante. Si la información de la base de conocimiento no es suficiente para responder completamente, puedes complementar con conocimiento general, pero menciona claramente qué parte viene de los materiales del curso."""
 
-        print(f"DEBUG RAG: Contexto final generado, longitud total: {len(final_context)} caracteres")
         return final_context
 
 
