@@ -72,7 +72,6 @@ class StudentGroupDetailView(LoginRequiredMixin, StudentsOnlyMixin, DetailView):
         context['course'] = group.course
         
         # Las monitorías personalizadas ahora vienen directamente del grupo.
-        # Ya no necesitamos el modelo intermedio TeacherCourse.
         context['teacher_tutoring_slots'] = group.tutoring_slots.all()
         
         return context

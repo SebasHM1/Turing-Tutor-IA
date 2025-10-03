@@ -34,12 +34,24 @@ class TeacherDashboardView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
     context_object_name = 'groups'  # El objeto principal ahora son los grupos
 
     def get_queryset(self):
-        # La consulta ahora es más simple: obtenemos los grupos asignados al profesor.
-        return (Group.objects
-                .filter(teacher=self.request.user)
-                .select_related('course') # Optimizamos para obtener el curso relacionado
-                .annotate(students_count=Count('enrollments')) # Contamos los estudiantes por grupo
-                .distinct())
+        # La consulta original obtiene los grupos que enseña el profesor.
+        # Pero si quieres mostrar una lista de CURSOS, debemos cambiar la lógica.
+        # Vamos a obtener los CURSOS donde el profesor imparte al menos un grupo.
+
+        teacher_courses_ids = (Group.objects
+                               .filter(teacher=self.request.user)
+                               .values_list('course_id', flat=True)
+                               .distinct())
+
+        # Ahora obtenemos los cursos y ANOTAMOS el conteo de estudiantes.
+        queryset = (Course.objects
+                    .filter(id__in=teacher_courses_ids)
+                    .annotate(
+                        # Para cada Course, cuenta los Enrollments que pertenecen a los grupos de ESE curso.
+                        students_count=Count('groups__enrollments', distinct=True)
+                    ))
+        
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
