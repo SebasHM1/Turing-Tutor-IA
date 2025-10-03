@@ -42,31 +42,26 @@ class Course(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class TeacherCourse(models.Model):
-    """Relación muchos-a-muchos profesor ↔ course."""
-    teacher = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='courses',
-        db_column='profesor'
-    )
-    course  = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE,
-        related_name='teachers',
-        db_column='materia'
-    )
-
-    joined_at = models.DateTimeField(auto_now_add=True, db_column='fecha_union')
-
+    
+class Group(models.Model):
+    """
+    Representa un grupo o clase específica de un curso,
+    con un profesor, un horario y un conjunto de estudiantes.
+    """
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='groups', verbose_name="Curso")
+    teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='taught_groups', verbose_name="Profesor")
+    name = models.CharField(max_length=100, verbose_name="Nombre del Grupo (ej: Grupo 1, G-01)")
+    schedule = models.CharField(max_length=255, verbose_name="Horario del Grupo")
+    
     class Meta:
-        unique_together = ('teacher', 'course')
-        db_table = 'courses_profesor_materia'
+        verbose_name = "Grupo"
+        verbose_name_plural = "Grupos"
+        unique_together = ('course', 'name') # No puede haber dos grupos con el mismo nombre en el mismo curso
 
     def __str__(self):
-        return f'{self.teacher.email} ↔ {self.course.name}'
+        return f"{self.course.name} - {self.name}"
+
+
 
 class TutoringSlot(models.Model):
     """Representa una única franja horaria de monitoría."""
@@ -80,11 +75,7 @@ class TutoringSlot(models.Model):
         SATURDAY = 'SAT', _('Sábado')
         SUNDAY = 'SUN', _('Domingo')
 
-    teacher_course = models.ForeignKey(
-        TeacherCourse, 
-        on_delete=models.CASCADE, 
-        related_name='tutoring_slots'
-    )
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='tutoring_slots', verbose_name="Grupo")
     day = models.CharField(
         max_length=3,
         choices=DaysOfWeek.choices,
@@ -100,35 +91,11 @@ class TutoringSlot(models.Model):
 
     class Meta:
         # Asegura que no haya dos horarios idénticos para el mismo profesor/curso
-        unique_together = ('teacher_course', 'day', 'start_time')
+        unique_together = ('group', 'day', 'start_time')
         ordering = ['day', 'start_time']
 
     def __str__(self):
         return f"{self.get_day_display()}: {self.start_time.strftime('%H:%M')} - {self.end_time.strftime('%H:%M')}"
-
-class Enrollment(models.Model):
-    """Relación estudiante ↔ course."""
-    student = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='enrollments',
-        limit_choices_to={'role': 'Student'},
-        db_column='estudiante'
-    )
-    course = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE,
-        related_name='enrollments',
-        db_column='materia'
-    )
-    joined_at = models.DateTimeField(auto_now_add=True, db_column='fecha_union')
-
-    class Meta:
-        unique_together = ('student', 'course')
-        db_table = 'courses_inscripcion'
-
-    def __str__(self):
-        return f'{self.student.email} ↔ {self.course.name}'
 
 class CoursePrompt(models.Model):
     course = models.OneToOneField(Course, on_delete=models.CASCADE, related_name='prompt')
@@ -180,6 +147,21 @@ def sanitized_upload_to(instance, filename):
     safe_filename = f"{slug_name}-{unique_id}{extension}"
     
     return os.path.join('tutoring_schedules', safe_filename)
+
+
+class Enrollment(models.Model):
+    """
+    Relaciona a un estudiante con un GRUPO específico, no con un curso.
+    """
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='enrollments', verbose_name="Estudiante")
+    # CAMBIO CLAVE: Apunta a Group, no a Course
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='enrollments', verbose_name="Grupo")
+    joined_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de unión")
+
+    class Meta:
+        verbose_name = "Inscripción"
+        verbose_name_plural = "Inscripciones"
+        unique_together = ('student', 'group') # Un estudiante solo puede estar una vez en el mismo grupo
 
 class TutoringSchedule(models.Model):
     """
