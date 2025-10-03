@@ -117,17 +117,12 @@ class KnowledgeBaseView(LoginRequiredMixin, TeachersOnlyMixin, FormView):
     form_class = KnowledgeBaseFileForm
 
     def post(self, request, *args, **kwargs):
-        print(f"DEBUG: POST method called for course {self.kwargs['pk']}")
-        print(f"DEBUG: Request FILES: {request.FILES}")
-        print(f"DEBUG: Request POST data: {request.POST}")
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        print(f"DEBUG: form_valid called - Form is valid!")
         course = Course.objects.get(pk=self.kwargs['pk'])
         file_obj = form.save(commit=False)
         file_obj.course = course
-        print(f"DEBUG: Saving file - Course: {course.id}, File: {file_obj.file.name if file_obj.file else 'NO FILE'}")
         
         # Asignar nombre si no se proporcionó
         if not file_obj.name and file_obj.file:
@@ -136,35 +131,25 @@ class KnowledgeBaseView(LoginRequiredMixin, TeachersOnlyMixin, FormView):
         try:
             # Guardar primero el archivo sin procesar
             file_obj.save()
-            print(f"DEBUG: File saved successfully with ID: {file_obj.id}")
-            
-            # Verificar que se guardó consultando la base de datos
-            saved_file = KnowledgeBaseFile.objects.get(id=file_obj.id)
-            print(f"DEBUG: Verification - File exists in DB: ID={saved_file.id}, Course={saved_file.course_id}")
             
         except Exception as e:
-            print(f"DEBUG: Error saving file: {str(e)}")
             messages.error(self.request, f"Error al guardar el archivo: {str(e)}")
             return self.form_invalid(form)
         
         # REACTIVAMOS EL PROCESAMIENTO RAG
         try:
-            print(f"DEBUG: Starting RAG processing for file ID: {file_obj.id}")
             result = rag_processor.process_pdf_file(file_obj)
             if result['success']:
-                print(f"DEBUG: RAG processing successful: {result['chunks_count']} chunks")
                 messages.success(
                     self.request, 
                     f"PDF subido y procesado exitosamente. {result['chunks_count']} fragmentos de texto creados."
                 )
             else:
-                print(f"DEBUG: RAG processing failed: {result['error']}")
                 messages.warning(
                     self.request,
                     f"PDF subido pero hubo un error al procesarlo: {result['error']}"
                 )
         except Exception as e:
-            print(f"DEBUG: Exception during RAG processing: {str(e)}")
             # Asegurémonos de que el archivo se marque como no procesado
             file_obj.processing_error = str(e)
             file_obj.processed = False
@@ -177,19 +162,12 @@ class KnowledgeBaseView(LoginRequiredMixin, TeachersOnlyMixin, FormView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        print(f"DEBUG: form_invalid called - Form has errors!")
-        print(f"DEBUG: Form errors: {form.errors}")
-        print(f"DEBUG: Form non_field_errors: {form.non_field_errors()}")
         return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['course'] = Course.objects.get(pk=self.kwargs['pk'])
         files = KnowledgeBaseFile.objects.filter(course_id=self.kwargs['pk'])
-        print(f"DEBUG: Course ID: {self.kwargs['pk']}")
-        print(f"DEBUG: Files found: {files.count()}")
-        for f in files:
-            print(f"DEBUG: File - ID: {f.id}, Name: {f.name}, Course: {f.course_id}")
         context['files'] = files
         context['active_page'] = 'knowledge_base'
         return context
@@ -198,30 +176,24 @@ class KnowledgeBaseView(LoginRequiredMixin, TeachersOnlyMixin, FormView):
         course = Course.objects.get(pk=self.kwargs['pk'])
         file_obj = form.save(commit=False)
         file_obj.course = course
-        print(f"DEBUG: Saving file - Course: {course.id}, File: {file_obj.file.name}")
         
         # Guardar primero el archivo sin procesar
         file_obj.save()
-        print(f"DEBUG: File saved with ID: {file_obj.id}")
         
         # Luego intentar procesarlo para RAG (esto no debería afectar el guardado)
         try:
-            print(f"DEBUG: Starting RAG processing for file ID: {file_obj.id}")
             result = rag_processor.process_pdf_file(file_obj)
             if result['success']:
-                print(f"DEBUG: RAG processing successful: {result['chunks_count']} chunks")
                 messages.success(
                     self.request, 
                     f"PDF subido y procesado exitosamente. {result['chunks_count']} fragmentos de texto creados."
                 )
             else:
-                print(f"DEBUG: RAG processing failed: {result['error']}")
                 messages.warning(
                     self.request,
                     f"PDF subido pero hubo un error al procesarlo: {result['error']}"
                 )
         except Exception as e:
-            print(f"DEBUG: Exception during RAG processing: {str(e)}")
             # Asegurémonos de que el archivo se marque como no procesado
             file_obj.processing_error = str(e)
             file_obj.processed = False

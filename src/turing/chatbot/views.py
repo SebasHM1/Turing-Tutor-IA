@@ -101,20 +101,12 @@ def send_message(request):
                 # RAG: Buscar contexto relevante de la base de conocimiento
                 rag_context = ""
                 if session.course_id:
-                    print(f"DEBUG RAG: Buscando contexto para curso ID: {session.course_id}")
-                    print(f"DEBUG RAG: Pregunta del usuario: {user_message}")
                     try:
                         rag_context = rag_processor.create_rag_context(user_message, session.course_id)
-                        if rag_context:
-                            print(f"DEBUG RAG: Contexto encontrado, longitud: {len(rag_context)} caracteres")
-                            print(f"DEBUG RAG: Primeros 200 caracteres del contexto: {rag_context[:200]}...")
-                        else:
-                            print("DEBUG RAG: No se encontró contexto relevante")
-                    except Exception as rag_error:
-                        print(f"DEBUG RAG: Error en RAG: {rag_error}")
-                        # Continue without RAG context if there's an error
+                    except Exception:
+                        rag_context = ""
                 else:
-                    print("DEBUG RAG: Sin curso asociado, no se usará RAG")
+                    rag_context = ""
                 
                 # Construir el prompt del sistema base
                 system_prompt = "Eres un asistente de IA útil para estudiantes universitarios."
