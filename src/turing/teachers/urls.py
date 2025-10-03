@@ -1,24 +1,41 @@
 # teachers/urls.py
 from django.urls import path
 from .views import (
-    TeacherDashboardView, CourseCreateView,
-    JoinCourseTeacherView, LeaveCourseTeacherView, JoinByCodeTeacherView, PromptEditView,
-    TutoringScheduleUploadView, TutoringScheduleListView, CourseDeleteView,
-    manage_tutoring_slots
+    # Vistas principales y de gestión de cursos
+    TeacherDashboardView,
+    CourseCreateView,
+    CourseDeleteView,
+    
+    # Vistas para la gestión de grupos y estudiantes
+    GroupCreateView,
+    manage_group_enrollments,
+
+    # Vistas para la gestión de monitorías (actualizadas)
+    TutoringScheduleListView,
+    TutoringScheduleUploadView,
+    manage_tutoring_slots,
+    
+    # Vistas de configuración
+    PromptEditView,
 )
 
 app_name = 'teachers'
 
 urlpatterns = [
-    path('dashboard/',                TeacherDashboardView.as_view(), name='dashboard'),
-    path('courses/new/',              CourseCreateView.as_view(),     name='create'),
-    path('courses/<int:pk>/join/',    JoinCourseTeacherView.as_view(),  name='join'),
-    path('courses/<int:pk>/leave/',   LeaveCourseTeacherView.as_view(), name='leave'),
-    path('courses/join-by-code/',     JoinByCodeTeacherView.as_view(),  name='join_by_code'),
-    path('prompt-edit/',              PromptEditView.as_view(),       name='prompt_edit'),
+    path('dashboard/', TeacherDashboardView.as_view(), name='dashboard'),
 
-    path('course/<int:course_pk>/upload-schedule/', TutoringScheduleUploadView.as_view(), name='upload_schedule'),
+    path('courses/new/', CourseCreateView.as_view(), name='course_create'),
+    path('courses/<int:pk>/delete/', CourseDeleteView.as_view(), name='course_delete'),
+
+    path('courses/<int:course_pk>/groups/new/', GroupCreateView.as_view(), name='group_create'),
+    
+    path('groups/<int:group_pk>/students/', manage_group_enrollments, name='manage_enrollments'),
+    
     path('tutoring-schedules/', TutoringScheduleListView.as_view(), name='tutoring_schedules'),
-    path('course/<int:course_pk>/edit-tutoring/', manage_tutoring_slots, name='edit_tutoring'),
-    path('courses/<int:pk>/delete/', CourseDeleteView.as_view(), name='delete'),
+    path('courses/<int:course_pk>/upload-schedule/', TutoringScheduleUploadView.as_view(), name='upload_schedule'),
+    
+    path('groups/<int:group_pk>/manage-tutoring/', manage_tutoring_slots, name='manage_tutoring'),
+
+    path('prompt-edit/', PromptEditView.as_view(), name='prompt_edit'),
+
 ]
