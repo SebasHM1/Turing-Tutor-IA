@@ -42,6 +42,7 @@ class TeacherDashboardView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
         context['total_students'] = my_courses.aggregate(total=Sum('students_count'))['total'] or 0
         context['avg_attendance'] = None
         context['join_code_form'] = JoinByCodeTeacherForm()
+        context['active_page'] = 'dashboard'
         return context
 
 class CourseCreateView(LoginRequiredMixin, TeachersOnlyMixin, CreateView):

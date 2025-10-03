@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 
+
 class PromptConfig(models.Model):
     key = models.CharField(max_length=50, unique=True, default="global")
     content = models.TextField("Prompt del profesor", default="", blank=True)

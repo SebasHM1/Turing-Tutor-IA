@@ -15,7 +15,7 @@ urlpatterns = [
     path('courses/<int:pk>/join/',    JoinCourseTeacherView.as_view(),  name='join'),
     path('courses/<int:pk>/leave/',   LeaveCourseTeacherView.as_view(), name='leave'),
     path('courses/join-by-code/',     JoinByCodeTeacherView.as_view(),  name='join_by_code'),
-    path('prompt/',                   PromptEditView.as_view(),         name='prompt_edit'),
+    path('prompt-edit/',              PromptEditView.as_view(),       name='prompt_edit'),
 
     path('course/<int:course_pk>/upload-schedule/', TutoringScheduleUploadView.as_view(), name='upload_schedule'),
     path('tutoring-schedules/', TutoringScheduleListView.as_view(), name='tutoring_schedules'),

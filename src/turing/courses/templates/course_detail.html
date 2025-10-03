@@ -1,0 +1,244 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course.name }} - Detalles</title>
+    <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard">
+    <div class="page">
+        {% if is_teacher %}
+            {% include '_sidebar_course.html' with course=course active_page='course_detail' %}
+        {% else %}
+            <aside class="sidebar">
+                <div class="brand-title"><a href="/chatbot/" class="brand-link">Turing</a></div>
+                <hr class="sidebar-divider">
+                <ul class="nav-links">
+                    <li><a href="{% url 'courses:my_student_courses' %}"><i class="fa-solid fa-house"></i> Mis Cursos</a></li>
+                    <li><a class="active" href="#"><i class="fa-solid fa-book-open"></i> {{ course.name }}</a></li>
+                </ul>
+            </aside>
+        {% endif %}
+        
+        <main>
+            <div class="topbar">
+                <div class="topbar-inner">
+                    <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
+                        {% csrf_token %}
+                    </form>
+                    <div class="topbar-user">
+                        <button type="button" class="btn btn-ghost small js-logout">
+                            <i class="fa-solid fa-right-from-bracket"></i> Salir
+                        </button>
+                        <i class="fa-regular fa-bell bell"></i>
+                        {% if is_teacher %}
+                            <span>Prof. {{ user.last_name }}</span>
+                        {% else %}
+                            <span>{{ user.first_name }} {{ user.last_name }}</span>
+                        {% endif %}
+                        <div class="avatar-circle">
+                            {% if user.profile.avatar_url %}
+                            <img src="{{ user.profile.avatar_url }}" alt="Avatar">
+                            {% else %}
+                            <i class="fa-regular fa-user"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="container">
+                    {% if messages %}
+                    <div class="flash-stack" style="margin-bottom:10px;">
+                        {% for m in messages %}
+                        <div class="alert {{ m.tags }}">{{ m }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="welcome">
+                        <div class="welcome-head place-back">
+                            <button type="button" class="btn-back js-back" aria-label="Volver atrás">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <h1>{{ course.name }}</h1>
+                        </div>
+                        <p class="welcome-sub">{{ course.description|default:"Descripción del curso" }}</p>
+                    </div>
+
+                    <div class="course-info-grid">
+                        <div class="card course-info">
+                            <h3><i class="fa-solid fa-info-circle"></i> Información del Curso</h3>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <strong>Código:</strong>
+                                    <span>{{ course.code }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <strong>Nivel:</strong>
+                                    <span>{{ course.level }}</span>
+                                </div>
+                                {% if course.schedule %}
+                                <div class="info-item">
+                                    <strong>Horario:</strong>
+                                    <span>{{ course.schedule }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="info-item">
+                                    <strong>Creado:</strong>
+                                    <span>{{ course.created_at|date:"d/m/Y" }}</span>
+                                </div>
+                                {% if is_teacher %}
+                                <div class="info-item">
+                                    <strong>Estudiantes:</strong>
+                                    <span>{{ course.enrollments.count }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if is_teacher %}
+                        <div class="card quick-actions">
+                            <h3><i class="fa-solid fa-bolt"></i> Acciones Rápidas</h3>
+                            <div class="actions-grid">
+                                <a href="{% url 'courses:prompt_edit' course.pk %}" class="action-card">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    <span>Configurar Prompt</span>
+                                </a>
+                                <a href="{% url 'courses:knowledge_base' course.pk %}" class="action-card">
+                                    <i class="fa-solid fa-database"></i>
+                                    <span>Subir PDFs</span>
+                                </a>
+                                <a href="{% url 'teachers:upload_schedule' course.pk %}" class="action-card">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <span>Horario Monitorías</span>
+                                </a>
+                                <a href="{% url 'teachers:edit_tutoring' course.pk %}" class="action-card">
+                                    <i class="fa-solid fa-clock"></i>
+                                    <span>Gestionar Horarios</span>
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if course.description %}
+                    <div class="card">
+                        <h3><i class="fa-solid fa-align-left"></i> Descripción</h3>
+                        <p>{{ course.description }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="{% static 'js/ui.js' %}"></script>
+    <style>
+        .course-info-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .course-info, .quick-actions {
+            padding: 1.5rem;
+        }
+        
+        .course-info h3, .quick-actions h3 {
+            margin: 0 0 1rem 0;
+            color: #333;
+            font-size: 1.125rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            gap: 0.75rem;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-item strong {
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        
+        .action-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+        
+        .action-card:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .action-card i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #007bff;
+        }
+        
+        .action-card span {
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .sidebar-title {
+            color: #666;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 0.5rem 1rem;
+        }
+        
+        .sidebar-section {
+            margin: 1rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .course-info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>

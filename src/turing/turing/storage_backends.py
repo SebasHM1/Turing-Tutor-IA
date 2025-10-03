@@ -19,18 +19,17 @@ class SupabaseStorage(Storage):
         'name' es el nombre/ruta del archivo.
         'content' es el archivo en sí.
         """
-        # Nos aseguramos de que el content se pueda leer varias veces si es necesario
-        content.seek(0)
-        file_data = content.read()
-        # Usamos la librería de Supabase para subir el archivo
-        response = self.client.storage.from_(self.bucket_name).upload(
-            path=name,
-            file=file_data,
-            # 'content-type' es importante para que el navegador sepa cómo mostrar el PDF
-            file_options={"content-type": "application/pdf"} 
-        )
-        # Devolvemos el nombre del archivo para que Django lo guarde en la base de datos
-        return name
+        try:
+            content.seek(0)
+            file_data = content.read()
+            response = self.client.storage.from_(self.bucket_name).upload(
+                path=name,
+                file=file_data,
+                file_options={"content-type": "application/pdf"}
+            )
+            return response.path
+        except Exception as e:
+            raise e
 
     def url(self, name):
         """

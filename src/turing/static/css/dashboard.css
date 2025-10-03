@@ -583,3 +583,48 @@ main {
         padding: 0 4px;
     }
 }
+
+/* Badge styles for knowledge base processing status */
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.badge-success {
+    background-color: #D1FAE5;
+    color: #065F46;
+}
+
+.badge-warning {
+    background-color: #FEF3C7;
+    color: #92400E;
+}
+
+.badge-danger {
+    background-color: #FEE2E2;
+    color: #B91C1C;
+}
+
+.btn-primary-soft {
+    background-color: #DBEAFE;
+    color: #1E40AF;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary-soft:hover {
+    background-color: #BFDBFE;
+}
+
+.text-muted {
+    color: var(--ink-weak);
+}

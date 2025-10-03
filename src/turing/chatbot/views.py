@@ -9,12 +9,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from users.decorators import student_required
 from .models import ChatSession, ChatMessage
 from courses.models import Enrollment, Course
-from teachers.models import PromptConfig 
+from courses.rag_utils import rag_processor
 
 
+import os
+import json
+from openai import OpenAI
 
-import google.generativeai as genai
-genai.configure(api_key=settings.GEMINI_API_KEY)
+import markdown
+from markdown.extensions import codehilite
+
+
 
 
 @login_required
@@ -73,7 +78,6 @@ def chatbot_view(request, session_id=None, course_id=None):
         'current_course': course,
     })
 
-
 @student_required
 @login_required
 def send_message(request):
@@ -81,18 +85,61 @@ def send_message(request):
         try:
             user_message = request.POST.get('message') or ''
             session_id = request.POST.get('session_id')
+
             session = ChatSession.objects.select_related('course').get(id=session_id, user=request.user)
             ChatMessage.objects.create(session=session, sender='user', message=user_message)
 
+
             try:
-                system_prompt = _get_system_prompt()
-                model = genai.GenerativeModel(
-                    'gemini-2.0-flash',
-                    system_instruction=system_prompt 
+                # Configura la API Key de OpenAI
+                os.environ['OPENAI_API_KEY'] = getattr(settings, 'OPENAI_API_KEY', None) or os.getenv('OPENAI_API_KEY')
+                client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+                # Memoria de conversación
+                context_messages = get_chat_context(session, limit=5)
+                
+                # RAG: Buscar contexto relevante de la base de conocimiento
+                rag_context = ""
+                if session.course_id:
+                    try:
+                        rag_context = rag_processor.create_rag_context(user_message, session.course_id)
+                    except Exception:
+                        rag_context = ""
+                else:
+                    rag_context = ""
+                
+                # Construir el prompt del sistema base
+                system_prompt = "Eres un asistente de IA útil para estudiantes universitarios."
+                
+                # Preparar mensajes para OpenAI
+                messages_for_api = [{"role": "system", "content": system_prompt}]
+                
+                # Añadir contexto de conversación (incluye prompt del curso si existe)
+                messages_for_api.extend(context_messages)
+                
+                # Añadir contexto RAG si está disponible
+                if rag_context:
+                    messages_for_api.append({"role": "system", "content": rag_context})
+                
+                # Añadir mensaje del usuario
+                messages_for_api.append({"role": "user", "content": user_message})
+
+                completion = client.chat.completions.create(
+                    model="gpt-4o-mini",  # Puedes cambiar el modelo si lo deseas
+                    messages=messages_for_api
                 )
-                response = model.generate_content(user_message)
-                bot_message = response.text
-            except Exception:
+
+                data = json.loads(completion.model_dump_json())
+                bot_message = data['choices'][0]['message']['content']
+
+                # Procesar markdown a HTML con resaltado de sintaxis
+                md = markdown.Markdown(extensions=[
+                    'codehilite',
+                    'fenced_code'
+                ])
+                bot_message = md.convert(bot_message)
+            except Exception as e:
+                print(f"Error with OpenAI API: {e}")
                 bot_message = "Sorry, there was an error with the AI service."
 
             ChatMessage.objects.create(session=session, sender='bot', message=bot_message)
@@ -132,9 +179,42 @@ def delete_session(request, session_id):
         pass
     return redirect('chatbot:chatbot')
 
-def _get_system_prompt() -> str:
-    cfg = PromptConfig.objects.filter(key="global").first()
-    return (cfg.content or "").strip() or "Eres un tutor académico claro, paciente y preciso."
+
+def get_chat_context(session, limit=5):
+    """
+    Devuelve los últimos mensajes en formato messages para OpenAI,
+    incluyendo siempre el prompt del curso si existe
+    """
+    recent_messages = ChatMessage.objects.filter(
+        session=session
+    ).order_by('-timestamp')[:limit]
+
+    messages = []
+    
+    # Añadir prompt del curso al inicio del contexto si existe
+    if session.course_id:
+        try:
+            from courses.models import CoursePrompt
+            course_prompt = CoursePrompt.objects.get(course_id=session.course_id)
+            if course_prompt.content.strip():
+                # Incluir el prompt del curso como contexto del sistema
+                course_context = f"""Instrucciones específicas para el curso {session.course.name}:
+{course_prompt.content}
+
+Recuerda seguir estas instrucciones en todas tus respuestas para este curso."""
+                messages.append({"role": "system", "content": course_context})
+        except CoursePrompt.DoesNotExist:
+            # No hay prompt personalizado para este curso
+            pass
+        except Exception as e:
+            print(f"Error loading course prompt: {e}")
+    
+    # Añadir historial de conversación
+    for msg in reversed(recent_messages):
+        role = 'assistant' if msg.sender == 'bot' else 'user'
+        messages.append({"role": role, "content": msg.message})
+        
+    return messages
 
 @login_required
 @require_POST

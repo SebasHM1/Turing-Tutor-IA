@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Prompt del curso</title>
+    <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body class="dashboard">
+    <div class="page">
+        {% include '_sidebar_course.html' with course=object.course active_page='course_prompt' %}
+        <main>
+            <div class="topbar">
+                <div class="topbar-inner">
+                    <div></div>
+                    <div class="topbar-user">
+                        <span>Prof. {{ user.last_name }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="container">
+                    <div class="header-row">
+                        <h1>Prompt del curso: {{ object.course.name }}</h1>
+                        <a href="{% url 'courses:detail' object.course.id %}" class="btn btn-secondary">← Volver</a>
+                    </div>
+                    <form method="post" class="card" style="padding:16px;">
+                        {% csrf_token %}
+                        <label for="{{ form.content.id_for_label }}" class="label">Prompt del profesor para este curso</label>
+                        {{ form.content }}
+                        <div style="margin-top:12px; display:flex; gap:8px;">
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                            <a class="btn btn-ghost" href="{% url 'courses:detail' object.course.id %}">Cancelar</a>
+                        </div>
+                    </form>
+                    {% if object and object.updated_at %}
+                    <p class="muted" style="margin-top:8px;">
+                        Última actualización: {{ object.updated_at|date:"Y-m-d H:i" }}
+                        {% if object.updated_by %}
+                        por {{ object.updated_by.get_full_name|default:object.updated_by.email }}
+                        {% endif %}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
