@@ -75,7 +75,22 @@ class TutoringSlot(models.Model):
         SATURDAY = 'SAT', _('Sábado')
         SUNDAY = 'SUN', _('Domingo')
 
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='tutoring_slots', verbose_name="Grupo")
+    group = models.ForeignKey(
+        Group, 
+        on_delete=models.CASCADE, 
+        related_name='tutoring_slots', 
+        verbose_name="Grupo",
+        null=True,  # Permite que la columna en la BD sea NULL
+        blank=True  # Permite que en los formularios de Django esté vacío
+    )    
+
+    legacy_teacher_course_id = models.IntegerField(
+        null=True, 
+        blank=True, 
+        editable=False,
+        verbose_name="Relación Antigua (Migración)"
+    )
+    
     day = models.CharField(
         max_length=3,
         choices=DaysOfWeek.choices,
@@ -91,7 +106,7 @@ class TutoringSlot(models.Model):
 
     class Meta:
         # Asegura que no haya dos horarios idénticos para el mismo profesor/curso
-        unique_together = ('group', 'day', 'start_time')
+        # unique_together = ('group', 'day', 'start_time')
         ordering = ['day', 'start_time']
 
     def __str__(self):
@@ -154,14 +169,28 @@ class Enrollment(models.Model):
     Relaciona a un estudiante con un GRUPO específico, no con un curso.
     """
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='enrollments', verbose_name="Estudiante")
-    # CAMBIO CLAVE: Apunta a Group, no a Course
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='enrollments', verbose_name="Grupo")
+    group = models.ForeignKey(
+            Group, 
+            on_delete=models.CASCADE, 
+            related_name='enrollments', 
+            verbose_name="Grupo",
+            null=True,  # Permite que la columna en la BD sea NULL
+            blank=True  # Permite que en los formularios de Django este campo esté vacío
+        )    
+    legacy_course = models.ForeignKey(
+        Course,
+        on_delete=models.SET_NULL, # Si se borra el curso, no borramos la inscripción
+        null=True,
+        blank=True,
+        editable=False, # No aparecerá en los formularios de admin
+        verbose_name="Curso Original (Migración)"
+    )
     joined_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de unión")
 
     class Meta:
         verbose_name = "Inscripción"
         verbose_name_plural = "Inscripciones"
-        unique_together = ('student', 'group') # Un estudiante solo puede estar una vez en el mismo grupo
+        # unique_together = ('student', 'group') # Un estudiante solo puede estar una vez en el mismo grupo
 
 class TutoringSchedule(models.Model):
     """

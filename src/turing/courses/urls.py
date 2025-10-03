@@ -32,5 +32,4 @@ urlpatterns = [
 
     path("course/<int:pk>/tutoring-schedule-proxy/", 
          tutoring_schedule_proxy, name="tutoring_schedule_proxy"),
-         
 ]
