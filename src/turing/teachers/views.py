@@ -28,42 +28,35 @@ class TeachersOnlyMixin(UserPassesTestMixin):
 class TeacherDashboardView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
     """
     Dashboard principal del profesor.
-    Ahora muestra los GRUPOS que imparte, no los cursos.
+    Muestra los GRUPOS que imparte el profesor (no los cursos).
     """
-    template_name = 'dashboard.html' 
-    context_object_name = 'groups'  # El objeto principal ahora son los grupos
+    template_name = 'dashboard.html'
+    context_object_name = 'groups'
 
     def get_queryset(self):
-        # La consulta original obtiene los grupos que enseña el profesor.
-        # Pero si quieres mostrar una lista de CURSOS, debemos cambiar la lógica.
-        # Vamos a obtener los CURSOS donde el profesor imparte al menos un grupo.
-
-        teacher_courses_ids = (Group.objects
-                               .filter(teacher=self.request.user)
-                               .values_list('course_id', flat=True)
-                               .distinct())
-
-        # Ahora obtenemos los cursos y ANOTAMOS el conteo de estudiantes.
-        queryset = (Course.objects
-                    .filter(id__in=teacher_courses_ids)
-                    .annotate(
-                        # Para cada Course, cuenta los Enrollments que pertenecen a los grupos de ESE curso.
-                        students_count=Count('groups__enrollments', distinct=True)
-                    ))
-        
-        return queryset
+        # Grupos donde el usuario logueado es el profesor asignado
+        return (
+            Group.objects
+            .filter(teacher=self.request.user)
+            .select_related('course', 'teacher')
+            .annotate(
+                students_count=Count('enrollments', distinct=True)
+            )
+            .order_by('course__name', 'name')
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        my_groups = context['groups']
-        
-        # Opcional: Mostrar cursos donde el profesor podría crear nuevos grupos
+        groups = context['groups']  # ahora sí son Group instances
+
+        # Cursos que el profe "dueño" puede gestionar (para crear grupos nuevos)
         context['manageable_courses'] = Course.objects.filter(owner=self.request.user)
-        
-        context['active_groups'] = my_groups.count()
-        context['total_students'] = my_groups.aggregate(total=Sum('students_count'))['total'] or 0
+
+        context['active_groups'] = groups.count()
+        context['total_students'] = groups.aggregate(total=Sum('students_count'))['total'] or 0
         context['active_page'] = 'dashboard'
         return context
+
 
 class CourseCreateView(LoginRequiredMixin, TeachersOnlyMixin, CreateView):
     """
@@ -114,13 +107,27 @@ class GroupCreateView(LoginRequiredMixin, TeachersOnlyMixin, CreateView):
 @user_passes_test(lambda u: u.role == 'Teacher')
 def manage_group_enrollments(request, group_pk):
     """
-    NUEVA VISTA: Gestiona los estudiantes inscritos en un grupo específico.
-    Permite añadir o eliminar estudiantes de la lista.
+    Gestiona los estudiantes inscritos en un grupo.
+    Permite añadir o eliminar. Permisos:
+    - teacher del grupo
+    - owner del curso
+    - superuser
     """
-    group = get_object_or_404(Group, pk=group_pk, teacher=request.user)
-    
+    # Obtén el grupo sin filtrar por permisos aún
+    group = get_object_or_404(
+        Group.objects.select_related('course', 'teacher'),
+        pk=group_pk
+    )
+
+    user = request.user
+    is_owner = getattr(group.course, 'owner_id', None) == user.id
+    is_teacher = getattr(group, 'teacher_id', None) == user.id
+
+    if not (is_owner or is_teacher or user.is_superuser):
+        raise PermissionDenied("No tienes permiso para gestionar este grupo.")
+
     enrolled_students_ids = Enrollment.objects.filter(group=group).values_list('student_id', flat=True)
-    
+
     if request.method == 'POST':
         student_id = request.POST.get('student_id')
         action = request.POST.get('action')
@@ -128,7 +135,7 @@ def manage_group_enrollments(request, group_pk):
         if not student_id or not action:
             messages.error(request, "Petición inválida.")
             return redirect('teachers:manage_enrollments', group_pk=group.pk)
-            
+
         student = get_object_or_404(CustomUser, id=student_id, role='Student')
 
         if action == 'add':
@@ -137,16 +144,16 @@ def manage_group_enrollments(request, group_pk):
         elif action == 'remove':
             Enrollment.objects.filter(student=student, group=group).delete()
             messages.success(request, f"{student.get_full_name()} ha sido eliminado del grupo.")
-        
+
         return redirect('teachers:manage_enrollments', group_pk=group.pk)
 
-    # Preparamos el contexto para la plantilla
     context = {
         'group': group,
         'enrolled_students': CustomUser.objects.filter(id__in=enrolled_students_ids),
         'available_students': CustomUser.objects.filter(role='Student').exclude(id__in=enrolled_students_ids),
     }
     return render(request, 'manage_enrollments.html', context)
+
 
 
 class TutoringScheduleListView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
