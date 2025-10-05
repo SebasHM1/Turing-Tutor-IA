@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "TuringTutorIA/wsgi.py",
+      "src": "turing/wsgi.py",
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
@@ -18,7 +18,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "TuringTutorIA/wsgi.py"
+      "dest": "turing/wsgi.py"
     }
   ]
 }
