@@ -11,16 +11,16 @@
 
     <script>
         window.MathJax = {
-                    tex: {
-                        inlineMath: [['$', '$'], ['\\(', '\\)']],
-                        displayMath: [['$$', '$$'], ['\\[', '\\]']],
-                        processEscapes: true,
-                        processEnvironments: true
-                    },
-                    options: {
-                        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-                    }
-                };
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
     </script>
     <script src="{% static 'js/chatbot.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -40,7 +40,7 @@
             </div>
             <div class="user-details" style="margin-left: 40px;">
                 <div class="brand-title">
-                    <a href="{% url 'courses:my_student_courses' %}" class="brand-link">Turing IA</a>
+                    <a href="{% url 'courses:my_student_groups' %}" class="brand-link">Turing IA</a>
                 </div>
                 <h3>{{ user.get_full_name|default:user.email }}</h3>
                 <p>Student ID:</p>
@@ -67,7 +67,7 @@
             {% if user.is_staff or user.role == 'Teacher' %}
             <li><a href="{% url 'courses:my_courses' %}"><i class="fas fa-user"></i> Perfil</a></li>
             {% elif user.role == 'Student' %}
-            <li><a href="{% url 'courses:my_student_courses' %}"><i class="fas fa-user"></i> Perfil</a></li>
+            <li><a href="{% url 'courses:my_student_groups' %}"><i class="fas fa-user"></i> Perfil</a></li>
             {% else %}
             <li><a href="#"><i class="fas fa-user"></i> Perfil</a></li>
             {% endif %}

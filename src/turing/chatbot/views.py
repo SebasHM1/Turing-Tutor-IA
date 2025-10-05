@@ -36,7 +36,7 @@ def chatbot_view(request, session_id=None, course_id=None):
     if course_id is not None:
         # Aqui verifico que el estudiante esté inscrito en esa materia
         if not Enrollment.objects.filter(student=request.user, course_id=course_id).exists():
-            return redirect('courses:my_student_courses')
+            return redirect('courses:my_student_groups')
 
         course = get_object_or_404(Course, pk=course_id)
         session = (ChatSession.objects
@@ -54,7 +54,7 @@ def chatbot_view(request, session_id=None, course_id=None):
     elif session_id is not None:
         session = ChatSession.objects.filter(id=session_id, user=request.user).select_related('course').first()
         if not session:
-            return redirect('courses:my_student_courses')
+            return redirect('courses:my_student_groups')
         course = session.course
 
     # Ultima sesión del usuario 
@@ -157,7 +157,7 @@ def send_message(request):
 @login_required
 def create_session_course(request, course_id):
     if not Enrollment.objects.filter(student=request.user, course_id=course_id).exists():
-        return redirect('courses:my_student_courses')
+        return redirect('courses:my_student_groups')
     session = ChatSession.objects.create(
         user=request.user,
         course_id=course_id,

@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,21 +10,23 @@
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body class="dashboard">
     <div class="page">
         {% if is_teacher %}
-            {% include '_sidebar_course.html' with course=course active_page='course_detail' %}
+        {% include '_sidebar_course.html' with course=course active_page='course_detail' %}
         {% else %}
-            <aside class="sidebar">
-                <div class="brand-title"><a href="/chatbot/" class="brand-link">Turing</a></div>
-                <hr class="sidebar-divider">
-                <ul class="nav-links">
-                    <li><a href="{% url 'courses:my_student_courses' %}"><i class="fa-solid fa-house"></i> Mis Cursos</a></li>
-                    <li><a class="active" href="#"><i class="fa-solid fa-book-open"></i> {{ course.name }}</a></li>
-                </ul>
-            </aside>
+        <aside class="sidebar">
+            <div class="brand-title"><a href="/chatbot/" class="brand-link">Turing</a></div>
+            <hr class="sidebar-divider">
+            <ul class="nav-links">
+                <li><a href="{% url 'courses:my_student_groups' %}"><i class="fa-solid fa-house"></i> Mis Cursos</a>
+                </li>
+                <li><a class="active" href="#"><i class="fa-solid fa-book-open"></i> {{ course.name }}</a></li>
+            </ul>
+        </aside>
         {% endif %}
-        
+
         <main>
             <div class="topbar">
                 <div class="topbar-inner">
@@ -36,9 +39,9 @@
                         </button>
                         <i class="fa-regular fa-bell bell"></i>
                         {% if is_teacher %}
-                            <span>Prof. {{ user.last_name }}</span>
+                        <span>Prof. {{ user.last_name }}</span>
                         {% else %}
-                            <span>{{ user.first_name }} {{ user.last_name }}</span>
+                        <span>{{ user.first_name }} {{ user.last_name }}</span>
                         {% endif %}
                         <div class="avatar-circle">
                             {% if user.profile.avatar_url %}
@@ -50,7 +53,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="content">
                 <div class="container">
                     {% if messages %}
@@ -60,7 +63,7 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-                    
+
                     <div class="welcome">
                         <div class="welcome-head place-back">
                             <button type="button" class="btn-back js-back" aria-label="Volver atrás">
@@ -145,22 +148,24 @@
             gap: 1.5rem;
             margin-bottom: 1.5rem;
         }
-        
-        .course-info, .quick-actions {
+
+        .course-info,
+        .quick-actions {
             padding: 1.5rem;
         }
-        
-        .course-info h3, .quick-actions h3 {
+
+        .course-info h3,
+        .quick-actions h3 {
             margin: 0 0 1rem 0;
             color: #333;
             font-size: 1.125rem;
         }
-        
+
         .info-grid {
             display: grid;
             gap: 0.75rem;
         }
-        
+
         .info-item {
             display: flex;
             justify-content: space-between;
@@ -168,22 +173,22 @@
             padding: 0.5rem 0;
             border-bottom: 1px solid #f0f0f0;
         }
-        
+
         .info-item:last-child {
             border-bottom: none;
         }
-        
+
         .info-item strong {
             color: #666;
             font-weight: 600;
         }
-        
+
         .actions-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.75rem;
         }
-        
+
         .action-card {
             display: flex;
             flex-direction: column;
@@ -196,27 +201,27 @@
             color: #333;
             transition: all 0.2s ease;
         }
-        
+
         .action-card:hover {
             background: #e9ecef;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             text-decoration: none;
             color: #333;
         }
-        
+
         .action-card i {
             font-size: 1.5rem;
             margin-bottom: 0.5rem;
             color: #007bff;
         }
-        
+
         .action-card span {
             font-size: 0.875rem;
             font-weight: 500;
             text-align: center;
         }
-        
+
         .sidebar-title {
             color: #666;
             font-size: 0.875rem;
@@ -225,20 +230,21 @@
             letter-spacing: 0.5px;
             margin: 0 0 0.5rem 1rem;
         }
-        
+
         .sidebar-section {
             margin: 1rem 0;
         }
-        
+
         @media (max-width: 768px) {
             .course-info-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .actions-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </body>
+
 </html>

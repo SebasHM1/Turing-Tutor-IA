@@ -40,7 +40,7 @@ class MyStudentGroupsView(LoginRequiredMixin, StudentsOnlyMixin, ListView):
         en la misma consulta, evitando múltiples accesos a la base de datos.
         """
         return (Enrollment.objects
-                .filter(student=self.request.user)
+                .filter(student=self.request.user, group__isnull=False)
                 .select_related('group', 'group__course', 'group__teacher')
                 .order_by('group__course__name', 'group__name'))
 

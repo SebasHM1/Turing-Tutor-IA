@@ -14,7 +14,7 @@ class TuringLoginView(LoginView):
         user = self.request.user
         if getattr(user, 'role', None) == UserRole.TEACHER:
             return reverse_lazy('teachers:dashboard')
-        return reverse_lazy('courses:my_student_courses')
+        return reverse_lazy('courses:my_student_groups')
 
 def register_view(request):
     if request.method == 'POST':
@@ -33,4 +33,4 @@ def register_view(request):
 def redirect_after_login(request):
     if getattr(request.user, 'role', None) == UserRole.TEACHER:
         return redirect('teachers:dashboard')
-    return redirect('courses:my_student_courses')
+    return redirect('courses:my_student_groups')

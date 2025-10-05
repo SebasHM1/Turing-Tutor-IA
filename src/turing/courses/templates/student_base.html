@@ -8,7 +8,7 @@
     <title>{% block title %}Mis Materias{% endblock %} - Turing</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     {# Este es el bloque crucial para los estilos de cada página #}
     {% block extra_head %}{% endblock %}
 </head>
@@ -20,7 +20,7 @@
             <hr class="sidebar-divider">
             <ul class="nav-links">
                 <li><a href="#"><i class="fa-solid fa-house"></i> Dashboard</a></li>
-                <li><a class="active" href="{% url 'courses:my_student_courses' %}">
+                <li><a class="active" href="{% url 'courses:my_student_groups' %}">
                         <i class="fa-solid fa-layer-group"></i> Mis Materias
                     </a></li>
                 <li><a href="#"><i class="fa-regular fa-calendar"></i> Calendario</a></li>
@@ -61,4 +61,5 @@
 
     <script src="{% static 'js/ui.js' %}"></script>
 </body>
+
 </html>
