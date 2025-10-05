@@ -1,139 +1,215 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const chatForm = document.getElementById('chat-form');
-    const messageInput = document.getElementById('message-input');
-    const chatLog = document.getElementById('chat-log');
+// static/js/chatbot.js
+// Chat con envío AJAX, polling incremental, typing del bot y render de LaTeX.
 
-    if (!chatLog || !chatForm || !messageInput) return;
+(function () {
+    if (window.__chatbotInit) return;
+    window.__chatbotInit = true;
 
-    const getCookie = name => {
+    // ===== Ajustes ============================================================
+    const CHAT_POLL_MS = 3000;
+    const ENABLE_TYPING_EFFECT = true;
+    const TYPING_SPEED_MS = 20;
+
+    // ===== Utils ==============================================================
+    function getCookie(name) {
         const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
         return m ? m.pop() : '';
-    };
-
-    function showTypingEffect(container, text, speed = 25) {
-        let index = 0;
-        const interval = setInterval(() => {
-            if (index < text.length) {
-                container.innerHTML += text.charAt(index);
-                index++;
-                // Re-render MathJax while typing
-                if (window.MathJax && index % 10 === 0) {
-                    MathJax.typesetPromise([container]).catch((err) => console.log('MathJax error:', err.message));
-                }
-            } else {
-                clearInterval(interval);
-                // Final MathJax render
-                if (window.MathJax) {
-                    MathJax.typesetPromise([container]).catch((err) => console.log('MathJax error:', err.message));
-                }
-            }
-        }, speed);
     }
 
-    chatForm.onsubmit = async function(e) {
-        e.preventDefault();
-        
-        const message = messageInput.value.trim();
-        if (!message) return;
-        
-        const sessionId = this.getAttribute('data-session-id');
-        const sendUrl = this.getAttribute('data-send-url');
-        const csrfInput = this.querySelector('[name=csrfmiddlewaretoken]');
-        const csrfToken = csrfInput ? csrfInput.value : getCookie('csrftoken');
-        
-        // Clear input
-        messageInput.value = '';
-        
-        // Add user message to chat immediately
-        const userDiv = document.createElement('div');
-        userDiv.className = 'user';
-        userDiv.innerHTML = `<strong>User:</strong> ${message} <small>${new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}</small>`;
-        chatLog.appendChild(userDiv);
-        
-        // Scroll to bottom
-        chatLog.scrollTop = chatLog.scrollHeight;
-        
-        try {
-            const response = await fetch(sendUrl, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": csrfToken,
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                    message: message,
-                    session_id: sessionId
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            if (data.bot_message) {
-                // Add bot message to chat with typing effect
-                const botDiv = document.createElement('div');
-                botDiv.className = 'bot';
-                botDiv.innerHTML = `<strong>Bot:</strong> <span class="bot-text"></span> <small>${new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}</small>`;
-                chatLog.appendChild(botDiv);
-                
-                // Use typing effect for bot response
-                showTypingEffect(botDiv.querySelector('.bot-text'), data.bot_message, 25);
-                
-            } else if (data.error) {
-                // Show error message
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'bot error';
-                errorDiv.innerHTML = `<strong>Error:</strong> ${data.error} <small>${new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}</small>`;
-                chatLog.appendChild(errorDiv);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            // Show error message to user
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'bot error';
-            errorDiv.innerHTML = `<strong>Error:</strong> Hubo un problema al enviar el mensaje. <small>${new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}</small>`;
-            chatLog.appendChild(errorDiv);
+    function renderHTMLForMessage(sender, html, time) {
+        const who = sender === 'bot' ? 'Assistant' : 'User';
+        const t = time || new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        return `<strong>${who}:</strong> ${html} <small>${t}</small>`;
+    }
+
+    function createMsgNode(sender, html, id, time) {
+        const div = document.createElement('div');
+        div.className = sender; // "user" | "bot"
+        if (id) div.dataset.msgId = String(id);
+        div.innerHTML = renderHTMLForMessage(sender, html, time);
+        return div;
+    }
+
+    function typesetLatex(container) {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            try { return window.MathJax.typesetPromise([container]); } catch { }
         }
-        
-        // Scroll to bottom
-        chatLog.scrollTop = chatLog.scrollHeight;
-    };
-
-    // Auto-scroll to bottom on page load
-    if (chatLog) {
-        chatLog.scrollTop = chatLog.scrollHeight;
+        return Promise.resolve();
     }
 
-    // Re-render MathJax on page load for existing messages
-    if (window.MathJax) {
-        MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err.message));
-    }
-});
-
-
-requestAnimationFrame(() => { chatLog.scrollTop = chatLog.scrollHeight; });
-
-
-document.querySelectorAll('.rename-chat').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        const id = btn.dataset.id;
-        const current = (btn.parentElement.querySelector('.chat-name')?.textContent || '').trim();
-        const name = prompt('Nuevo nombre del chat:', current);
-        if (!name) return;
-
-        const res = await fetch(`/chatbot/session/${id}/rename/`, {
-            method: 'POST',
-            headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'X-Requested-With': 'XMLHttpRequest' },
-            body: new URLSearchParams({ name })
+    async function typeOutHTML(containerEl, html, speed = TYPING_SPEED_MS) {
+        return new Promise((resolve) => {
+            let i = 0;
+            const total = html.length;
+            containerEl.innerHTML = '';
+            const interval = setInterval(async () => {
+                if (i < total) {
+                    containerEl.innerHTML += html.charAt(i++);
+                    // re-typeset ocasionalmente para fórmulas largas
+                    if (window.MathJax && i % 30 === 0) {
+                        try { await window.MathJax.typesetPromise([containerEl]); } catch { }
+                    }
+                } else {
+                    clearInterval(interval);
+                    typesetLatex(containerEl).then(resolve);
+                }
+            }, speed);
         });
-        if (res.ok) {
-            const data = await res.json();
-            const label = btn.parentElement.querySelector('.chat-name');
-            if (data.name && label) label.textContent = data.name;
-        } else {
-            alert('No se pudo renombrar el chat.');
+    }
+
+    // ===== DOM ================================================================
+    const chatForm = document.getElementById('chat-form');
+    const chatLog = document.getElementById('chat-log');
+    const messageInput = document.getElementById('message-input');
+    if (!chatForm || !chatLog || !messageInput) return;
+
+    // ===== Estado =============================================================
+    let lastMessageId = (function initLastId() {
+        const nodes = chatLog.querySelectorAll('[data-msg-id]');
+        if (!nodes.length) return null;
+        return nodes[nodes.length - 1].dataset.msgId || null;
+    })();
+
+    // ===== Envío de mensajes ==================================================
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const text = (messageInput.value || '').trim();
+        if (!text) return;
+
+        const sessionId = chatForm.getAttribute('data-session-id');
+        const sendUrl = chatForm.getAttribute('data-send-url');
+        const csrfToken = (chatForm.querySelector('[name=csrfmiddlewaretoken]')?.value) || getCookie('csrftoken');
+
+        // 1) Muestra el mensaje del usuario “pendiente” (se reconciliará tras el poll)
+        const pending = document.createElement('div');
+        pending.className = 'user';
+        pending.dataset.pending = '1';
+        pending.innerHTML = renderHTMLForMessage('user', text);
+        chatLog.appendChild(pending);
+        chatLog.scrollTop = chatLog.scrollHeight;
+
+        // 2) Limpia input
+        messageInput.value = '';
+
+        // 3) Envía
+        try {
+            await fetch(sendUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: new URLSearchParams({ message: text, session_id: sessionId }),
+            });
+        } catch {
+            const err = createMsgNode('bot', 'Error enviando el mensaje.', '', null);
+            chatLog.appendChild(err);
+            chatLog.scrollTop = chatLog.scrollHeight;
+            await typesetLatex(err);
         }
-    }, { passive: true });
-});
+
+        // 4) Fuerza un poll inmediato para sincronizar
+        await pollNewMessages();
+    });
+
+    // ===== Polling ============================================================
+    let pollingTimer = null;
+
+    async function pollNewMessages() {
+        const sessionId = chatForm.getAttribute('data-session-id');
+        if (!sessionId) return;
+
+        const params = new URLSearchParams({ session_id: sessionId });
+        if (lastMessageId) params.append('after_id', lastMessageId);
+
+        try {
+            const resp = await fetch(`/chatbot/poll_messages/?${params.toString()}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            if (!resp.ok) return;
+            const data = await resp.json();
+            const list = Array.isArray(data.messages) ? data.messages : [];
+            if (!list.length) return;
+
+            for (const m of list) {
+                // Reemplaza el “pendiente” del usuario por el oficial (con id)
+                if (m.sender === 'user') {
+                    const pending = chatLog.querySelector('.user[data-pending="1"]');
+                    if (pending) {
+                        pending.innerHTML = renderHTMLForMessage('user', m.html, m.timestamp);
+                        pending.dataset.msgId = String(m.id);
+                        delete pending.dataset.pending;
+                        lastMessageId = String(m.id);
+                        await typesetLatex(pending);
+                        continue;
+                    }
+                }
+
+                // Añade mensaje nuevo
+                if (m.sender === 'bot' && ENABLE_TYPING_EFFECT) {
+                    // estructura del nodo: strong + span + small
+                    const div = document.createElement('div');
+                    div.className = 'bot';
+                    div.dataset.msgId = String(m.id);
+                    const t = m.timestamp || new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                    div.innerHTML = `<strong>Assistant:</strong> <span class="bot-text"></span> <small>${t}</small>`;
+                    const span = div.querySelector('.bot-text');
+                    chatLog.appendChild(div);
+                    chatLog.scrollTop = chatLog.scrollHeight;
+
+                    await typeOutHTML(span, m.html);
+                } else {
+                    const node = createMsgNode(m.sender, m.html, m.id, m.timestamp);
+                    chatLog.appendChild(node);
+                    await typesetLatex(node);
+                }
+
+                lastMessageId = String(m.id);
+            }
+
+            chatLog.scrollTop = chatLog.scrollHeight;
+        } catch {
+        }
+    }
+
+    if (!pollingTimer) {
+        pollingTimer = setInterval(pollNewMessages, CHAT_POLL_MS);
+    }
+
+    (function initRenameHandlers() {
+        document.querySelectorAll('.rename-chat').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id;
+                const current = (btn.parentElement.querySelector('.chat-name')?.textContent || '').trim();
+                const name = prompt('Nuevo nombre del chat:', current);
+                if (!name) return;
+
+                try {
+                    const res = await fetch(`/chatbot/session/${id}/rename/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: new URLSearchParams({ name }),
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        const label = btn.parentElement.querySelector('.chat-name');
+                        if (data.name && label) label.textContent = data.name;
+                    } else {
+                        alert('No se pudo renombrar el chat.');
+                    }
+                } catch {
+                    alert('No se pudo renombrar el chat.');
+                }
+            }, { passive: true });
+        });
+    })();
+
+    requestAnimationFrame(() => { chatLog.scrollTop = chatLog.scrollHeight; });
+    typesetLatex(chatLog);
+})();

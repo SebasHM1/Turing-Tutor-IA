@@ -2,15 +2,16 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
+from django.utils.html import escape
 
 from users.decorators import student_required
 from .models import ChatSession, ChatMessage
 from courses.models import Enrollment, Course
 from courses.rag_utils import rag_processor
-
 
 import os
 import json
@@ -25,51 +26,63 @@ from markdown.extensions import codehilite
 @login_required
 def chatbot_view(request, session_id=None, course_id=None):
     """
-    - Si viene course_id: abre (o crea) la última sesión del usuario para esa materia.
-    - Si viene session_id: abre esa sesión (y deduce la materia).
-    - Si no viene nada: Abre la última sesión del usuario).
+    - Si viene course_id: abre (o crea) la última sesión del usuario para ese curso.
+    - Si viene session_id: abre esa sesión (y deduce el curso).
+    - Si no viene nada: abre la última sesión del usuario (puede no tener curso).
     """
     course = None
     session = None
 
-
+    # 1) Entré por curso
     if course_id is not None:
-        # Aqui verifico que el estudiante esté inscrito en esa materia
-        if not Enrollment.objects.filter(student=request.user, course_id=course_id).exists():
+        # validar matrícula por GRUPO 
+        is_enrolled = Enrollment.objects.filter(student=request.user).filter(
+            Q(group__course_id=course_id) | Q(legacy_course_id=course_id)
+        ).exists()
+        if not is_enrolled:
             return redirect('courses:my_student_groups')
 
         course = get_object_or_404(Course, pk=course_id)
+
         session = (ChatSession.objects
                    .filter(user=request.user, course_id=course_id)
                    .order_by('-created_at')
                    .first())
-        if not session:
+        if session is None:
             session = ChatSession.objects.create(
                 user=request.user,
-                course_id=course_id,
+                course=course,
                 name=f"Chat {datetime.now().strftime('%H:%M')}"
             )
 
-    # Abrir por id de sesión
+    # 2) Entré por sesión
     elif session_id is not None:
-        session = ChatSession.objects.filter(id=session_id, user=request.user).select_related('course').first()
-        if not session:
+        session = (ChatSession.objects
+                   .filter(id=session_id, user=request.user)
+                   .select_related('course')
+                   .first())
+        if session is None:
             return redirect('courses:my_student_groups')
         course = session.course
 
-    # Ultima sesión del usuario 
+    # 3) Última sesión del usuario (fallback)
     else:
-        session = ChatSession.objects.filter(user=request.user).order_by('-created_at').first()
-        if not session:
+        session = (ChatSession.objects
+                   .filter(user=request.user)
+                   .order_by('-created_at')
+                   .first())
+        if session is None:
             session = ChatSession.objects.create(user=request.user, name="New Chat")
-        course = session.course
-
+        course = session.course 
     messages = ChatMessage.objects.filter(session=session).order_by('timestamp')
-    # Filtra recientes por la misma materia si no, por todas del usuario
-    if course:
-        recent_chats = ChatSession.objects.filter(user=request.user, course=course).order_by('-created_at')
+    if course is not None:
+        recent_chats = (ChatSession.objects
+                        .filter(user=request.user, course=course)
+                        .order_by('-created_at'))
     else:
-        recent_chats = ChatSession.objects.filter(user=request.user).order_by('-created_at')
+        recent_chats = (ChatSession.objects
+                        .filter(user=request.user)
+                        .order_by('-created_at'))
 
     return render(request, 'chatbot/chat_interface.html', {
         'messages': messages,
@@ -77,6 +90,7 @@ def chatbot_view(request, session_id=None, course_id=None):
         'current_session': session,
         'current_course': course,
     })
+
 
 @student_required
 @login_required
@@ -156,14 +170,20 @@ def send_message(request):
 @student_required
 @login_required
 def create_session_course(request, course_id):
-    if not Enrollment.objects.filter(student=request.user, course_id=course_id).exists():
+    is_enrolled = Enrollment.objects.filter(student=request.user).filter(
+        Q(group__course_id=course_id) | Q(legacy_course_id=course_id)
+    ).exists()
+    if not is_enrolled:
         return redirect('courses:my_student_groups')
+
     session = ChatSession.objects.create(
         user=request.user,
         course_id=course_id,
         name=f"Chat {datetime.now().strftime('%H:%M')}"
     )
     return redirect('chatbot:chat_detail', session.id)
+
+
 
 
 @student_required
@@ -230,3 +250,46 @@ def rename_session(request, pk):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'ok': True, 'name': session.name})
     return redirect('chatbot:chat_detail', pk=session.id)
+
+@student_required
+@login_required
+@require_GET
+def poll_messages(request):
+    """
+    Devuelve mensajes nuevos de una sesión, posteriores a after_id.
+    Respuesta: { messages: [{id, sender, html, timestamp}] }
+    """
+    session_id = request.GET.get('session_id')
+    after_id = request.GET.get('after_id')
+
+    if not session_id:
+        return JsonResponse({'error': 'session_id requerido'}, status=400)
+
+    try:
+        session = ChatSession.objects.select_related('course').get(id=session_id, user=request.user)
+    except ChatSession.DoesNotExist:
+        return JsonResponse({'error': 'Sesión no encontrada'}, status=404)
+
+    qs = ChatMessage.objects.filter(session=session).order_by('id')
+    if after_id:
+        try:
+            qs = qs.filter(id__gt=int(after_id))
+        except ValueError:
+            pass
+
+    out = []
+    for msg in qs:
+        # El bot guarda HTML ya convertido con markdown; el usuario es texto plano.
+        if msg.sender == 'user':
+            html = escape(msg.message)  # evitamos inyección accidental
+        else:
+            html = msg.message  # ya es HTML seguro para mostrar
+
+        out.append({
+            'id': msg.id,
+            'sender': msg.sender,
+            'html': html,
+            'timestamp': msg.timestamp.strftime('%H:%M'),
+        })
+
+    return JsonResponse({'messages': out})

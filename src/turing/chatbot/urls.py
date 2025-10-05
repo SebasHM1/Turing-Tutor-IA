@@ -11,4 +11,5 @@ urlpatterns = [
     path('send_message/', views.send_message, name='send_message'),
     path('delete_session/<int:session_id>/', views.delete_session, name='delete_session'),
     path('session/<int:pk>/rename/', views.rename_session, name='rename_session'),
+    path('poll_messages/', views.poll_messages, name='poll_messages'),
 ]
