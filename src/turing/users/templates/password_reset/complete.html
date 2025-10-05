@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<style>
+    .sign-in-btn {
+        display: block;
+        margin: 30px auto 0 auto; /* margen superior de 30px, centrado horizontal */
+        width: fit-content; /* ajusta el ancho al contenido */
+        text-align: center;
+    }
+</style>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contraseña Restablecida - Turing Tutor</title>
+    <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
+</head>
+<body>
+    <div class="login-container">
+        <!-- Logo y nombre -->
+        <div class="logo-title">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+            <span class="brand">Turing Tutor</span>
+        </div>
+
+        <!-- Título y mensaje -->
+        <h2>¡Contraseña Restablecida!</h2>
+        <p class="subtitle">
+            Tu contraseña ha sido restablecida con éxito. Ahora puedes iniciar sesión con tu nueva contraseña.
+        </p>
+
+        <!-- Botón centrado -->
+        <a href="{% url 'login' %}" class="sign-in-btn">Iniciar Sesión</a>
+
+        <!-- Enlace alternativo con margen arriba -->
+        <div class="register-link" style="margin-top: 30px;">
+            ¿No tienes cuenta? <a href="{% url 'users:register' %}">Regístrate</a>
+        </div>
+    </div>
+</body>
+</html>

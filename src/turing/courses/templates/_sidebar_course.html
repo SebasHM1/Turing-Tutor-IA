@@ -1,0 +1,33 @@
+{% comment %} Sidebar para la sección de cursos (profesor) {% endcomment %}
+<aside class="sidebar">
+    <div class="brand-title"><a href="/chatbot/" class="brand-link">Turing</a></div>
+    <hr class="sidebar-divider">
+    <ul class="nav-links">
+        <li><a href="{% url 'teachers:dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+        <li><a class="{% if active_page == 'course_detail' %}active{% endif %}" href="{% url 'courses:detail' course.id %}"><i class="fa-solid fa-layer-group"></i> Detalles del Curso</a></li>
+    </ul>
+    <hr class="sidebar-divider">
+    <div class="sidebar-section">
+        <h4 class="sidebar-title">{{ course.name }}</h4>
+        <ul class="nav-links">
+            <li><a class="{% if active_page == 'course_prompt' %}active{% endif %}" href="{% url 'courses:prompt_edit' pk=course.id %}"><i class="fa-solid fa-wand-magic-sparkles"></i> Prompt del Curso</a></li>
+            <li><a class="{% if active_page == 'knowledge_base' %}active{% endif %}" href="{% url 'courses:knowledge_base' course.id %}"><i class="fa-solid fa-database"></i> Base de Conocimiento</a></li>
+        </ul>
+    </div>
+</aside>
+
+<style>
+    .sidebar-section {
+        margin: 1rem 0;
+    }
+    
+    .sidebar-title {
+        color: #666;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0 0 0.5rem 1rem;
+        padding: 0.5rem 0;
+    }
+</style>
