@@ -1,5 +1,16 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "TuringTutorIA/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.9",
+        "buildCommand": "bash build_files.sh"
+      }
+    }
+  ],
   "routes": [
     {
       "src": "/static/(.*)",
@@ -7,7 +18,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "turing/wsgi.py"
+      "dest": "TuringTutorIA/wsgi.py"
     }
   ]
 }
