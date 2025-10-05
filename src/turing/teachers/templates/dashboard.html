@@ -5,29 +5,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Cursos</title>
+    <title>{% block title %}Dashboard{% endblock %} - Turing Profesor</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    {% block extra_head %}{% endblock %}
 </head>
 
 <body class="dashboard">
     <div class="page">
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="brand-title"><a href="/chatbot/" class="brand-link">Turing</a></div>
             <hr class="sidebar-divider">
             <ul class="nav-links">
-                <li><a class="active" href="{% url 'teachers:dashboard' %}"><i class="fa-solid fa-house"></i>
-                        Dashboard</a></li>
-                <li><a href="{% url 'teachers:prompt_edit' %}"><i class="fa-solid fa-wand-magic-sparkles"></i> Prompt
-                        del profesor</a></li>
-                <li><a href="{% url 'teachers:tutoring_schedules' %}"><i class="fa-regular fa-calendar"></i> Monitorías</a></li>
+                {# CAMBIO: Se ajustan los enlaces a las nuevas URLs y lógica #}
+                <li><a class="active" href="{% url 'teachers:dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="{% url 'teachers:tutoring_schedules' %}"><i class="fa-regular fa-calendar"></i> Horarios PDF</a></li>
+                <li><a href="{% url 'teachers:prompt_edit' %}"><i class="fa-solid fa-wand-magic-sparkles"></i> Prompt IA Global</a></li>
                 <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
                 <li><a href="#"><i class="fa-regular fa-circle-question"></i> Centro de Ayuda</a></li>
             </ul>
         </aside>
 
+        <!-- Columna principal -->
         <main>
+            <!-- Topbar (sin cambios mayores) -->
             <div class="topbar">
                 <div class="topbar-inner">
                     <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
@@ -51,7 +53,9 @@
                     </div>
                 </div>
             </div>
+
             {% block content %}
+            <!-- Contenido del Dashboard -->
             <div class="content">
                 <div class="container">
                     {% if messages %}
@@ -61,22 +65,22 @@
                         {% endfor %}
                     </div>
                     {% endif %}
+                    
                     <div class="welcome">
-                        <div class="welcome-head place-back">
-                            <button type="button" class="btn-back js-back" aria-label="Volver atrás">
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </button>
-                            <h1>Bienvenido, Prof. {{ user.last_name }}</h1>
+                        <div class="welcome-head">
+                            <h1>Dashboard del Profesor</h1>
                         </div>
-                        <p class="welcome-sub">Gestiona tus cursos y clases desde aquí</p>
+                        <p class="welcome-sub">Gestiona tus materias, grupos y estudiantes desde aquí.</p>
                     </div>
 
+                    <!-- KPIs (Reflejan la nueva lógica) -->
                     <div class="kpis">
                         <div class="kpi card">
                             <div class="icon"><i class="fa-solid fa-book-open"></i></div>
                             <div>
-                                <div class="label">Cursos Activos</div>
-                                <div class="value">{{ active_courses }}</div>
+                                <div class="label">Grupos Asignados</div>
+                                {# CAMBIO: La vista ahora pasa 'active_groups', el conteo de grupos #}
+                                <div class="value">{{ active_groups }}</div>
                             </div>
                         </div>
                         <div class="kpi card">
@@ -86,94 +90,73 @@
                                 <div class="value">{{ total_students }}</div>
                             </div>
                         </div>
-                        <div class="kpi card">
-                            <div class="icon"><i class="fa-solid fa-chart-column"></i></div>
-                            <div>
-                                <div class="label">Promedio Asistencia</div>
-                                <div class="value">{% if avg_attendance %}{{ avg_attendance }}%{% else %}92%{% endif %}
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
+                    <!-- Encabezado y CTA principal -->
                     <div class="header-row">
-                        <h2>Mis Cursos</h2>
-                        <a href="{% url 'teachers:create' %}" class="btn btn-primary">
-                            <i class="fa-solid fa-plus"></i> Crear Nuevo Curso
+                        <h2>Mis Grupos</h2>
+                        {# CAMBIO: El CTA ahora es para crear una MATERIA. El profesor creará grupos DENTRO de la materia. #}
+                        <a href="{% url 'teachers:course_create' %}" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i> Crear Nueva Materia
                         </a>
                     </div>
 
+                    <!-- Grid de Grupos -->
                     <div class="courses-grid">
-                        {% for c in courses %}
+                        {# CAMBIO FUNDAMENTAL: Ahora iteramos sobre los 'groups' que la vista nos pasa #}
+                        {% for group in groups %}
                         <article class="course-card card">
                             <div class="card-header">
-                                <h3>{{ c.name }}</h3>
+                                {# Mostramos el nombre del curso y el del grupo para diferenciarlos #}
+                                <div>
+                                    <h3>{{ group.course.name }}</h3>
+                                    <span class="badge">{{ group.name }}</span>
+                                </div>
                                 <div class="menu">
                                     <button class="icon-button" type="button" title="Opciones"
                                         onclick="this.nextElementSibling.classList.toggle('open')">
                                         <i class="fa-solid fa-ellipsis"></i>
                                     </button>
                                     <div class="menu-pop">
-                                        <a href="{% url 'teachers:leave' c.id %}">Salir</a>
-                                        {% if c.owner_id == user.id %}
-                                        <a href="{% url 'teachers:delete' c.id %}"
-                                            onclick="return confirm('¿Eliminar curso? Esta acción no se puede deshacer.');">Eliminar</a>
+                                        {# Aquí puedes añadir opciones como Editar Grupo o Eliminar Grupo #}
+                                        <a href="#">Editar Grupo</a>
+                                        {% if group.course.owner_id == user.id %}
+                                            {# Solo el dueño de la MATERIA puede eliminarla por completo #}
+                                            <a href="{% url 'teachers:course_delete' group.course.pk %}" class="danger"
+                                               onclick="return confirm('¿Seguro que quieres eliminar la materia \'{{ group.course.name }}\' y TODOS sus grupos? Esta acción no se puede deshacer.');">
+                                               Eliminar Materia
+                                            </a>
                                         {% endif %}
                                     </div>
                                 </div>
                             </div>
 
-
-                            <div class="course-meta muted">Código: {{ c.code }}</div>
-                            {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
-                            <div class="course-meta muted"><i class="fa-regular fa-user"></i> {{ c.students_count }}
-                                estudiantes</div>
+                            <div class="course-meta muted">Horario: {{ group.schedule }}</div>
+                            <div class="course-meta muted">
+                                <i class="fa-regular fa-user"></i> 
+                                {# La vista ahora calcula 'students_count' para cada grupo #}
+                                {{ group.students_count }} estudiante{{ group.students_count|pluralize }}
+                            </div>
 
                             <div class="course-actions">
-                                <a href="{% url 'courses:detail' c.pk %}" class="btn btn-secondary">Ver detalles</a>
-                                <a href="{% url 'teachers:edit_tutoring' c.pk %}" class="btn btn-primary-soft">Gestionar Monitoría</a>
-                                <a href="{% url 'teachers:leave' c.id %}" class="btn btn-danger-soft">Salir del
-                                    curso</a>
+                                {# NUEVA LÓGICA: Enlaces a las nuevas vistas de gestión #}
+                                <a href="{% url 'teachers:manage_enrollments' group.pk %}" class="btn btn-primary-soft">
+                                    <i class="fa-solid fa-users"></i> Estudiantes
+                                </a>
+                                <a href="{% url 'teachers:manage_tutoring' group.pk %}" class="btn btn-secondary">
+                                    <i class="fa-regular fa-clock"></i> Monitorías
+                                </a>
                             </div>
-                            
                         </article>
                         {% empty %}
-                        <p>No tienes cursos aún.</p>
+                        <div class="card card-muted" style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                            <p>Aún no impartes ningún grupo. Crea una materia y luego añádele tu primer grupo.</p>
+                        </div>
                         {% endfor %}
                     </div>
 
-                    <div class="join-card card">
-                        <h2 class="section-title">Unirse a un Curso</h2>
-                        <form class="join-inline" method="post" action="{% url 'teachers:join_by_code' %}">
-                            {% csrf_token %}
-                            <input type="text" name="code" placeholder="Ingresa el código del curso" autocomplete="off">
-                            <button class="btn btn-primary" type="submit">
-                                <i class="fa-solid fa-right-to-bracket"></i> Unirse
-                            </button>
-                        </form>
-
-                        {% if other_courses %}
-                        <div class="courses-grid" style="margin-top:10px;">
-                            {% for oc in other_courses %}
-                            <article class="course-card card">
-                                <div class="card-header">
-                                    <h3>{{ oc.name }}</h3>
-                                </div>
-                                <div class="course-meta muted">Código: {{ oc.code }}</div>
-                                {% if oc.schedule %}<div class="course-meta muted">{{ oc.schedule }}</div>{% endif %}
-                                <div class="course-actions">
-                                    <a href="{% url 'teachers:join' oc.id %}" class="btn btn-primary">
-                                        <i class="fa-solid fa-right-to-bracket"></i> Unirse
-                                    </a>
-                                </div>
-                            </article>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-
-
-
+                    {# CAMBIO RADICAL: Toda la sección de "Unirse a un curso" ha sido eliminada. #}
+                    {# Ya no es relevante para el flujo de trabajo del profesor. #}
                 </div>
             </div>
             {% endblock content %}

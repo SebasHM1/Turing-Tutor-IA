@@ -11,11 +11,11 @@
 {% block content %}
 <div class="content">
     <div class="container">
-        
+
         {# --- SECCIÓN DE BIENVENIDA --- #}
         <div class="welcome">
             <div class="welcome-head place-back">
-                <a href="{% url 'courses:my_student_courses' %}" class="btn-back" aria-label="Volver atrás">
+                <a href="{% url 'courses:my_student_groups' %}" class="btn-back" aria-label="Volver atrás">
                     <i class="fa-solid fa-chevron-left"></i>
                 </a>
                 <h1>{{ course.name }}</h1>
@@ -48,40 +48,40 @@
         </div>
 
         {% for assignment in teacher_assignments %}
-            {% if assignment.tutoring_slots.all %}
-                <div class="card teacher-card">
-                    <div class="teacher-card-header">
-                        <i class="fa-solid fa-chalkboard-user"></i>
-                        <div class="teacher-details">
-                            <span class="teacher-name">{{ assignment.teacher.name }} {{ assignment.teacher.last_name }}</span>
-                            <span class="teacher-title">Profesor(a) del curso</span>
-                        </div>
-                    </div>
-                    <ul class="tutoring-slots-list">
-                        {% for slot in assignment.tutoring_slots.all %}
-                            <li class="tutoring-slot">
-                                <div class="slot-info">
-                                    <i class="fa-solid fa-calendar-day icon-prefix"></i>
-                                    <strong>{{ slot.get_day_display }}</strong>
-                                </div>
-                                <div class="slot-info">
-                                    <i class="fa-regular fa-clock icon-prefix"></i>
-                                    <span>{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</span>
-                                </div>
-                                <div class="slot-info">
-                                    <i class="fa-solid fa-location-dot icon-prefix"></i>
-                                    <span>{{ slot.location }}</span>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
+        {% if assignment.tutoring_slots.all %}
+        <div class="card teacher-card">
+            <div class="teacher-card-header">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                <div class="teacher-details">
+                    <span class="teacher-name">{{ assignment.teacher.name }} {{ assignment.teacher.last_name }}</span>
+                    <span class="teacher-title">Profesor(a) del curso</span>
                 </div>
-            {% endif %}
-        {% empty %}
-            <div class="card card-muted">
-                <i class="fa-regular fa-folder-open"></i>
-                <p>Aún no hay monitorías personalizadas publicadas por los profesores.</p>
             </div>
+            <ul class="tutoring-slots-list">
+                {% for slot in assignment.tutoring_slots.all %}
+                <li class="tutoring-slot">
+                    <div class="slot-info">
+                        <i class="fa-solid fa-calendar-day icon-prefix"></i>
+                        <strong>{{ slot.get_day_display }}</strong>
+                    </div>
+                    <div class="slot-info">
+                        <i class="fa-regular fa-clock icon-prefix"></i>
+                        <span>{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</span>
+                    </div>
+                    <div class="slot-info">
+                        <i class="fa-solid fa-location-dot icon-prefix"></i>
+                        <span>{{ slot.location }}</span>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        {% empty %}
+        <div class="card card-muted">
+            <i class="fa-regular fa-folder-open"></i>
+            <p>Aún no hay monitorías personalizadas publicadas por los profesores.</p>
+        </div>
         {% endfor %}
 
         {# --- SECCIÓN DE HORARIO GENERAL (PDF) --- #}
@@ -90,27 +90,25 @@
         </div>
 
         {% if course.tutoring_schedule and course.tutoring_schedule.file.url %}
-            <div class="card pdf-viewer-card">
-                <iframe id="pdf-viewer-iframe" 
-                        width="100%" 
-                        height="800px">
-                </iframe>
-            </div>
+        <div class="card pdf-viewer-card">
+            <iframe id="pdf-viewer-iframe" width="100%" height="800px">
+            </iframe>
+        </div>
 
-            <script>
-            document.addEventListener('DOMContentLoaded', function() {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
                 const viewerUrl = "{% static 'web/viewer.html' %}";
                 const proxyUrl = "{% url 'courses:tutoring_schedule_proxy' course.pk %}";
                 const finalUrl = `${viewerUrl}?file=${encodeURIComponent(proxyUrl)}`;
                 document.getElementById('pdf-viewer-iframe').src = finalUrl;
             });
-            </script>
+        </script>
 
         {% else %}
-            <div class="card card-muted">
-                <i class="fa-solid fa-file-circle-xmark"></i>
-                <p>Aún no se ha publicado un horario general de monitorías para este curso.</p>
-            </div>
+        <div class="card card-muted">
+            <i class="fa-solid fa-file-circle-xmark"></i>
+            <p>Aún no se ha publicado un horario general de monitorías para este curso.</p>
+        </div>
         {% endif %}
 
     </div>

@@ -1,0 +1,79 @@
+{% extends "student_base.html" %}
+{% load static %}
+
+{% block title %}Mis Grupos{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="container">
+        <div class="welcome">
+            <div class="welcome-head">
+                {# El botón de 'atrás' no tiene mucho sentido en la página principal #}
+                <h1>Bienvenido, {{ user.name }}</h1>
+            </div>
+            {# CAMBIO: El mensaje de bienvenida ahora es más pasivo, ya que el estudiante no realiza acciones aquí #}
+            <p class="welcome-sub">Aquí encontrarás todos los grupos a los que has sido asignado.</p>
+        </div>
+
+        <!-- KPIs Simplificados -->
+        {# CAMBIO: La KPI de "cursos disponibles" se elimina. Solo mostramos lo que es relevante para el estudiante. #}
+        <div class="kpis" style="justify-content: start;">
+            <div class="kpi card">
+                <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
+                <div>
+                    <div class="label">Grupos Inscritos</div>
+                    {# CAMBIO: La vista ahora pasa 'enrollments', por lo que contamos su longitud #}
+                    <div class="value">{{ enrollments|length }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Encabezado de la sección -->
+        <div class="header-row">
+            <h2>Mis Grupos</h2>
+        </div>
+
+        <!-- Grid de Grupos/Cursos -->
+        <div class="courses-grid">
+            {# CAMBIO FUNDAMENTAL: Ahora iteramos sobre 'enrollments', que nos da acceso a todo #}
+            {% for enrollment in enrollments %}
+            <article class="course-card card">
+                <div class="card-header">
+                    {# Mostramos el nombre de la materia... #}
+                    <h3>{{ enrollment.group.course.name }}</h3>
+                    {# ...y el nombre del grupo para ser específicos #}
+                    <span class="badge">{{ enrollment.group.name }}</span>
+                </div>
+                
+                {# Mostramos información relevante del grupo y del profesor #}
+                <div class="course-meta muted">Profesor(a): {{ enrollment.group.teacher.get_full_name }}</div>
+                <div class="course-meta muted">Horario: {{ enrollment.group.schedule }}</div>
+
+                <div class="course-actions">
+                    {# CAMBIO: El enlace de "Ver detalles" ahora apunta a la URL de detalle del GRUPO #}
+                    <a href="{% url 'courses:student_group_detail' enrollment.group.pk %}" class="btn btn-secondary">
+                        <i class="fa-solid fa-circle-info"></i> Ver Detalles
+                    </a>
+                    {# CAMBIO: El enlace al chatbot ahora debe pasar el ID del curso para obtener el contexto correcto #}
+                    <a href="{% url 'chatbot:course_chat' enrollment.group.course.id %}" class="btn btn-primary">
+                        <i class="fa-solid fa-comments"></i> Abrir Chat IA
+                    </a>
+                    {# CAMBIO: El botón de "Salir" se elimina. El estudiante no puede salirse por su cuenta. #}
+                </div>
+            </article>
+            {% empty %}
+            {# Mensaje mejorado para cuando no hay inscripciones #}
+            <div class="card card-muted" style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                <i class="fa-regular fa-folder-open" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <p>Aún no has sido inscrito en ningún grupo.</p>
+                <p class="muted" style="font-size: 0.9rem;">Contacta a tus profesores si crees que esto es un error.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        {# CAMBIO RADICAL: Toda la sección de "Explora y únete a nuevas materias" se elimina por completo. #}
+        {# Esta funcionalidad ya no existe para los estudiantes. #}
+
+    </div>
+</div>
+{% endblock content %}

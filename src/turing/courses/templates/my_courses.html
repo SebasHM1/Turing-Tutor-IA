@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Cursos</title>
+    <title>Dashboard del Profesor</title>
     <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,14 +16,11 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="brand-title">Turing</div>
-
             <hr class="sidebar-divider">
-
             <ul class="nav-links">
-                <li><a href="#"><i class="fa-solid fa-house"></i> Dashboard</a></li>
-
-                <li><a class="active" href="{% url 'courses:my_courses' %}"><i class="fa-solid fa-layer-group"></i> Mis
-                        Cursos</a></li>
+                <li><a class="active" href="{% url 'teachers:dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                {# CAMBIO: El enlace "Mis Cursos" ahora apunta al dashboard principal del profesor #}
+                <li><a href="{% url 'teachers:tutoring_schedules' %}"><i class="fa-solid fa-layer-group"></i> Horarios PDF</a></li>
                 <li><a href="#"><i class="fa-regular fa-calendar"></i> Calendario</a></li>
                 <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
                 <li><a href="#"><i class="fa-regular fa-circle-question"></i> Centro de Ayuda</a></li>
@@ -32,26 +29,18 @@
 
         <!-- Columna principal -->
         <main>
-            <!-- Topbar -->
+            <!-- Topbar (sin cambios significativos) -->
             <div class="topbar">
                 <div class="topbar-inner">
-                    <div class="search">
-                        <input type="text" placeholder="Buscar cursos...">
-                    </div>
-
-                    <!-- Form de logout escondido -->
                     <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
                         {% csrf_token %}
                     </form>
-
                     <div class="topbar-user">
                         <button type="button" class="btn btn-ghost small js-logout">
                             <i class="fa-solid fa-right-from-bracket"></i> Salir
                         </button>
-
-
                         <i class="fa-regular fa-bell bell"></i>
-                        <span>Prof. {{ user.last_name }}</span>
+                        <span>Prof. {{ user.get_full_name }}</span>
                         <div class="avatar-circle">
                             {% if user.profile.avatar_url %}
                             <img src="{{ user.profile.avatar_url }}" alt="Avatar">
@@ -63,36 +52,26 @@
                 </div>
             </div>
 
-
-
-
             <!-- Contenido -->
             <div class="content">
                 <div class="container">
                     <div class="welcome">
-                        <div class="welcome-head place-back">
-                            <button type="button" class="btn-back js-back" aria-label="Volver atrás">
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </button>
-                            <h1>Bienvenido, Prof. {{ user.last_name }}</h1>
+                        <div class="welcome-head">
+                            <h1>Dashboard del Profesor</h1>
                         </div>
-
-                        <p class="welcome-sub">Gestiona tus cursos y clases desde aquí</p>
+                        <p class="welcome-sub">Gestiona tus materias, grupos y estudiantes desde aquí.</p>
                     </div>
 
-
-
-
-                    <!-- KPIs -->
+                    <!-- KPIs (Reflejan la nueva lógica) -->
                     <div class="kpis">
                         <div class="kpi card">
                             <div class="icon"><i class="fa-solid fa-book-open"></i></div>
                             <div>
-                                <div class="label">Cursos Activos</div>
-                                <div class="value">{{ active_courses }}</div>
+                                <div class="label">Grupos Asignados</div>
+                                {# CAMBIO: La vista ahora pasa 'active_groups' que es el conteo de grupos #}
+                                <div class="value">{{ active_groups }}</div>
                             </div>
                         </div>
-
                         <div class="kpi card">
                             <div class="icon"><i class="fa-solid fa-user-group"></i></div>
                             <div>
@@ -100,61 +79,56 @@
                                 <div class="value">{{ total_students }}</div>
                             </div>
                         </div>
-                        <div class="kpi card">
-                            <div class="icon"><i class="fa-solid fa-chart-column"></i></div>
-                            <div>
-                                <div class="label">Promedio Asistencia</div>
-                                <div class="value">{% if avg_attendance %}{{ avg_attendance }}%{% else %}92%{% endif %}
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Encabezado sección y CTA -->
                     <div class="header-row">
-                        <h2>Mis Cursos</h2>
-                        <a href="{% url 'courses:create' %}" class="btn btn-primary">
-                            <i class="fa-solid fa-plus"></i> Crear Nuevo Curso
+                        <h2>Mis Materias y Grupos</h2>
+                        {# CAMBIO: La URL para crear un curso fue renombrada para mayor claridad #}
+                        <a href="{% url 'teachers:course_create' %}" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i> Crear Nueva Materia
                         </a>
                     </div>
 
-                    <!-- Grid de cursos -->
+                    <!-- Grid de Grupos -->
+                    {# CAMBIO FUNDAMENTAL: Ahora iteramos sobre los 'groups' que la vista nos pasa #}
                     <div class="courses-grid">
-                        {% for c in courses %}
+                        {% for group in groups %}
                         <article class="course-card card">
                             <div class="card-header">
-                                <h3>{{ c.name }}</h3>
-                                <button class="icon-button" type="button" title="Opciones">
-                                    <i class="fa-solid fa-ellipsis"></i>
-                                </button>
+                                {# Mostramos el nombre del curso y el del grupo para diferenciarlos #}
+                                <h3>{{ group.course.name }}</h3>
+                                <span class="badge">{{ group.name }}</span>
                             </div>
 
-                            <div class="course-meta muted">Código: {{ c.code }}</div>
-                            {% if c.schedule %}<div class="course-meta muted">{{ c.schedule }}</div>{% endif %}
-                            <div class="course-meta muted"><i class="fa-regular fa-user"></i> {{ c.students_count }}
-                                estudiantes</div>
+                            <div class="course-meta muted">Horario: {{ group.schedule }}</div>
+                            <div class="course-meta muted">
+                                <i class="fa-regular fa-user"></i> 
+                                {# La vista ahora calcula 'students_count' para cada grupo #}
+                                {{ group.students_count }} estudiante{{ group.students_count|pluralize }}
+                            </div>
 
                             <div class="course-actions">
-                                <a href="#" class="btn btn-secondary">Ver detalles</a>
-                                <a href="{% url 'courses:leave' c.id %}" class="btn btn-danger-soft">Salir del curso</a>
+                                {# NUEVA LÓGICA: Enlaces a las nuevas vistas de gestión #}
+                                <a href="{% url 'teachers:manage_enrollments' group.pk %}" class="btn btn-primary-soft">
+                                    <i class="fa-solid fa-users"></i> Estudiantes
+                                </a>
+                                <a href="{% url 'teachers:manage_tutoring' group.pk %}" class="btn btn-secondary">
+                                    <i class="fa-regular fa-clock"></i> Monitorías
+                                </a>
+                                {# Aquí puedes añadir más acciones, como un botón de opciones o para eliminar el grupo #}
                             </div>
                         </article>
                         {% empty %}
-                        <p>No tienes cursos aún.</p>
+                        <div class="card card-muted" style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                            <p>Aún no impartes ningún grupo. Crea una materia y luego añádele tu primer grupo.</p>
+                        </div>
                         {% endfor %}
                     </div>
 
-                    <div class="join-card card">
-                        <h2 class="section-title">Unirse a un Curso</h2>
-                        <form class="join-inline" method="post" action="{% url 'courses:join_by_code' %}">
-                            {% csrf_token %}
-                            <input type="text" name="code" placeholder="Ingresa el código del curso" autocomplete="off">
-                            <button class="btn btn-primary" type="submit">
-                                <i class="fa-solid fa-right-to-bracket"></i> Unirse
-                            </button>
-                        </form>
-                    </div>
-
+                    {# CAMBIO: La funcionalidad de "unirse por código" se elimina #}
+                    {# El profesor ahora crea cursos o se le asignan grupos, no se une a ellos. #}
+                    
                 </div>
             </div>
         </main>

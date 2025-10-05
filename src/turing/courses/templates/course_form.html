@@ -58,8 +58,10 @@
         </form>
 
         <div class="register-link">
-            <a href="{% url 'courses:my_courses' %}">← Volver a mis materias</a>
+            {# antes: <a href="{% url 'courses:my_courses' %}">← Volver a mis materias</a> #}
+            <a href="{% url 'teachers:dashboard' %}">← Volver al panel docente</a>
         </div>
+
     </div>
 </body>
 
