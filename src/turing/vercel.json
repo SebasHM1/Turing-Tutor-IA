@@ -1,16 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "tu_proyecto/wsgi.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "15mb",
-        "runtime": "python3.9",
-        "buildCommand": "bash build_files.sh"
-      }
-    }
-  ],
   "routes": [
     {
       "src": "/static/(.*)",
@@ -18,7 +7,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "tu_proyecto/wsgi.py"
+      "dest": "turing/wsgi.py"
     }
   ]
 }
