@@ -32,6 +32,8 @@ STATICFILES_DIRS = [
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
