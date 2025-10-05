@@ -1,0 +1,475 @@
+/* ===== Base ===== */
+:root {
+    --bg: #f5f6f8;
+    --ink: #111827;
+    --ink-weak: #6b7280;
+    --card: #ffffff;
+    --tile: #f3f6fb;
+    --border: #e5e7eb;
+    --primary: #1677ff;
+    --primary-strong: #0b5fff;
+    --danger: #ef4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    background-color: var(--bg);
+    color: var(--ink);
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+    width: 280px;
+    background-color: var(--bg);
+    height: 100vh;
+    overflow-y: auto;
+    padding: 16px;
+    border-right: 1px solid var(--border);
+}
+
+.brand-title {
+    font-weight: 800;
+    font-size: 18px;
+    margin: 6px 0 10px;
+}
+
+.brand-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.user-info {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-details h3 {
+    font-size: 15px;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+
+.user-details p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--ink-weak);
+}
+
+.student-id {
+    font-weight: 600;
+    color: #374151;
+}
+
+.sidebar-divider {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 12px 0 14px 0;
+}
+
+.nav-links {
+    list-style: none;
+    display: grid;
+    gap: 6px;
+}
+
+.nav-links li a {
+    text-decoration: none;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.nav-links li a i {
+    width: 18px;
+    min-width: 18px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.nav-links li a:hover {
+    background-color: var(--tile);
+}
+
+.nav-links li a.active {
+    background-color: rgba(22, 119, 255, .10);
+    color: var(--primary);
+}
+
+.nav-links li a.active i {
+    color: var(--primary);
+}
+
+/* ===== Recent Chats ===== */
+.recent-chats h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.recent-chats ul {
+    list-style: none;
+    display: grid;
+    gap: 8px;
+}
+
+.recent-chats li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 10px;
+}
+
+.recent-chats li:hover {
+    background: rgba(17, 24, 39, .04);
+}
+
+.recent-chats li a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+}
+
+.chat-info {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.chat-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #111827;
+}
+
+.chat-time {
+    font-size: 12px;
+    color: var(--ink-weak);
+}
+
+.recent-chats form button {
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+}
+
+.recent-chats form button:hover {
+    color: #6b7280;
+}
+
+.recent-chats .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #374151;
+    margin-top: 6px;
+}
+
+body.chat-page {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--bg);
+}
+
+.main-chat {
+    flex: 1;
+    min-height: 100vh;
+    display: grid;
+    background: var(--card);
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas: "header" "log" "composer";
+}
+
+.chat-header {
+    grid-area: header;
+}
+
+#chat-log {
+    grid-area: log;
+    overflow-y: auto;
+    padding: 16px;
+    background: var(--card);
+}
+
+#chat-form {
+    grid-area: composer;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+}
+
+.chat-header .logo {
+    background: #e9efff;
+    color: #2b5bf0;
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.chat-header .bot-details h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.chat-header .bot-details p {
+    margin: 2px 0 0;
+    color: var(--ink-weak);
+    font-size: 12px;
+}
+
+/* Log (burbujas) */
+#chat-log {
+    padding: 16px;
+    overflow-y: auto;
+    background: var(--card);
+}
+
+#chat-log div {
+    margin: 8px 0;
+    max-width: min(72ch, 72%);
+    padding: 10px 12px;
+    border-radius: 14px;
+    line-height: 1.35;
+    position: relative;
+    box-shadow: 0 1px 1px rgba(17, 24, 39, .03);
+}
+
+/* Bot: gris a la izquierda */
+#chat-log div.bot {
+    background-color: #f3f4f6;
+    color: #111827;
+    text-align: left;
+    border: 1px solid #e5e7eb;
+}
+
+/* User: azul a la derecha */
+#chat-log div.user {
+    background-color: var(--primary);
+    color: #fff;
+    text-align: right;
+    margin-left: auto;
+    /* empuja a la derecha */
+}
+
+/* tiempos dentro de la burbuja más sutiles */
+#chat-log small {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 11px;
+    opacity: .75;
+}
+
+/* oculta “User:” y “Bot:” para un look más limpio */
+#chat-log .user strong,
+#chat-log .bot strong {
+    display: none;
+}
+
+/* ===== Composer ===== */
+#chat-form {
+    display: grid;
+    grid-template-columns: 1fr 48px;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+}
+
+#chat-form input {
+    width: 100%;
+    height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #e1e5ea;
+    border-radius: 12px;
+    outline: none;
+    background-color: #f3f6fb;
+    font-size: 14px;
+}
+
+#chat-form input:focus {
+    box-shadow: 0 0 0 3px rgba(22, 119, 255, .15);
+}
+
+#chat-form button {
+    width: 48px;
+    height: 44px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    outline: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#chat-form button:hover {
+    background-color: var(--primary-strong);
+}
+
+#chat-form button i {
+    font-size: 18px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 960px) {
+    .sidebar {
+        display: none;
+    }
+}
+
+/* Code blocks styling */
+.highlight {
+    background: #f6f8fa;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 10px 0;
+    overflow-x: auto;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+/* Inline code styling */
+code {
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    color: #d73a49;
+}
+
+/* Pre blocks */
+pre {
+    background: #f6f8fa;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 10px 0;
+    overflow-x: auto;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+/* Lists styling */
+ul, ol {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+li {
+    margin: 5px 0;
+}
+
+/* Strong/Bold text */
+strong {
+    font-weight: 600;
+    color: #24292e;
+}
+
+/* Blockquotes */
+blockquote {
+    border-left: 4px solid #dfe2e5;
+    padding-left: 16px;
+    margin: 10px 0;
+    color: #6a737d;
+}
+
+/* Tables */
+table {
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+
+th, td {
+    border: 1px solid #dfe2e5;
+    padding: 8px 12px;
+}
+
+th {
+    background: #f6f8fa;
+    font-weight: 600;
+}
+
+/* Chat message styling */
+.bot .bot-text {
+    line-height: 1.6;
+}
+
+.bot .bot-text p {
+    margin: 8px 0;
+}
+
+/* MathJax styling */
+.MathJax {
+    font-size: 1.1em !important;
+}
+
+/* Syntax highlighting for different languages */
+.highlight .k { color: #d73a49; } /* Keywords */
+.highlight .s { color: #032f62; } /* Strings */
+.highlight .c { color: #6a737d; font-style: italic; } /* Comments */
+.highlight .n { color: #24292e; } /* Names */
+.highlight .o { color: #d73a49; } /* Operators */
+.highlight .p { color: #24292e; } /* Punctuation */

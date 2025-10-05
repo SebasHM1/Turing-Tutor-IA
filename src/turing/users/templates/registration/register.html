@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turing Tutor – Crear Cuenta</title>
+    <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <!-- Logo y marca -->
+        <div class="logo-title">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+            <span class="brand">Turing Tutor</span>
+        </div>
+
+        <!-- Título y subtítulo -->
+        <h2>Crear Cuenta</h2>
+        <p class="subtitle">Únete a nuestra comunidad de aprendizaje</p>
+
+        <!-- Errores globales -->
+        {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+        <p style="color:red; font-size:0.9em; margin-bottom:10px;">{{ error }}</p>
+        {% endfor %}
+        {% endif %}
+
+        <form method="post" action="{% url 'users:register' %}">
+            {% csrf_token %}
+
+            <!-- Correo electrónico -->
+            <label for="{{ form.email.id_for_label }}">Correo electrónico</label>
+            <div class="input-group">
+                <i class="fa-regular fa-envelope"></i>
+                {{ form.email }}
+            </div>
+            {% for err in form.email.errors %}
+            <p style="color:red; font-size:0.8em; margin-top:-6px; margin-bottom:6px;">{{ err }}</p>
+            {% endfor %}
+
+            <!-- Nombre(s) -->
+            <label for="{{ form.name.id_for_label }}">Nombre(s)</label>
+            <div class="input-group">
+                <i class="fa-regular fa-user"></i>
+                {{ form.name }}
+            </div>
+            {% for err in form.name.errors %}
+            <p style="color:red; font-size:0.8em; margin-top:-6px; margin-bottom:6px;">{{ err }}</p>
+            {% endfor %}
+
+            <!-- Apellido(s) -->
+            <label for="{{ form.last_name.id_for_label }}">Apellido(s)</label>
+            <div class="input-group">
+                <i class="fa-regular fa-user"></i>
+                {{ form.last_name }}
+            </div>
+            {% for err in form.last_name.errors %}
+            <p style="color:red; font-size:0.8em; margin-top:-6px; margin-bottom:6px;">{{ err }}</p>
+            {% endfor %}
+
+            <!-- Cédula -->
+            <label for="{{ form.cedula.id_for_label }}">Cédula</label>
+            <div class="input-group">
+                <i class="fa-solid fa-id-card"></i>
+                {{ form.cedula }}
+            </div>
+            {% for err in form.cedula.errors %}
+            <p style="color:red; font-size:0.8em; margin-top:-6px; margin-bottom:6px;">{{ err }}</p>
+            {% endfor %}
+
+            <!-- Código Universitario -->
+            <label for="{{ form.university_code.id_for_label }}">Código Universitario</label>
+            <div class="input-group">
+                <i class="fa-solid fa-university"></i>
+                {{ form.university_code }}
+            </div>
+            {% for err in form.university_code.errors %}
+            <p style="color:red; font-size:0.8em; margin-top:-6px; margin-bottom:6px;">{{ err }}</p>
+            {% endfor %}
+
+            <!-- Grupo -->
+            <label for="{{ form.user_group.id_for_label }}">Grupo</label>
+            <div class="input-group">
+                <i class="fa-solid fa-users"></i>
+                {{ form.user_group }}
+            </div>
+            {% for err in form.user_group.errors %}
+            <p style="color:red; font-size:0.8em; margin-top:-6px; margin-bottom:6px;">{{ err }}</p>
+            {% endfor %}
+
+            <!-- Contraseña -->
+            <label for="{{ form.password1.id_for_label }}">Crear contraseña</label>
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                {{ form.password1 }}
+                <i class="fa-regular fa-eye"></i>
+            </div>
+            {% for err in form.password1.errors %}
+            <p style="color:red; font-size:0.8em; margin-top:-6px; margin-bottom:6px;">{{ err }}</p>
+            {% endfor %}
+
+            <!-- Confirmar contraseña -->
+            <label for="{{ form.password2.id_for_label }}">Confirmar contraseña</label>
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                {{ form.password2 }}
+                <i class="fa-regular fa-eye"></i>
+            </div>
+            {% for err in form.password2.errors %}
+            <p style="color:red; font-size:0.8em; margin-top:-6px; margin-bottom:6px;">{{ err }}</p>
+            {% endfor %}
+
+            <!-- Términos -->
+            <div class="options">
+                <label style="font-size:0.9em;">
+                    <input type="checkbox" name="terms" required>
+                    Acepto los Términos de servicio y la Política de privacidad
+                </label>
+            </div>
+
+            <!-- Botón -->
+            <button type="submit" class="sign-in-btn">Crear Cuenta →</button>
+        </form>
+
+        <!-- Enlace a login -->
+        <div class="register-link">
+            ¿Ya tienes una cuenta? <a href="{% url 'login' %}">Inicia sesión</a>
+        </div>
+    </div>
+</body>
+
+</html>

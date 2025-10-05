@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard del Profesor</title>
+    <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="dashboard">
+    <div class="page">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand-title">Turing</div>
+            <hr class="sidebar-divider">
+            <ul class="nav-links">
+                <li><a class="active" href="{% url 'teachers:dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                {# CAMBIO: El enlace "Mis Cursos" ahora apunta al dashboard principal del profesor #}
+                <li><a href="{% url 'teachers:tutoring_schedules' %}"><i class="fa-solid fa-layer-group"></i> Horarios PDF</a></li>
+                <li><a href="#"><i class="fa-regular fa-calendar"></i> Calendario</a></li>
+                <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
+                <li><a href="#"><i class="fa-regular fa-circle-question"></i> Centro de Ayuda</a></li>
+            </ul>
+        </aside>
+
+        <!-- Columna principal -->
+        <main>
+            <!-- Topbar (sin cambios significativos) -->
+            <div class="topbar">
+                <div class="topbar-inner">
+                    <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
+                        {% csrf_token %}
+                    </form>
+                    <div class="topbar-user">
+                        <button type="button" class="btn btn-ghost small js-logout">
+                            <i class="fa-solid fa-right-from-bracket"></i> Salir
+                        </button>
+                        <i class="fa-regular fa-bell bell"></i>
+                        <span>Prof. {{ user.get_full_name }}</span>
+                        <div class="avatar-circle">
+                            {% if user.profile.avatar_url %}
+                            <img src="{{ user.profile.avatar_url }}" alt="Avatar">
+                            {% else %}
+                            <i class="fa-regular fa-user"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido -->
+            <div class="content">
+                <div class="container">
+                    <div class="welcome">
+                        <div class="welcome-head">
+                            <h1>Dashboard del Profesor</h1>
+                        </div>
+                        <p class="welcome-sub">Gestiona tus materias, grupos y estudiantes desde aquí.</p>
+                    </div>
+
+                    <!-- KPIs (Reflejan la nueva lógica) -->
+                    <div class="kpis">
+                        <div class="kpi card">
+                            <div class="icon"><i class="fa-solid fa-book-open"></i></div>
+                            <div>
+                                <div class="label">Grupos Asignados</div>
+                                {# CAMBIO: La vista ahora pasa 'active_groups' que es el conteo de grupos #}
+                                <div class="value">{{ active_groups }}</div>
+                            </div>
+                        </div>
+                        <div class="kpi card">
+                            <div class="icon"><i class="fa-solid fa-user-group"></i></div>
+                            <div>
+                                <div class="label">Total Estudiantes</div>
+                                <div class="value">{{ total_students }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Encabezado sección y CTA -->
+                    <div class="header-row">
+                        <h2>Mis Materias y Grupos</h2>
+                        {# CAMBIO: La URL para crear un curso fue renombrada para mayor claridad #}
+                        <a href="{% url 'teachers:course_create' %}" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i> Crear Nueva Materia
+                        </a>
+                    </div>
+
+                    <!-- Grid de Grupos -->
+                    {# CAMBIO FUNDAMENTAL: Ahora iteramos sobre los 'groups' que la vista nos pasa #}
+                    <div class="courses-grid">
+                        {% for group in groups %}
+                        <article class="course-card card">
+                            <div class="card-header">
+                                {# Mostramos el nombre del curso y el del grupo para diferenciarlos #}
+                                <h3>{{ group.course.name }}</h3>
+                                <span class="badge">{{ group.name }}</span>
+                            </div>
+
+                            <div class="course-meta muted">Horario: {{ group.schedule }}</div>
+                            <div class="course-meta muted">
+                                <i class="fa-regular fa-user"></i> 
+                                {# La vista ahora calcula 'students_count' para cada grupo #}
+                                {{ group.students_count }} estudiante{{ group.students_count|pluralize }}
+                            </div>
+
+                            <div class="course-actions">
+                                {# NUEVA LÓGICA: Enlaces a las nuevas vistas de gestión #}
+                                <a href="{% url 'teachers:manage_enrollments' group.pk %}" class="btn btn-primary-soft">
+                                    <i class="fa-solid fa-users"></i> Estudiantes
+                                </a>
+                                <a href="{% url 'teachers:manage_tutoring' group.pk %}" class="btn btn-secondary">
+                                    <i class="fa-regular fa-clock"></i> Monitorías
+                                </a>
+                                {# Aquí puedes añadir más acciones, como un botón de opciones o para eliminar el grupo #}
+                            </div>
+                        </article>
+                        {% empty %}
+                        <div class="card card-muted" style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                            <p>Aún no impartes ningún grupo. Crea una materia y luego añádele tu primer grupo.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {# CAMBIO: La funcionalidad de "unirse por código" se elimina #}
+                    {# El profesor ahora crea cursos o se le asignan grupos, no se une a ellos. #}
+                    
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="{% static 'js/ui.js' %}"></script>
+
+</body>
+
+</html>

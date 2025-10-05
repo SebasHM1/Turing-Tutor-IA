@@ -1,0 +1,143 @@
+.info-card {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-card h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* Espacio entre el ícono y el texto */
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    color: #495057;
+}
+
+.info-item .icon-prefix {
+    font-size: 1.2rem;
+    color: #007bff;
+    margin-right: 0.75rem;
+    width: 24px;
+    text-align: center;
+}
+
+.info-item strong {
+    color: #212529;
+    margin-right: 0.5rem;
+}
+
+/* --- Tarjetas de Monitorías por Profesor --- */
+.teacher-card {
+    margin-top: 1.5rem;
+    border-left: 4px solid #007bff; /* Color de acento */
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s ease;
+}
+
+.teacher-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.teacher-card-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.teacher-card-header .fa-chalkboard-user {
+    font-size: 2.5rem;
+    color: #495057;
+    margin-right: 1rem;
+}
+
+.teacher-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.teacher-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+.teacher-title {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.tutoring-slots-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tutoring-slot {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Diseño responsivo */
+    gap: 1rem;
+    padding: 1.25rem;
+    border-bottom: 1px solid #f1f1f1;
+    background-color: #fff;
+}
+
+.tutoring-slot:last-child {
+    border-bottom: none;
+}
+
+.slot-info {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.slot-info .icon-prefix {
+    color: #007bff;
+    margin-right: 0.75rem;
+    width: 20px;
+    text-align: center;
+}
+
+/* --- Visor de PDF --- */
+.pdf-viewer-card {
+    margin-top: 1.5rem;
+    overflow: hidden; /* Para que el iframe no se salga de los bordes redondeados */
+}
+
+.pdf-viewer-card iframe {
+    display: block; /* Elimina espacio en blanco inferior */
+    border: none;
+}
+
+
+/* --- Tarjeta para estados vacíos/mensajes --- */
+.card-muted {
+    margin-top: 1.5rem;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    border: 1px dashed #ced4da;
+    color: #6c757d;
+}
+
+.card-muted i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}

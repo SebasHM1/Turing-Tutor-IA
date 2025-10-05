@@ -1,0 +1,56 @@
+{% extends "dashboard.html" %}
+{% load static %}
+
+{% block content %}
+<div class="content">
+    <div class="container">
+        <div class="welcome">
+            <div class="welcome-head place-back">
+                <a href="{% url 'teachers:dashboard' %}" class="btn-back" aria-label="Volver atrás">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <h1>
+                    {% if form.instance.pk %}
+                        Editar Grupo
+                    {% else %}
+                        Crear Nuevo Grupo para {{ course.name }}
+                    {% endif %}
+                </h1>
+            </div>
+            <p class="welcome-sub">
+                Define un nombre y horario para esta clase específica.
+            </p>
+        </div>
+
+        <div class="card form-wrapper">
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}">Nombre del Grupo</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <div class="field-error">{{ form.name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.schedule.id_for_label }}">Horario del Grupo</label>
+                    {{ form.schedule }}
+                        {% if form.schedule.errors %}
+                        <div class="field-error">{{ form.schedule.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'teachers:dashboard' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-save"></i> Guardar Grupo
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

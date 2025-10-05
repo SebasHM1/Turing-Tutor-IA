@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mis Materias{% endblock %} - Turing</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    {# Este es el bloque crucial para los estilos de cada página #}
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="dashboard">
+    <div class="page">
+        <aside class="sidebar">
+            <a href="/chatbot/" class="brand-title brand-link">Turing</a>
+            <hr class="sidebar-divider">
+            <ul class="nav-links">
+                <li><a href="#"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a class="active" href="{% url 'courses:my_student_groups' %}">
+                        <i class="fa-solid fa-layer-group"></i> Mis Materias
+                    </a></li>
+                <li><a href="#"><i class="fa-regular fa-calendar"></i> Calendario</a></li>
+                <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
+                <li><a href="#"><i class="fa-regular fa-circle-question"></i> Centro de Ayuda</a></li>
+            </ul>
+        </aside>
+
+        <main>
+            <div class="topbar">
+                <div class="topbar-inner">
+                    <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
+                        {% csrf_token %}
+                    </form>
+                    <div class="topbar-user">
+                        <button type="button" class="btn btn-ghost small js-logout">
+                            <i class="fa-solid fa-right-from-bracket"></i> Salir
+                        </button>
+                        <i class="fa-regular fa-bell bell"></i>
+                        <span>{{ user.name }}</span>
+                        <div class="avatar-circle">
+                            {% if user.profile.avatar_url %}
+                            <img src="{{ user.profile.avatar_url }}" alt="Avatar">
+                            {% else %}
+                            <i class="fa-regular fa-user"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Este bloque estará VACÍO. Las otras plantillas lo llenarán. #}
+            {% block content %}
+            {% endblock content %}
+
+        </main>
+    </div>
+
+    <script src="{% static 'js/ui.js' %}"></script>
+</body>
+
+</html>
