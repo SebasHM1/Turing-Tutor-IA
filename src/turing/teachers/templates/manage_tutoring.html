@@ -5,7 +5,7 @@
     <div class="container">
         <div class="welcome">
             <div class="welcome-head place-back">
-                <a href="{% url 'teachers:dashboard' %}" class="btn-back" aria-label="Volver atrás">
+                <a href="{% url 'teachers:dashboard' %}" class="btn-back js-back" aria-label="Volver atrás">
                     <i class="fa-solid fa-chevron-left"></i>
                 </a>
                 <h1>Gestionar Horarios de Monitoría</h1>
@@ -13,41 +13,78 @@
             <p class="welcome-sub">Para el curso: <strong>{{ course.name }}</strong></p>
         </div>
 
-        <form method="post">
+        <form method="post" class="tutoring-form">
             {% csrf_token %}
-            {{ formset.management_form }} {# -- ESTO ES OBLIGATORIO PARA EL FORMSET -- #}
-            
-            <div class="card" style="margin-top: 2rem;">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Día</th>
-                            <th>Hora Inicio</th>
-                            <th>Hora Fin</th>
-                            <th>Ubicación / Enlace</th>
-                            <th>Eliminar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for form in formset %}
-                            <tr>
-                                <td>{{ form.day }}</td>
-                                <td>{{ form.start_time }}</td>
-                                <td>{{ form.end_time }}</td>
-                                <td>{{ form.location }}</td>
-                                <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}</td>
-                                {# -- Campo oculto para el ID de cada fila -- #}
-                                {{ form.id }} 
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            {{ formset.management_form }}
+
+            <div class="tutoring-slots-wrapper">
+                {% for form in formset %}
+                <div class="tutoring-slot-card card">
+                    <div class="slot-header">
+                        <span class="slot-number">#{{ forloop.counter }}</span>
+                        {% if form.instance.pk %}
+                        <label class="delete-checkbox">
+                            {{ form.DELETE }}
+                            <span class="delete-label">
+                                <i class="fa-solid fa-trash-can"></i> Eliminar
+                            </span>
+                        </label>
+                        {% endif %}
+                    </div>
+
+                    <div class="slot-fields">
+                        <div class="field-group">
+                            <label for="{{ form.day.id_for_label }}">
+                                <i class="fa-regular fa-calendar"></i> Día
+                            </label>
+                            {{ form.day }}
+                            {% if form.day.errors %}
+                            <div class="field-error">{{ form.day.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="field-group">
+                            <label for="{{ form.start_time.id_for_label }}">
+                                <i class="fa-regular fa-clock"></i> Hora Inicio
+                            </label>
+                            {{ form.start_time }}
+                            {% if form.start_time.errors %}
+                            <div class="field-error">{{ form.start_time.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="field-group">
+                            <label for="{{ form.end_time.id_for_label }}">
+                                <i class="fa-regular fa-clock"></i> Hora Fin
+                            </label>
+                            {{ form.end_time }}
+                            {% if form.end_time.errors %}
+                            <div class="field-error">{{ form.end_time.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="field-group field-full">
+                            <label for="{{ form.location.id_for_label }}">
+                                <i class="fa-solid fa-location-dot"></i> Ubicación / Enlace
+                            </label>
+                            {{ form.location }}
+                            {% if form.location.errors %}
+                            <div class="field-error">{{ form.location.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {{ form.id }}
+                </div>
+                {% endfor %}
             </div>
 
-            <div class="form-actions" style="margin-top: 1.5rem;">
-                <a href="{% url 'teachers:dashboard' %}" class="btn btn-secondary">Cancelar</a>
+            <div class="form-actions">
+                <a href="{% url 'teachers:dashboard' %}" class="btn btn-secondary">
+                    <i class="fa-solid fa-xmark"></i> Cancelar
+                </a>
                 <button type="submit" class="btn btn-primary">
-                    <i class="fa-solid fa-save"></i> Guardar Cambios
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
                 </button>
             </div>
         </form>

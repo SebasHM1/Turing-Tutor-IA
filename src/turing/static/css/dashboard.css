@@ -14,10 +14,10 @@
 
 .pdf-viewer-container {
     margin-top: 1rem;
-    padding: 0; 
-    overflow: hidden; 
-    height: 800px; 
-    resize: vertical; 
+    padding: 0;
+    overflow: hidden;
+    height: 800px;
+    resize: vertical;
 }
 
 body.dashboard {
@@ -394,8 +394,17 @@ main {
     font-weight: 600;
     font-size: 14px;
     border: 1px solid transparent;
+    cursor: pointer;
     position: relative;
     overflow: hidden;
+}
+
+button.btn {
+    cursor: pointer;
+}
+
+button.btn:hover {
+    transform: translateY(-1px);
 }
 
 .btn-primary {
@@ -504,6 +513,32 @@ main {
     display: block;
 }
 
+.menu-delete-btn {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    text-align: left;
+    background: none;
+    border: none;
+    color: var(--danger-text);
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.menu-delete-btn:hover {
+    background: var(--danger-soft);
+}
+
+.menu-pop a.danger {
+    color: var(--danger-text);
+}
+
+.menu-pop a.danger:hover {
+    background: var(--danger-soft);
+}
+
 
 @keyframes ripple {
     to {
@@ -547,42 +582,6 @@ main {
     font-size: 14px;
 }
 
-/* Responsive */
-@media (max-width:1100px) {
-    .kpis {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .courses-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width:768px) {
-    .topbar-inner {
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    .search {
-        width: 100%;
-        max-width: none;
-    }
-
-    .kpis {
-        grid-template-columns: 1fr;
-    }
-
-    .header-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .container {
-        padding: 0 4px;
-    }
-}
 
 /* Badge styles for knowledge base processing status */
 .badge {
@@ -629,12 +628,8 @@ main {
     color: var(--ink-weak);
 }
 
-/* ==========================================================================
-   ESTILOS PARA FORMULARIOS (Reutilizable)
-   ========================================================================== */
-
 .form-wrapper {
-    max-width: 600px; /* Limita el ancho del formulario */
+    max-width: 600px;
     margin-top: 2rem;
 }
 
@@ -668,8 +663,10 @@ main {
 
 .form-actions {
     display: flex;
-    justify-content: flex-end; /* Alinea los botones a la derecha */
-    gap: 1rem; /* Espacio entre botones */
+    justify-content: flex-end;
+    /* Alinea los botones a la derecha */
+    gap: 1rem;
+    /* Espacio entre botones */
     margin-top: 2rem;
     padding-top: 1.5rem;
     border-top: 1px solid #e9ecef;
@@ -681,7 +678,8 @@ main {
 
 .enrollment-manager {
     display: grid;
-    grid-template-columns: 1fr; /* Una columna en móviles */
+    grid-template-columns: 1fr;
+    /* Una columna en móviles */
     gap: 2rem;
     margin-top: 2rem;
 }
@@ -712,7 +710,8 @@ main {
     padding: 0;
     margin: 0;
     max-height: 500px;
-    overflow-y: auto; /* Scroll si la lista es muy larga */
+    overflow-y: auto;
+    /* Scroll si la lista es muy larga */
 }
 
 .student-item {
@@ -746,4 +745,474 @@ main {
     display: block;
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
+}
+
+/* ========================================================================
+   ESTILOS PARA EDITOR DE PROMPT DE IA
+   ======================================================================== */
+
+.prompt-editor-card {
+    margin-top: 2rem;
+    padding: 2rem;
+}
+
+.prompt-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+}
+
+.prompt-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.5rem;
+}
+
+.prompt-header h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.prompt-description {
+    color: var(--ink-weak);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.prompt-editor-card textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-input);
+    font-size: 0.9375rem;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 300px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prompt-editor-card textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.1);
+}
+
+.prompt-editor-card textarea::placeholder {
+    color: #9CA3AF;
+}
+
+.prompt-tips {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #F0F9FF;
+    border: 1px solid #BAE6FD;
+    border-radius: 10px;
+}
+
+.tip-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    color: #0369A1;
+}
+
+.tip-header i {
+    font-size: 1.125rem;
+}
+
+.tip-list {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #0C4A6E;
+    font-size: 0.875rem;
+}
+
+.tip-list li {
+    margin-bottom: 0.5rem;
+}
+
+.tip-list li:last-child {
+    margin-bottom: 0;
+}
+
+.prompt-meta {
+    margin: 1rem 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.prompt-meta .text-muted {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--ink-weak);
+    margin: 0;
+}
+
+.info-card {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+}
+
+.info-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    color: #92400E;
+}
+
+.info-header i {
+    font-size: 1.125rem;
+}
+
+.info-card p {
+    margin: 0;
+    color: #78350F;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+/* ========================================================================
+   ESTILOS PARA GESTIÓN DE MONITORÍAS
+   ======================================================================== */
+
+.tutoring-form {
+    margin-top: 2rem;
+}
+
+.tutoring-slots-wrapper {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tutoring-slot-card {
+    padding: 1.5rem;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.tutoring-slot-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.slot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.slot-number {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: rgba(22, 119, 255, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+}
+
+.delete-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    color: var(--danger-text);
+    font-size: 0.875rem;
+    transition: opacity 0.2s ease;
+}
+
+.delete-checkbox:hover {
+    opacity: 0.8;
+}
+
+.delete-checkbox input[type="checkbox"] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.delete-label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.slot-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.field-group.field-full {
+    grid-column: 1 / -1;
+}
+
+.field-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #374151;
+    font-size: 0.875rem;
+}
+
+.field-group label i {
+    color: var(--ink-weak);
+    font-size: 0.875rem;
+}
+
+.field-group select,
+.field-group input[type="time"],
+.field-group input[type="text"] {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-input);
+    font-size: 0.9375rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field-group select:focus,
+.field-group input[type="time"]:focus,
+.field-group input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.1);
+}
+
+.field-error {
+    color: var(--danger-text);
+    font-size: 0.8125rem;
+    margin-top: 0.375rem;
+}
+
+/* ========================================================================
+   ESTILOS PARA SUBIDA DE PDF
+   ======================================================================== */
+
+.upload-card {
+    max-width: 700px;
+    margin-top: 2rem;
+    padding: 2rem;
+}
+
+.upload-area {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.file-input {
+    position: absolute;
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    background: var(--bg-tile);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-label:hover {
+    border-color: var(--primary);
+    background: rgba(22, 119, 255, 0.05);
+}
+
+.upload-area.drag-over .upload-label {
+    border-color: var(--primary);
+    background: rgba(22, 119, 255, 0.1);
+    transform: scale(1.02);
+}
+
+.upload-area.has-file .upload-label {
+    border-color: #10B981;
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.upload-icon {
+    font-size: 3.5rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.upload-label:hover .upload-icon {
+    transform: translateY(-4px);
+}
+
+.upload-text {
+    text-align: center;
+}
+
+.upload-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 0.5rem 0;
+}
+
+.upload-subtitle {
+    font-size: 0.875rem;
+    color: var(--ink-weak);
+    margin: 0;
+}
+
+.file-selected {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.file-selected i {
+    font-size: 2rem;
+    color: #EF4444;
+}
+
+.file-name {
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.current-file-section {
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.current-file-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #15803D;
+    margin-bottom: 0.75rem;
+}
+
+.current-file-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    background: #fff;
+    border: 1px solid #BBF7D0;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #15803D;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.current-file-link:hover {
+    background: #DCFCE7;
+    transform: translateY(-1px);
+}
+
+.form-error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 8px;
+    color: var(--danger-text);
+    font-size: 0.875rem;
+    margin-top: 1rem;
+}
+
+.form-error i {
+    font-size: 1.125rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .slot-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .slot-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width:1100px) {
+    .kpis {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .courses-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width:768px) {
+    .topbar-inner {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .search {
+        width: 100%;
+        max-width: none;
+    }
+
+    .kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .container {
+        padding: 0 4px;
+    }
 }

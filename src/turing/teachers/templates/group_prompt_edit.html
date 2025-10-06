@@ -1,0 +1,107 @@
+{% extends "dashboard.html" %}
+{% load static %}
+
+{% block content %}
+<div class="content">
+    <div class="container">
+        <div class="welcome">
+            <div class="welcome-head place-back">
+                <a href="{% url 'teachers:dashboard' %}" class="btn-back js-back" aria-label="Volver atrás">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <h1>Prompt de IA para {{ group.name }}</h1>
+            </div>
+            <p class="welcome-sub">
+                Curso: <strong>{{ course.name }}</strong> · Define las instrucciones personalizadas para el agente de IA
+                de este grupo
+            </p>
+        </div>
+
+        {% if messages %}
+        <div class="flash-stack" style="margin-bottom: 1rem;">
+            {% for m in messages %}
+            <div class="alert {{ m.tags }}">
+                <i class="fa-solid fa-circle-check"></i>
+                {{ m }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="card prompt-editor-card">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="prompt-header">
+                    <div class="prompt-icon">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div>
+                        <h3>Instrucciones del Agente de IA</h3>
+                        <p class="prompt-description">
+                            Estas instrucciones guiarán el comportamiento del chatbot para los estudiantes de este grupo
+                            específico.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.ai_prompt.id_for_label }}">
+                        <i class="fa-solid fa-robot"></i> Prompt del Sistema
+                    </label>
+                    <textarea name="ai_prompt" id="{{ form.ai_prompt.id_for_label }}" rows="12"
+                        placeholder="Ejemplo: Eres un asistente de IA especializado en Algoritmos y Programación. Tu objetivo es ayudar a los estudiantes a comprender conceptos de programación, resolver dudas y guiarlos en sus ejercicios sin darles las respuestas directamente...">{{ form.ai_prompt.value|default:'' }}</textarea>
+
+                    {% if form.ai_prompt.errors %}
+                    <div class="field-error">{{ form.ai_prompt.errors.0 }}</div>
+                    {% endif %}
+
+                    <div class="prompt-tips">
+                        <div class="tip-header">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <strong>Consejos para un buen prompt:</strong>
+                        </div>
+                        <ul class="tip-list">
+                            <li>Define claramente el rol del asistente (ej: tutor, experto, mentor)</li>
+                            <li>Especifica el tono deseado (formal, amigable, motivador)</li>
+                            <li>Indica qué tipo de ayuda debe proporcionar y qué evitar</li>
+                            <li>Menciona los temas principales del curso</li>
+                            <li>Establece límites claros (ej: no dar respuestas completas a tareas)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="prompt-meta">
+                    {% if group.updated_at %}
+                    <p class="text-muted">
+                        <i class="fa-regular fa-clock"></i>
+                        Última actualización: {{ group.updated_at|date:"d/m/Y H:i" }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'teachers:dashboard' %}" class="btn btn-secondary">
+                        <i class="fa-solid fa-xmark"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Prompt
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="info-card card">
+            <div class="info-header">
+                <i class="fa-solid fa-circle-info"></i>
+                <strong>Información</strong>
+            </div>
+            <p>
+                Este prompt es específico para <strong>{{ group.name }}</strong> del curso <strong>{{ course.name
+                    }}</strong>.
+                Los estudiantes inscritos en este grupo interactuarán con el chatbot basándose en estas instrucciones.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

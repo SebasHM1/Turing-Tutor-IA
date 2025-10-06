@@ -1,37 +1,77 @@
 {% extends "dashboard.html" %}
-{% block content %}
-<div class="container">
-    <div class="header-row">
-        <h2>Subir Horario para: {{ course.name }}</h2>
-    </div>
-    
-    <div class="card" style="max-width: 600px; margin-top: 2rem;">
-        <form method="post" enctype="multipart/form-data" class="form-stacked">
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label for="{{ form.file.id_for_label }}">Selecciona un archivo PDF</label>
-                <input type="file" name="{{ form.file.name }}" accept=".pdf" required id="{{ form.file.id_for_label }}">
-                
-                {% if form.file.errors %}
-                    <div class="form-error">{{ form.file.errors|first }}</div>
-                {% endif %}
-            </div>
+{% load static %}
 
-            <div class="form-actions">
-                <a href="{% url 'teachers:tutoring_schedules' %}" class="btn btn-secondary">Cancelar</a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa-solid fa-save"></i> Guardar Horario
-                </button>
+{% block extra_head %}
+<script src="{% static 'js/upload_pdf.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<!-- El contenido sigue igual, solo elimina el <script> del final -->
+<div class="content">
+    <div class="container">
+        <div class="welcome">
+            <div class="welcome-head place-back">
+                <a href="{% url 'teachers:tutoring_schedules' %}" class="btn-back js-back" aria-label="Volver atrás">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <h1>Subir Horario de Monitorías</h1>
             </div>
-        </form>
-        {% if object.file %}
-        <div class="current-file-info">
-            <p><strong>Archivo actual:</strong>
-                <a href="{{ object.file.url }}" target="_blank">Ver PDF cargado</a>
-            </p>
+            <p class="welcome-sub">Para el curso: <strong>{{ course.name }}</strong></p>
         </div>
-        {% endif %}
+
+        <div class="card upload-card">
+            <form method="post" enctype="multipart/form-data" id="upload-form">
+                {% csrf_token %}
+
+                <div class="upload-area" id="upload-area">
+                    <input type="file" name="{{ form.file.name }}" accept=".pdf" required
+                        id="{{ form.file.id_for_label }}" class="file-input">
+                    <label for="{{ form.file.id_for_label }}" class="upload-label">
+                        <div class="upload-icon">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <div class="upload-text">
+                            <p class="upload-title">Haz clic para seleccionar un archivo PDF</p>
+                            <p class="upload-subtitle">o arrastra y suelta aquí</p>
+                        </div>
+                        <div class="file-selected" style="display: none;">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span class="file-name"></span>
+                        </div>
+                    </label>
+                </div>
+
+                {% if form.file.errors %}
+                <div class="form-error">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    {{ form.file.errors|first }}
+                </div>
+                {% endif %}
+
+                {% if object.file %}
+                <div class="current-file-section">
+                    <div class="current-file-header">
+                        <i class="fa-solid fa-file-circle-check"></i>
+                        <span>Archivo actual</span>
+                    </div>
+                    <a href="{{ object.file.url }}" target="_blank" class="current-file-link">
+                        <i class="fa-regular fa-file-pdf"></i>
+                        <span>Ver PDF actual</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                </div>
+                {% endif %}
+
+                <div class="form-actions">
+                    <a href="{% url 'teachers:tutoring_schedules' %}" class="btn btn-secondary">
+                        <i class="fa-solid fa-xmark"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Horario
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
