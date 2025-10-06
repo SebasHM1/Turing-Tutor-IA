@@ -157,20 +157,38 @@ def manage_group_enrollments(request, group_pk):
 
 
 class TutoringScheduleListView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
-    """
-    Muestra los CURSOS donde el profesor puede subir el PDF general de monitorías.
-    Esta lógica puede mantenerse a nivel de curso si el PDF es general.
-    """
     template_name = 'tutoring_schedule_list.html'
     context_object_name = 'courses'
 
     def get_queryset(self):
-        # Muestra los cursos donde el profesor imparte al menos un grupo.
         course_ids = Group.objects.filter(teacher=self.request.user).values_list('course_id', flat=True)
         return (Course.objects
                 .filter(id__in=course_ids)
-                .prefetch_related('tutoring_schedule')
+                .select_related('tutoring_schedule')
                 .distinct())
+
+    def get_context_data(self, **kwargs):
+        from courses.models import TutoringSchedule 
+        context = super().get_context_data(**kwargs)
+        rows = []
+        for c in context['courses']:
+            try:
+                schedule = c.tutoring_schedule
+            except TutoringSchedule.DoesNotExist:
+                schedule = None
+
+            has_file = bool(schedule and getattr(schedule.file, 'name', ''))
+            file_url = schedule.file.url if has_file else None
+
+            rows.append({
+                'course': c,
+                'schedule': schedule,
+                'has_file': has_file,
+                'file_url': file_url,
+            })
+        context['course_rows'] = rows
+        return context
+
 
 class TutoringScheduleUploadView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
     model = TutoringSchedule

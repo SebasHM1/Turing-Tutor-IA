@@ -4,37 +4,35 @@
     <div class="header-row">
         <h2>Gestionar Horarios de Monitorías</h2>
     </div>
-    <p class="welcome-sub">Aquí puedes subir y actualizar el archivo PDF con los horarios de monitorías para cada uno de tus cursos.</p>
+    <p class="welcome-sub">Aquí puedes subir y actualizar el archivo PDF con los horarios de monitorías para cada uno de
+        tus cursos.</p>
 
     <div class="courses-grid">
-        {% for course in courses %}
+        {% for row in course_rows %}
         <article class="course-card card">
             <div class="card-header">
-                <h3>{{ course.name }}</h3>
+                <h3>{{ row.course.name }}</h3>
             </div>
-            <div class="course-meta muted">Código: {{ course.code }}</div>
-            
-            {% if course.tutoring_schedule.file.url %}
-                <p>
-                    <strong>Horario actual:</strong> 
-                    <a href="{{ course.tutoring_schedule.file.url }}" target="_blank">
-                        Ver PDF <i class="fa-solid fa-external-link-alt"></i>
-                    </a>
-                </p>
-                <div class="course-meta muted">
-                    Actualizado el: {{ course.tutoring_schedule.updated_at|date:"d/m/Y H:i" }}
-                </div>
+            <div class="course-meta muted">Código: {{ row.course.code }}</div>
+
+            {% if row.has_file %}
+            <p>
+                <strong>Horario actual:</strong>
+                <a href="{{ row.file_url }}" target="_blank" rel="noopener">
+                    Ver PDF <i class="fa-solid fa-external-link-alt"></i>
+                </a>
+            </p>
+            <div class="course-meta muted">
+                Actualizado el: {{ row.schedule.updated_at|date:"d/m/Y H:i" }}
+            </div>
             {% else %}
-                <p class="muted">Aún no se ha subido un horario de monitorías.</p>
+            <p class="muted">Aún no se ha subido un horario de monitorías.</p>
             {% endif %}
 
             <div class="course-actions">
-                <a href="{% url 'teachers:upload_schedule' course.pk %}" class="btn btn-primary">
-                    {% if course.tutoring_schedule.file %}
-                        <i class="fa-solid fa-upload"></i> Cambiar PDF
-                    {% else %}
-                        <i class="fa-solid fa-upload"></i> Subir PDF
-                    {% endif %}
+                <a href="{% url 'teachers:upload_schedule' row.course.pk %}" class="btn btn-primary">
+                    <i class="fa-solid fa-upload"></i>
+                    {% if row.has_file %}Cambiar PDF{% else %}Subir PDF{% endif %}
                 </a>
             </div>
         </article>
