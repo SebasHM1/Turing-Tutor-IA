@@ -129,6 +129,25 @@ class CoursePrompt(models.Model):
 
     def __str__(self):
         return f"Prompt de {self.course.name} (actualizado {self.updated_at:%Y-%m-%d %H:%M})"
+
+
+class CourseTopics(models.Model):
+    """Temas definidos por el profesor para cada curso"""
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='topics')
+    name = models.CharField(max_length=200, verbose_name="Nombre del tema")
+    description = models.TextField(blank=True, verbose_name="Descripción")
+    keywords = models.TextField(blank=True, help_text="Palabras clave separadas por comas", verbose_name="Palabras clave")
+    is_active = models.BooleanField(default=True, verbose_name="Activo")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['course', 'name']
+        verbose_name = "Tema del Curso"
+        verbose_name_plural = "Temas del Curso"
+        ordering = ['course', 'name']
+    
+    def __str__(self):
+        return f"{self.course.name} - {self.name}"
     
 
 class KnowledgeBaseFile(models.Model):

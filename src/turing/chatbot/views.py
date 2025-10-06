@@ -12,6 +12,7 @@ from users.decorators import student_required
 from .models import ChatSession, ChatMessage
 from courses.models import Enrollment, Course
 from courses.rag_utils import rag_processor
+from .topic_analyzer import topic_analyzer
 
 import os
 import json
@@ -101,8 +102,13 @@ def send_message(request):
             session_id = request.POST.get('session_id')
 
             session = ChatSession.objects.select_related('course').get(id=session_id, user=request.user)
-            ChatMessage.objects.create(session=session, sender='user', message=user_message)
+            user_chat_message = ChatMessage.objects.create(session=session, sender='user', message=user_message)
 
+            # ANÁLISIS DE TEMAS: Solo se guarda si está relacionado con un tema
+            try:
+                topic_analyzer.analyze_message_topic(user_chat_message)
+            except Exception as e:
+                print(f"Error en análisis de temas: {e}")
 
             try:
                 # Configura la API Key de OpenAI
