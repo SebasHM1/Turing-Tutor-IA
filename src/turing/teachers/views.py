@@ -5,9 +5,9 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
-from django.db import transaction, connection
+from django.db.models import Q 
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, ListView, RedirectView, FormView, UpdateView
+from django.views.generic import CreateView, ListView, RedirectView, DetailView, UpdateView
 from django.forms import inlineformset_factory
 from django.core.exceptions import PermissionDenied
 
@@ -255,6 +255,26 @@ def manage_tutoring_slots(request, group_pk):
     }
     return render(request, 'manage_tutoring.html', context)
 
+class ManageCourseView(LoginRequiredMixin, TeachersOnlyMixin, DetailView):
+    """
+    NUEVA VISTA: Panel de control para una materia específica.
+    Desde aquí se gestionan los grupos, el prompt y la base de conocimiento.
+    """
+    model = Course
+    template_name = 'manage_course.html'  # Crearemos esta nueva plantilla
+    context_object_name = 'course'
+
+    def get_queryset(self):
+        # Asegura que un profesor solo pueda gestionar los cursos que posee
+        # o en los que imparte al menos un grupo.
+        course_ids = Group.objects.filter(teacher=self.request.user).values_list('course_id', flat=True)
+        return Course.objects.filter(Q(owner=self.request.user) | Q(id__in=course_ids)).distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pasamos los grupos de este curso que son impartidos por el profesor actual
+        context['teacher_groups'] = self.object.groups.filter(teacher=self.request.user)
+        return context
 
 class PromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
     # Sin cambios, ya que opera a nivel global

@@ -18,10 +18,8 @@
             <div class="brand-title"><a href="/chatbot/" class="brand-link">Turing</a></div>
             <hr class="sidebar-divider">
             <ul class="nav-links">
-                {# CAMBIO: Se ajustan los enlaces a las nuevas URLs y lógica #}
                 <li><a class="active" href="{% url 'teachers:dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a></li>
                 <li><a href="{% url 'teachers:tutoring_schedules' %}"><i class="fa-regular fa-calendar"></i> Horarios PDF</a></li>
-                <li><a href="{% url 'teachers:prompt_edit' %}"><i class="fa-solid fa-wand-magic-sparkles"></i> Prompt IA Global</a></li>
                 <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
                 <li><a href="#"><i class="fa-regular fa-circle-question"></i> Centro de Ayuda</a></li>
             </ul>
@@ -118,7 +116,7 @@
                                         <i class="fa-solid fa-ellipsis"></i>
                                     </button>
                                     <div class="menu-pop">
-                                        {# Aquí puedes añadir opciones como Editar Grupo o Eliminar Grupo #}
+                                        <a href="{% url 'teachers:manage_course' group.course.pk %}">Gestionar Materia</a>
                                         <a href="#">Editar Grupo</a>
                                         {% if group.course.owner_id == user.id %}
                                             {# Solo el dueño de la MATERIA puede eliminarla por completo #}

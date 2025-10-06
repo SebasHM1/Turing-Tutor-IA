@@ -1,0 +1,74 @@
+{% extends "dashboard.html" %}
+{% load static %}
+
+{% block title %}{{ course.name }} - Gestión{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="container">
+        <div class="welcome">
+            <div class="welcome-head place-back">
+                <a href="{% url 'teachers:dashboard' %}" class="btn-back" aria-label="Volver atrás">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <h1>Gestionar Materia: {{ course.name }}</h1>
+            </div>
+            <p class="welcome-sub">Administra los grupos, la base de conocimiento y la configuración de la IA para esta materia.</p>
+        </div>
+
+        <div class="header-row">
+            <h2><i class="fa-solid fa-users-rectangle"></i> Grupos en esta Materia</h2>
+            <a href="{% url 'teachers:group_create' course.pk %}" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Añadir Nuevo Grupo
+            </a>
+        </div>
+        <div class="courses-grid">
+            {% for group in teacher_groups %}
+            <article class="course-card card">
+                <div class="card-header">
+                    <h3>{{ group.name }}</h3>
+                </div>
+                <div class="course-meta muted">Horario: {{ group.schedule }}</div>
+                <div class="course-meta muted">
+                    <i class="fa-regular fa-user"></i> {{ group.enrollments.count }} estudiante{{ group.enrollments.count|pluralize }}
+                </div>
+                <div class="course-actions">
+                    <a href="{% url 'teachers:manage_enrollments' group.pk %}" class="btn btn-primary-soft">
+                        <i class="fa-solid fa-users"></i> Estudiantes
+                    </a>
+                    <a href="{% url 'teachers:manage_tutoring' group.pk %}" class="btn btn-secondary">
+                        <i class="fa-regular fa-clock"></i> Monitorías
+                    </a>
+                </div>
+            </article>
+            {% empty %}
+            <div class="card card-muted" style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                <p>Aún no impartes ningún grupo en esta materia. ¡Añade uno!</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="header-row" style="margin-top: 2.5rem;">
+            <h2><i class="fa-solid fa-cogs"></i> Configuración de la Materia</h2>
+        </div>
+        <div class="card">
+            <ul class="settings-list">
+                <li>
+                    <div class="setting-info">
+                        <strong><i class="fa-solid fa-wand-magic-sparkles icon-prefix"></i> Prompt de IA</strong>
+                        <p>Define las instrucciones y el comportamiento base del chatbot para esta materia.</p>
+                    </div>
+                    <a href="{% url 'courses:prompt_edit' course.pk %}" class="btn btn-secondary">Editar Prompt</a>
+                </li>
+                <li>
+                    <div class="setting-info">
+                        <strong><i class="fa-solid fa-database icon-prefix"></i> Base de Conocimiento (RAG)</strong>
+                        <p>Sube los archivos PDF (syllabus, lecturas, etc.) que el chatbot usará como fuente de verdad.</p>
+                    </div>
+                    <a href="{% url 'courses:knowledge_base' course.pk %}" class="btn btn-secondary">Gestionar Archivos</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock content %}

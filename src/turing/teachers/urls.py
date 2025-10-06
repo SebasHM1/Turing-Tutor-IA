@@ -5,6 +5,7 @@ from .views import (
     TeacherDashboardView,
     CourseCreateView,
     CourseDeleteView,
+    ManageCourseView,
     
     # Vistas para la gestión de grupos y estudiantes
     GroupCreateView,
@@ -37,5 +38,7 @@ urlpatterns = [
     path('groups/<int:group_pk>/manage-tutoring/', manage_tutoring_slots, name='manage_tutoring'),
 
     path('prompt-edit/', PromptEditView.as_view(), name='prompt_edit'),
+
+    path('course/<int:pk>/manage/', ManageCourseView.as_view(), name='manage_course')
 
 ]
