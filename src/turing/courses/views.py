@@ -46,33 +46,31 @@ class MyStudentGroupsView(LoginRequiredMixin, StudentsOnlyMixin, ListView):
 
 class StudentGroupDetailView(LoginRequiredMixin, StudentsOnlyMixin, DetailView):
     """
-    [VISTA MODIFICADA] Muestra la página de detalles de un GRUPO específico.
-    Reemplaza a la antigua 'StudentCourseDetailView'.
+    Muestra la página de detalles de un GRUPO específico, incluyendo
+    información del curso y todos los grupos del mismo curso con sus monitorías.
     """
-    model = Group  # El modelo principal de esta vista es ahora Group.
+    model = Group
     template_name = 'student_group_detail.html'
-    context_object_name = 'group' # El objeto principal en la plantilla será 'group'.
+    context_object_name = 'current_group'
 
     def get_queryset(self):
         """
-        Aseguramos que un estudiante solo pueda acceder a los detalles de los grupos
-        en los que está formalmente inscrito. Esto es una medida de seguridad clave.
+        Aseguramos que un estudiante solo pueda acceder a los grupos
+        en los que está formalmente inscrito.
         """
-        return Group.objects.filter(enrollments__student=self.request.user)
+        return Group.objects.filter(
+            enrollments__student=self.request.user
+        ).select_related('course', 'teacher')
 
     def get_context_data(self, **kwargs):
-        """
-        Enriquecemos el contexto para la plantilla. A través del objeto 'group',
-        podemos acceder fácilmente al curso, al profesor y a las monitorías.
-        """
         context = super().get_context_data(**kwargs)
         group = self.get_object()
         
-        # El curso se obtiene directamente desde la relación del grupo.
         context['course'] = group.course
         
-        # Las monitorías personalizadas ahora vienen directamente del grupo.
-        context['teacher_tutoring_slots'] = group.tutoring_slots.all()
+        context['groups'] = group.course.groups.all().select_related(
+            'teacher'
+        ).prefetch_related('tutoring_slots')
         
         return context
 

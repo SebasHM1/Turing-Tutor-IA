@@ -15,30 +15,19 @@ from .views import (
     TutoringScheduleListView,
     TutoringScheduleUploadView,
     manage_tutoring_slots,
-    
-    # Vistas de configuración
-    PromptEditView,
+    GroupPromptEditView,
 )
 
 app_name = 'teachers'
 
 urlpatterns = [
     path('dashboard/', TeacherDashboardView.as_view(), name='dashboard'),
-
     path('courses/new/', CourseCreateView.as_view(), name='course_create'),
     path('courses/<int:pk>/delete/', CourseDeleteView.as_view(), name='course_delete'),
-
     path('courses/<int:course_pk>/groups/new/', GroupCreateView.as_view(), name='group_create'),
-    
     path('groups/<int:group_pk>/students/', manage_group_enrollments, name='manage_enrollments'),
-    
+    path('groups/<int:group_pk>/prompt/', GroupPromptEditView.as_view(), name='group_prompt_edit'),
     path('tutoring-schedules/', TutoringScheduleListView.as_view(), name='tutoring_schedules'),
     path('courses/<int:course_pk>/upload-schedule/', TutoringScheduleUploadView.as_view(), name='upload_schedule'),
-    
     path('groups/<int:group_pk>/manage-tutoring/', manage_tutoring_slots, name='manage_tutoring'),
-
-    path('prompt-edit/', PromptEditView.as_view(), name='prompt_edit'),
-
-    path('course/<int:pk>/manage/', ManageCourseView.as_view(), name='manage_course')
-
 ]

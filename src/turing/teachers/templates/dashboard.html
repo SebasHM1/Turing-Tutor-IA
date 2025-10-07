@@ -18,10 +18,28 @@
             <div class="brand-title"><a href="/chatbot/" class="brand-link">Turing</a></div>
             <hr class="sidebar-divider">
             <ul class="nav-links">
-                <li><a class="active" href="{% url 'teachers:dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a></li>
-                <li><a href="{% url 'teachers:tutoring_schedules' %}"><i class="fa-regular fa-calendar"></i> Horarios PDF</a></li>
-                <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
-                <li><a href="#"><i class="fa-regular fa-circle-question"></i> Centro de Ayuda</a></li>
+                <li>
+                    <a href="{% url 'teachers:dashboard' %}"
+                        class="{% if active_page == 'dashboard' %}active{% endif %}">
+                        <i class="fa-solid fa-house"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'teachers:tutoring_schedules' %}"
+                        class="{% if active_page == 'tutoring_schedules' %}active{% endif %}">
+                        <i class="fa-regular fa-calendar"></i> Horarios PDF
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="{% if active_page == 'settings' %}active{% endif %}">
+                        <i class="fa-solid fa-gear"></i> Configuración
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="{% if active_page == 'help' %}active{% endif %}">
+                        <i class="fa-regular fa-circle-question"></i> Centro de Ayuda
+                    </a>
+                </li>
             </ul>
         </aside>
 
@@ -63,7 +81,7 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-                    
+
                     <div class="welcome">
                         <div class="welcome-head">
                             <h1>Dashboard del Profesor</h1>
@@ -93,7 +111,6 @@
                     <!-- Encabezado y CTA principal -->
                     <div class="header-row">
                         <h2>Mis Grupos</h2>
-                        {# CAMBIO: El CTA ahora es para crear una MATERIA. El profesor creará grupos DENTRO de la materia. #}
                         <a href="{% url 'teachers:course_create' %}" class="btn btn-primary">
                             <i class="fa-solid fa-plus"></i> Crear Nueva Materia
                         </a>
@@ -116,14 +133,16 @@
                                         <i class="fa-solid fa-ellipsis"></i>
                                     </button>
                                     <div class="menu-pop">
-                                        <a href="{% url 'teachers:manage_course' group.course.pk %}">Gestionar Materia</a>
                                         <a href="#">Editar Grupo</a>
                                         {% if group.course.owner_id == user.id %}
-                                            {# Solo el dueño de la MATERIA puede eliminarla por completo #}
-                                            <a href="{% url 'teachers:course_delete' group.course.pk %}" class="danger"
-                                               onclick="return confirm('¿Seguro que quieres eliminar la materia \'{{ group.course.name }}\' y TODOS sus grupos? Esta acción no se puede deshacer.');">
-                                               Eliminar Materia
-                                            </a>
+                                        <form method="post" action="{% url 'teachers:course_delete' group.course.pk %}"
+                                            style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="menu-delete-btn"
+                                                onclick="return confirm('¿Seguro que quieres eliminar la materia \'{{ group.course.name }}\' y TODOS sus grupos? Esta acción no se puede deshacer.');">
+                                                Eliminar Materia
+                                            </button>
+                                        </form>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -131,18 +150,20 @@
 
                             <div class="course-meta muted">Horario: {{ group.schedule }}</div>
                             <div class="course-meta muted">
-                                <i class="fa-regular fa-user"></i> 
+                                <i class="fa-regular fa-user"></i>
                                 {# La vista ahora calcula 'students_count' para cada grupo #}
                                 {{ group.students_count }} estudiante{{ group.students_count|pluralize }}
                             </div>
 
                             <div class="course-actions">
-                                {# NUEVA LÓGICA: Enlaces a las nuevas vistas de gestión #}
                                 <a href="{% url 'teachers:manage_enrollments' group.pk %}" class="btn btn-primary-soft">
                                     <i class="fa-solid fa-users"></i> Estudiantes
                                 </a>
                                 <a href="{% url 'teachers:manage_tutoring' group.pk %}" class="btn btn-secondary">
                                     <i class="fa-regular fa-clock"></i> Monitorías
+                                </a>
+                                <a href="{% url 'teachers:group_prompt_edit' group.pk %}" class="btn btn-outline">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Prompt IA
                                 </a>
                             </div>
                         </article>
