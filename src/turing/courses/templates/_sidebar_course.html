@@ -4,7 +4,7 @@
     <hr class="sidebar-divider">
     <ul class="nav-links">
         <li><a href="{% url 'teachers:dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a></li>
-        <li><a class="{% if active_page == 'course_detail' %}active{% endif %}" href="{% url 'courses:detail' course.id %}"><i class="fa-solid fa-layer-group"></i> Detalles del Curso</a></li>
+        <li><a class="{% if active_page == 'course_detail' %}active{% endif %}" href="{% url 'teachers:manage_course' course.id %}"><i class="fa-solid fa-layer-group"></i> Detalles del Curso</a></li>
     </ul>
     <hr class="sidebar-divider">
     <div class="sidebar-section">

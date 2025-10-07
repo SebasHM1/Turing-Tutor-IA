@@ -5,6 +5,7 @@ from .views import (
     TeacherDashboardView,
     CourseCreateView,
     CourseDeleteView,
+    ManageCourseView,
     
     # Vistas para la gestión de grupos y estudiantes
     GroupCreateView,
