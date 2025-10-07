@@ -40,21 +40,21 @@
         </div>
 
         <div class="header-row" style="margin-top: 2rem;">
-            <h2><i class="fa-regular fa-user-group"></i> Monitorías por Profesor</h2>
+            <h2><i class="fa-regular fa-user-group"></i> Monitorías por Grupo</h2>
         </div>
 
-        {% for assignment in teacher_assignments %}
-        {% if assignment.tutoring_slots.all %}
+        {% for group in groups %}
+        {% if group.tutoring_slots.all %}
         <div class="card teacher-card">
             <div class="teacher-card-header">
-                <i class="fa-solid fa-chalkboard-user"></i>
+                <i class="fa-solid fa-users"></i>
                 <div class="teacher-details">
-                    <span class="teacher-name">{{ assignment.teacher.name }} {{ assignment.teacher.last_name }}</span>
-                    <span class="teacher-title">Profesor(a) del curso</span>
+                    <span class="teacher-name">{{ group.name }}</span>
+                    <span class="teacher-title">{{ group.teacher.get_full_name }} - Profesor(a)</span>
                 </div>
             </div>
             <ul class="tutoring-slots-list">
-                {% for slot in assignment.tutoring_slots.all %}
+                {% for slot in group.tutoring_slots.all %}
                 <li class="tutoring-slot">
                     <div class="slot-info">
                         <i class="fa-solid fa-calendar-day icon-prefix"></i>
@@ -76,7 +76,7 @@
         {% empty %}
         <div class="card card-muted">
             <i class="fa-regular fa-folder-open"></i>
-            <p>Aún no hay monitorías personalizadas publicadas por los profesores.</p>
+            <p>Aún no hay monitorías personalizadas publicadas en este curso.</p>
         </div>
         {% endfor %}
 

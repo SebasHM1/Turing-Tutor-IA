@@ -89,6 +89,18 @@ form label {
     cursor: pointer;
 }
 
+.input-group .fa-eye,
+.input-group .fa-eye-slash {
+    margin-left: 8px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.input-group .fa-eye:hover,
+.input-group .fa-eye-slash:hover {
+    color: #0066ff;
+}
+
 .options {
     display: flex;
     justify-content: space-between;

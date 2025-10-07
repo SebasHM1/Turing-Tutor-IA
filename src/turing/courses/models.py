@@ -53,10 +53,21 @@ class Group(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nombre del Grupo (ej: Grupo 1, G-01)")
     schedule = models.CharField(max_length=255, verbose_name="Horario del Grupo")
     
+    ai_prompt = models.TextField(
+        blank=True,
+        default='',
+        verbose_name="Prompt de IA del Grupo",
+        help_text='Instrucciones personalizadas para el agente de IA de este grupo específico'
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Última actualización")
+    
     class Meta:
         verbose_name = "Grupo"
         verbose_name_plural = "Grupos"
-        unique_together = ('course', 'name') # No puede haber dos grupos con el mismo nombre en el mismo curso
+        unique_together = ('course', 'name')
+        ordering = ['course__name', 'name']
 
     def __str__(self):
         return f"{self.course.name} - {self.name}"
