@@ -32,7 +32,7 @@
         <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
 
-            <label for="{{ form.username.id_for_label }}">Email o Nombre de Usuario</label>
+            <label for="{{ form.username.id_for_label }}">Email</label>
             <div class="input-group">
                 <i class="fa-regular fa-user"></i>
                 {{ form.username }}
@@ -47,6 +47,7 @@
             <div class="input-group">
                 <i class="fa-solid fa-lock"></i>
                 {{ form.password }}
+                <i class="fa-regular fa-eye"></i>
             </div>
             {% if form.password.errors %}
             {% for error in form.password.errors %}
@@ -60,13 +61,13 @@
             </div>
 
             <button type="submit" class="sign-in-btn">Iniciar Sesión</button>
-            <!-- Eliminado el input hidden de next para no forzar redirecciones previas -->
         </form>
 
         <div class="register-link">
             ¿No tienes una cuenta? <a href="{% url 'users:register' %}">Regístrate</a>
         </div>
     </div>
+    <script src="{% static 'js/toggle_password.js' %}"></script>
 </body>
 
 </html>

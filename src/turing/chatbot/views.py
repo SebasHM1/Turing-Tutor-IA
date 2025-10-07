@@ -10,7 +10,7 @@ from django.utils.html import escape
 
 from users.decorators import student_required
 from .models import ChatSession, ChatMessage
-from courses.models import Enrollment, Course
+from courses.models import Enrollment, Course, Group
 from courses.rag_utils import rag_processor
 from .topic_analyzer import topic_analyzer
 
@@ -20,9 +20,6 @@ from openai import OpenAI
 
 import markdown
 from markdown.extensions import codehilite
-
-
-
 
 @login_required
 def chatbot_view(request, session_id=None, course_id=None):
@@ -115,8 +112,8 @@ def send_message(request):
                 os.environ['OPENAI_API_KEY'] = getattr(settings, 'OPENAI_API_KEY', None) or os.getenv('OPENAI_API_KEY')
                 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-                # Memoria de conversación
-                context_messages = get_chat_context(session, limit=5)
+                # Memoria de conversación (incluye prompt del grupo si existe)
+                context_messages = get_chat_context(request.user, session, limit=5)
                 
                 # RAG: Buscar contexto relevante de la base de conocimiento
                 rag_context = ""
@@ -134,7 +131,7 @@ def send_message(request):
                 # Preparar mensajes para OpenAI
                 messages_for_api = [{"role": "system", "content": system_prompt}]
                 
-                # Añadir contexto de conversación (incluye prompt del curso si existe)
+                # Añadir contexto de conversación (incluye prompt del grupo si existe)
                 messages_for_api.extend(context_messages)
                 
                 # Añadir contexto RAG si está disponible
@@ -145,7 +142,7 @@ def send_message(request):
                 messages_for_api.append({"role": "user", "content": user_message})
 
                 completion = client.chat.completions.create(
-                    model="gpt-4o-mini",  # Puedes cambiar el modelo si lo deseas
+                    model="gpt-4o-mini",
                     messages=messages_for_api
                 )
 
@@ -190,8 +187,6 @@ def create_session_course(request, course_id):
     return redirect('chatbot:chat_detail', session.id)
 
 
-
-
 @student_required
 @login_required
 def delete_session(request, session_id):
@@ -206,10 +201,21 @@ def delete_session(request, session_id):
     return redirect('chatbot:chatbot')
 
 
-def get_chat_context(session, limit=5):
+def get_student_group(user, course_id):
+    enrollment = Enrollment.objects.select_related('group').filter(
+        student=user,
+        group__course_id=course_id
+    ).first()
+    
+    if enrollment:
+        return enrollment.group
+    return None
+
+
+def get_chat_context(user, session, limit=5):
     """
     Devuelve los últimos mensajes en formato messages para OpenAI,
-    incluyendo siempre el prompt del curso si existe
+    incluyendo siempre el prompt del grupo específico si existe
     """
     recent_messages = ChatMessage.objects.filter(
         session=session
@@ -217,23 +223,19 @@ def get_chat_context(session, limit=5):
 
     messages = []
     
-    # Añadir prompt del curso al inicio del contexto si existe
     if session.course_id:
         try:
-            from courses.models import CoursePrompt
-            course_prompt = CoursePrompt.objects.get(course_id=session.course_id)
-            if course_prompt.content.strip():
-                # Incluir el prompt del curso como contexto del sistema
-                course_context = f"""Instrucciones específicas para el curso {session.course.name}:
-{course_prompt.content}
+            group = get_student_group(user, session.course_id)
+            
+            if group and group.ai_prompt and group.ai_prompt.strip():
+                group_context = f"""Instrucciones específicas para el grupo {group.name} del curso {session.course.name}:
 
-Recuerda seguir estas instrucciones en todas tus respuestas para este curso."""
-                messages.append({"role": "system", "content": course_context})
-        except CoursePrompt.DoesNotExist:
-            # No hay prompt personalizado para este curso
-            pass
+{group.ai_prompt}
+
+Recuerda seguir estas instrucciones en todas tus respuestas."""
+                messages.append({"role": "system", "content": group_context})
         except Exception as e:
-            print(f"Error loading course prompt: {e}")
+            print(f"Error loading group prompt: {e}")
     
     # Añadir historial de conversación
     for msg in reversed(recent_messages):
@@ -241,6 +243,7 @@ Recuerda seguir estas instrucciones en todas tus respuestas para este curso."""
         messages.append({"role": role, "content": msg.message})
         
     return messages
+
 
 @login_required
 @require_POST
@@ -256,6 +259,7 @@ def rename_session(request, pk):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'ok': True, 'name': session.name})
     return redirect('chatbot:chat_detail', pk=session.id)
+
 
 @student_required
 @login_required

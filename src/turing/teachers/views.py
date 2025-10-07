@@ -5,20 +5,17 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
-from django.db import transaction, connection
+from django.db.models import Q 
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, ListView, RedirectView, FormView, UpdateView
+from django.views.generic import CreateView, ListView, RedirectView, DetailView, UpdateView
 from django.forms import inlineformset_factory
 from django.core.exceptions import PermissionDenied
 
-# --- Models ---
 from courses.models import Course, Group, TutoringSchedule, TutoringSlot, Enrollment
-from .models import PromptConfig
-from users.models import CustomUser  # Asegúrate que este es tu modelo de usuario
-
-# --- Forms ---
+from users.models import CustomUser
 from courses.forms import CourseForm, TutoringScheduleForm
-from .forms import PromptForm, TutoringSlotForm, GroupForm  # Asumimos que crearás un GroupForm
+from .forms import TutoringSlotForm, GroupForm
+
 
 class TeachersOnlyMixin(UserPassesTestMixin):
     """Asegura que solo los usuarios con el rol 'Teacher' puedan acceder."""
@@ -170,6 +167,8 @@ class TutoringScheduleListView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
     def get_context_data(self, **kwargs):
         from courses.models import TutoringSchedule 
         context = super().get_context_data(**kwargs)
+        context['active_page'] = 'tutoring_schedules'
+        
         rows = []
         for c in context['courses']:
             try:
@@ -255,24 +254,49 @@ def manage_tutoring_slots(request, group_pk):
     }
     return render(request, 'manage_tutoring.html', context)
 
+class ManageCourseView(LoginRequiredMixin, TeachersOnlyMixin, DetailView):
+    """
+    NUEVA VISTA: Panel de control para una materia específica.
+    Desde aquí se gestionan los grupos, el prompt y la base de conocimiento.
+    """
+    model = Course
+    template_name = 'manage_course.html'  # Crearemos esta nueva plantilla
+    context_object_name = 'course'
 
-class PromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
-    # Sin cambios, ya que opera a nivel global
-    model = PromptConfig
-    form_class = PromptForm
-    template_name = 'prompt_edit.html'
-    success_url = reverse_lazy('teachers:prompt_edit')
+    def get_queryset(self):
+        # Asegura que un profesor solo pueda gestionar los cursos que posee
+        # o en los que imparte al menos un grupo.
+        course_ids = Group.objects.filter(teacher=self.request.user).values_list('course_id', flat=True)
+        return Course.objects.filter(Q(owner=self.request.user) | Q(id__in=course_ids)).distinct()
 
-    def get_object(self, queryset=None):
-        obj, _ = PromptConfig.objects.get_or_create(key="global")
-        return obj
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pasamos los grupos de este curso que son impartidos por el profesor actual
+        context['teacher_groups'] = self.object.groups.filter(teacher=self.request.user)
+        return context
 
+class GroupPromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
+    """Edita el prompt de IA específico para un grupo."""
+    model = Group
+    fields = ['ai_prompt']
+    template_name = 'group_prompt_edit.html'
+    pk_url_kwarg = 'group_pk'
+    
+    def get_queryset(self):
+        return Group.objects.filter(teacher=self.request.user)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['group'] = self.object
+        context['course'] = self.object.course
+        return context
+    
     def form_valid(self, form):
-        obj = form.save(commit=False)
-        obj.updated_by = self.request.user
-        obj.save()
-        messages.success(self.request, _("¡Prompt actualizado!"))
+        messages.success(self.request, f"Prompt de IA actualizado para {self.object.name}")
         return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('teachers:dashboard')
 
 class CourseDeleteView(LoginRequiredMixin, TeachersOnlyMixin, RedirectView):
     """
@@ -280,13 +304,15 @@ class CourseDeleteView(LoginRequiredMixin, TeachersOnlyMixin, RedirectView):
     Esto eliminará todos los grupos, inscripciones y monitorías asociadas.
     """
     pattern_name = 'teachers:dashboard'
+    
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('teachers:dashboard')
 
     def post(self, request, *args, **kwargs):
-        # Obtenemos el curso y verificamos que el usuario es el propietario
         course = get_object_or_404(Course, pk=kwargs['pk'], owner=self.request.user)
         course_name = course.name
         
         course.delete()
         
         messages.success(request, f"La materia '{course_name}' y todos sus grupos asociados han sido eliminados.")
-        return redirect(self.get_redirect_url(*args, **kwargs))
+        return redirect('teachers:dashboard') 
