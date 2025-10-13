@@ -1,123 +1,108 @@
-import os
-import json
-from typing import Optional
-from django.conf import settings
-from openai import OpenAI
+import re
+from typing import List
 from django.utils import timezone
 from .models import TopicWeight
-from courses.models import CourseTopics
+from courses.models import CourseTopics, TopicKeyword
 
 class TopicAnalyzer:
-    def __init__(self):
-        os.environ['OPENAI_API_KEY'] = getattr(settings, 'OPENAI_API_KEY', None) or os.getenv('OPENAI_API_KEY')
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    """
+    Analizador de temas basado en regex para detectar palabras clave en mensajes.
+    Reemplaza el sistema anterior basado en IA/NLP.
+    """
     
     def analyze_message_topic(self, message):
         """
-        Analiza un mensaje y SOLO crea registro si está relacionado con un tema
-        Retorna: TopicWeight o None
+        Analiza un mensaje y crea un registro TopicWeight por cada palabra clave encontrada.
+        Retorna: Lista de TopicWeight creados
         """
         
         # Solo analizar mensajes de usuarios en cursos
         if not message.session.course_id or message.sender != 'user':
-            return None
+            return []
         
-        # Obtener temas del curso
+        # Obtener temas activos del curso con sus keywords
         topics = CourseTopics.objects.filter(
             course_id=message.session.course_id, 
             is_active=True
-        )
+        ).prefetch_related('keywords')
         
         if not topics.exists():
-            return None
+            return []
         
-        # Preparar contexto para la IA
-        topics_context = self._prepare_topics_context(topics)
+        # Buscar keywords en el mensaje
+        matched_keywords = self._find_keywords_in_message(message.message, topics)
         
-        # Llamar a la IA para analizar
-        topic_id = self._call_ai_analysis(message.message, topics_context)
+        if not matched_keywords:
+            return []
         
-        # SOLO crear registro si encontró un tema relevante
-        if topic_id is None:
-            return None
-        
-        # Verificar que el topic_id existe
-        if not CourseTopics.objects.filter(id=topic_id, course_id=message.session.course_id).exists():
-            return None
-        
-        # Crear el peso (1 punto por mensaje relevante)
-        topic_weight = TopicWeight.objects.create(
-            message=message,
-            student=message.session.user,
-            course_id=message.session.course_id,
-            topic_id=topic_id,
-            date=timezone.now().date()
-        )
-        
-        return topic_weight
-    
-    def _prepare_topics_context(self, topics) -> str:
-        """Prepara el contexto de temas para la IA"""
-        topics_list = []
-        for topic in topics:
-            topic_info = f"ID: {topic.id}, Nombre: {topic.name}"
-            if topic.description:
-                topic_info += f", Descripción: {topic.description}"
-            if topic.keywords:
-                topic_info += f", Palabras clave: {topic.keywords}"
-            topics_list.append(topic_info)
-        
-        return "\n".join(topics_list)
-    
-    def _call_ai_analysis(self, user_message: str, topics_context: str) -> Optional[int]:
-        """
-        Llama a la IA para analizar el mensaje
-        Retorna: topic_id o None
-        """
-        system_prompt = f"""
-        Eres un analizador de temas educativos. Analiza si el mensaje del estudiante está relacionado con alguno de los temas del curso.
-
-        TEMAS DISPONIBLES:
-        {topics_context}
-
-        CRITERIOS ESTRICTOS:
-        - Solo responde con un tema si el mensaje está CLARAMENTE relacionado
-        - El mensaje debe mencionar conceptos, preguntas o problemas del tema
-        - Saludos, despedidas, agradecimientos generales = NO_TOPIC
-        - Preguntas administrativas no relacionadas con el contenido = NO_TOPIC
-        - Conversación casual = NO_TOPIC
-
-        RESPONDE SOLO CON:
-        - El ID del tema (número) si está relacionado
-        - "NO_TOPIC" si no está relacionado
-
-        NO uses JSON, solo responde el ID o NO_TOPIC.
-        """
-        
-        try:
-            response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_message}
-                ],
-                temperature=0.1
+        # Crear un TopicWeight por cada keyword encontrada
+        weights_created = []
+        for keyword_obj in matched_keywords:
+            weight = TopicWeight.objects.create(
+                message=message,
+                student=message.session.user,
+                course_id=message.session.course_id,
+                topic=keyword_obj.topic,
+                keyword=keyword_obj,
+                date=timezone.now().date()
             )
+            weights_created.append(weight)
+        
+        return weights_created
+    
+    def _find_keywords_in_message(self, message_text: str, topics) -> List:
+        """
+        Busca palabras clave en el mensaje usando regex flexible (case-insensitive).
+        Busca tanto el keyword principal como sus variaciones.
+        
+        Ejemplos:
+        - Keyword: "buenas prácticas de programación"
+        - Variaciones: "buenas practicas", "mejores practicas", "clean code"
+        - Cualquiera de estas detectará el keyword principal
+        
+        Retorna lista de objetos TopicKeyword únicos encontrados.
+        """
+        message_lower = message_text.lower()
+        matched_keywords = set()
+        
+        for topic in topics:
+            # Obtener keywords del tema (solo temas activos se pasan desde analyze_message_topic)
+            keywords = topic.keywords.prefetch_related('variations')
             
-            content = response.choices[0].message.content.strip()
-            
-            if content == "NO_TOPIC":
-                return None
-            
-            try:
-                topic_id = int(content)
-                return topic_id
-            except ValueError:
-                return None
+            for keyword_obj in keywords:
+                # Intentar match con el keyword principal
+                if self._matches_text(keyword_obj.keyword, message_lower):
+                    matched_keywords.add(keyword_obj)
+                    continue  # Ya lo encontramos, no necesitamos revisar variaciones
                 
-        except Exception as e:
-            print(f"Error en análisis de temas: {e}")
-            return None
+                # Si no match el principal, intentar con las variaciones
+                variations = keyword_obj.variations.all()
+                for variation in variations:
+                    if self._matches_text(variation.variation, message_lower):
+                        matched_keywords.add(keyword_obj)
+                        break  # Una variación es suficiente
+        
+        return list(matched_keywords)
+    
+    def _matches_text(self, search_term: str, message_lower: str) -> bool:
+        """
+        Verifica si un término de búsqueda está presente en el mensaje.
+        Para términos multi-palabra, verifica que TODAS las palabras estén presentes.
+        """
+        search_term_lower = search_term.lower()
+        words = search_term_lower.split()
+        
+        if len(words) == 1:
+            # Para términos de una sola palabra, usar word boundary estricto
+            pattern = r'\b' + re.escape(search_term_lower) + r'\b'
+            return bool(re.search(pattern, message_lower))
+        else:
+            # Para frases multi-palabra, verificar que TODAS las palabras estén presentes
+            # (no necesariamente consecutivas, permite flexibilidad)
+            return all(
+                re.search(r'\b' + re.escape(word) + r'\b', message_lower)
+                for word in words
+            )
 
 # Instancia global
 topic_analyzer = TopicAnalyzer()
