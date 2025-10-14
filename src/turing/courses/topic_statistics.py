@@ -8,7 +8,7 @@ class TopicStatisticsService:
     Servicio de estadísticas basado en palabras clave detectadas en mensajes.
     Ahora cada TopicWeight representa una keyword encontrada, no un mensaje completo.
     """
-    
+
     def get_student_topic_percentages(self, student_id, course_id, start_date=None, end_date=None):
         """
         Porcentajes por estudiante basados en keywords detectadas.
@@ -75,7 +75,7 @@ class TopicStatisticsService:
             'count': k['count'],
             'percentage': (k['count'] / total) * 100
         } for k in keyword_counts]
-    
+
     def get_group_topic_percentages(self, group_id, start_date=None, end_date=None):
         """
         Porcentajes de temas para un grupo basados en keywords detectadas.
