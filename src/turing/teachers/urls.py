@@ -30,4 +30,6 @@ urlpatterns = [
     path('tutoring-schedules/', TutoringScheduleListView.as_view(), name='tutoring_schedules'),
     path('courses/<int:course_pk>/upload-schedule/', TutoringScheduleUploadView.as_view(), name='upload_schedule'),
     path('groups/<int:group_pk>/manage-tutoring/', manage_tutoring_slots, name='manage_tutoring'),
+    path('courses/<int:pk>/', ManageCourseView.as_view(), name='manage_course'),
+
 ]

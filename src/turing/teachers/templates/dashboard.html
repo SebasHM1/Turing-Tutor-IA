@@ -133,10 +133,14 @@
                                         <i class="fa-solid fa-ellipsis"></i>
                                     </button>
                                     <div class="menu-pop">
-                                        <a href="#">Editar Grupo</a>
+                                        <a href="{% url 'teachers:manage_course' group.course.pk %}"
+                                            class="dropdown-item">
+                                            <i class="fa-solid fa-pen-to-square"></i> Editar Grupo
+                                        </a>
+
                                         {% if group.course.owner_id == user.id %}
                                         <form method="post" action="{% url 'teachers:course_delete' group.course.pk %}"
-                                            style="display: inline;">
+                                            style="display:inline;">
                                             {% csrf_token %}
                                             <button type="submit" class="menu-delete-btn"
                                                 onclick="return confirm('¿Seguro que quieres eliminar la materia \'{{ group.course.name }}\' y TODOS sus grupos? Esta acción no se puede deshacer.');">
