@@ -23,7 +23,7 @@
                 <div class="container">
                     <div class="header-row">
                         <h1>Prompt del curso: {{ object.course.name }}</h1>
-                        <a href="{% url 'courses:detail' object.course.id %}" class="btn btn-secondary">← Volver</a>
+                        <a href="{% url 'teachers:manage_course' object.course.id %}" class="btn btn-secondary">← Volver</a>
                     </div>
                     <form method="post" class="card" style="padding:16px;">
                         {% csrf_token %}
@@ -31,7 +31,7 @@
                         {{ form.content }}
                         <div style="margin-top:12px; display:flex; gap:8px;">
                             <button type="submit" class="btn btn-primary">Guardar</button>
-                            <a class="btn btn-ghost" href="{% url 'courses:detail' object.course.id %}">Cancelar</a>
+                            <a class="btn btn-ghost" href="{% url 'teachers:manage_course' object.course.id %}">Cancelar</a>
                         </div>
                     </form>
                     {% if object and object.updated_at %}

@@ -140,6 +140,53 @@ class CoursePrompt(models.Model):
 
     def __str__(self):
         return f"Prompt de {self.course.name} (actualizado {self.updated_at:%Y-%m-%d %H:%M})"
+
+
+class CourseTopics(models.Model):
+    """Temas definidos por el profesor para cada curso"""
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='topics')
+    name = models.CharField(max_length=200, verbose_name="Nombre del tema")
+    description = models.TextField(blank=True, verbose_name="Descripción")
+    is_active = models.BooleanField(default=True, verbose_name="Activo")
+    
+    class Meta:
+        unique_together = ['course', 'name']
+        verbose_name = "Tema del Curso"
+        verbose_name_plural = "Temas del Curso"
+        ordering = ['course', 'name']
+    
+    def __str__(self):
+        return f"{self.course.name} - {self.name}"
+
+
+class TopicKeyword(models.Model):
+    """Palabras clave asociadas a cada tema del curso"""
+    topic = models.ForeignKey(CourseTopics, on_delete=models.CASCADE, related_name='keywords')
+    keyword = models.CharField(max_length=100, verbose_name="Palabra clave principal")
+    
+    class Meta:
+        unique_together = ['topic', 'keyword']
+        verbose_name = "Palabra Clave del Tema"
+        verbose_name_plural = "Palabras Clave del Tema"
+        ordering = ['topic', 'keyword']
+    
+    def __str__(self):
+        return f"{self.topic.name} - {self.keyword}"
+
+
+class KeywordVariation(models.Model):
+    """Variaciones de escritura de una palabra clave para matching flexible"""
+    keyword = models.ForeignKey(TopicKeyword, on_delete=models.CASCADE, related_name='variations')
+    variation = models.CharField(max_length=100, verbose_name="Variación")
+    
+    class Meta:
+        unique_together = ['keyword', 'variation']
+        verbose_name = "Variación de Palabra Clave"
+        verbose_name_plural = "Variaciones de Palabras Clave"
+        ordering = ['keyword', 'variation']
+    
+    def __str__(self):
+        return f"{self.keyword.keyword} → {self.variation}"
     
 
 class KnowledgeBaseFile(models.Model):
