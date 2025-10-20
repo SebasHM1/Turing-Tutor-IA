@@ -413,7 +413,8 @@ pre {
 }
 
 /* Lists styling */
-ul, ol {
+ul,
+ol {
     margin: 10px 0;
     padding-left: 20px;
 }
@@ -442,7 +443,8 @@ table {
     margin: 10px 0;
 }
 
-th, td {
+th,
+td {
     border: 1px solid #dfe2e5;
     padding: 8px 12px;
 }
@@ -466,10 +468,162 @@ th {
     font-size: 1.1em !important;
 }
 
-/* Syntax highlighting for different languages */
-.highlight .k { color: #d73a49; } /* Keywords */
-.highlight .s { color: #032f62; } /* Strings */
-.highlight .c { color: #6a737d; font-style: italic; } /* Comments */
-.highlight .n { color: #24292e; } /* Names */
-.highlight .o { color: #d73a49; } /* Operators */
-.highlight .p { color: #24292e; } /* Punctuation */
+/* ======= Bloques de código del chat (estilo GitHub/ChatGPT mejorado) ======= */
+.chat-page pre {
+    position: relative;
+    background: #f6f8fa;
+    /* fondo claro, legible */
+    color: #24292e;
+    /* texto base */
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    overflow-x: auto;
+    border: 1px solid #d0d7de;
+    /* borde sutil */
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    white-space: pre;
+}
+
+.chat-page pre code {
+    display: block;
+    white-space: pre;
+    color: inherit;
+}
+
+/* Barra superior: lenguaje + botón copiar */
+.code-toolbar {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 2;
+}
+
+.code-label {
+    color: #57606a;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    background: #eaeef2;
+    border-radius: 4px;
+    padding: 2px 6px;
+    user-select: none;
+}
+
+.copy-btn {
+    border: 1px solid #d0d7de;
+    background: #f6f8fa;
+    color: #24292e;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.copy-btn:hover {
+    background: #eaeef2;
+    border-color: #afb8c1;
+}
+
+.copy-btn.copied {
+    background: #dafbe1;
+    border-color: #2ea043;
+    color: #0969da;
+}
+
+/* Código coloreado */
+.chat-page pre .k {
+    color: #cf222e;
+}
+
+/* keywords */
+.chat-page pre .s {
+    color: #0a3069;
+}
+
+/* strings */
+.chat-page pre .c {
+    color: #6a737d;
+    font-style: italic;
+}
+
+/* comments */
+.chat-page pre .n {
+    color: #24292e;
+}
+
+/* names */
+.chat-page pre .o {
+    color: #cf222e;
+}
+
+/* operators */
+.chat-page pre .p {
+    color: #24292e;
+}
+
+/* punctuation */
+
+/* Animación sutil al copiar */
+.copy-btn.copied::after {
+    content: " ✓";
+    color: #2ea043;
+}
+
+/* === Textarea estilo igual al input original === */
+#chat-form textarea#message-input {
+    width: 100%;
+    resize: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #111827;
+    background-color: #f9fafb;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-family: 'Segoe UI', sans-serif;
+    overflow-y: hidden;
+    box-sizing: border-box;
+}
+
+#chat-form textarea#message-input:focus {
+    border-color: #3b82f6;
+    /* azul */
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+#chat-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border-top: 1px solid #e5e7eb;
+    padding: 10px 12px;
+}
+
+#chat-form button[type="submit"] {
+    background: #1677ff;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    width: 42px;
+    height: 42px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+#chat-form button[type="submit"]:hover {
+    background: #1d4ed8;
+}
