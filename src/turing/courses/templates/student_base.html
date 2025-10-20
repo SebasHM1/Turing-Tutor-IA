@@ -39,17 +39,10 @@
             <hr class="sidebar-divider">
 
             <ul class="nav-links">
-                <li>
-                    <a href="{% url 'chatbot:chatbot' %}">
-                        <i class="fas fa-comment"></i> Chats
-                    </a>
-                </li>
-                <li>
-                    <a class="active" href="{% url 'courses:my_student_groups' %}">
-                        <i class="fa-solid fa-user"></i> Perfil
-                    </a>
-                </li>
-                {# Sin Ajustes ni Centro de ayuda #}
+                <li><a class="active" href="{% url 'courses:my_student_groups' %}">
+                        <i class="fa-solid fa-layer-group"></i> Mis Materias
+                    </a></li>
+                <li><a href="#"><i class="fa-regular fa-calendar"></i> Calendario</a></li>
             </ul>
 
             <hr class="sidebar-divider">
