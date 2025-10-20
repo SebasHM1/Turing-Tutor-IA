@@ -281,3 +281,125 @@
         });
     }
 })();
+
+(() => {
+    const form = document.getElementById('chat-form');
+    const textarea = document.getElementById('message-input');
+    const sendBtn = document.getElementById('send-btn') || (form ? form.querySelector('button[type="submit"]') : null);
+    if (!form || !textarea) return;
+
+    const autoresize = () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 160) + 'px';
+    };
+    textarea.addEventListener('input', autoresize);
+    queueMicrotask(autoresize);
+
+    textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            form.requestSubmit();
+        }
+    });
+
+    if (sendBtn && sendBtn.type !== 'submit') {
+        sendBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            form.requestSubmit();
+        });
+    }
+
+    window.WRITE_INSTANT = true;
+
+    if (window.typeWriter) {
+        window.typeWriter = (el, html) => { el.innerHTML = html; enhanceCodeBlocks(el); };
+    }
+})();
+
+// ======= Mejora visual de <pre><code> + botón Copiar =======
+function enhanceCodeBlocks(scope) {
+    const root = scope && scope.querySelectorAll ? scope : document;
+    root.querySelectorAll('pre').forEach(pre => {
+        if (pre.dataset.enhanced) return;
+        const code = pre.querySelector('code') || pre.firstElementChild || pre;
+        // Barra superior
+        const bar = document.createElement('div');
+        bar.className = 'code-toolbar';
+        // Etiqueta de lenguaje (si existe class="language-xyz")
+        const cls = (code.getAttribute('class') || '').match(/language-([a-z0-9+#-]+)/i);
+        if (cls && cls[1]) {
+            const label = document.createElement('span');
+            label.className = 'code-label';
+            label.textContent = cls[1].toLowerCase();
+            bar.appendChild(label);
+        }
+        // Botón copiar
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copiar';
+        btn.addEventListener('click', async () => {
+            const text = code.innerText || code.textContent || '';
+            try {
+                await navigator.clipboard.writeText(text);
+                btn.classList.add('copied');
+                btn.textContent = 'Copiado ✓';
+                setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copiar'; }, 1200);
+            } catch (e) {
+                btn.textContent = 'Error';
+                setTimeout(() => (btn.textContent = 'Copiar'), 1200);
+            }
+        });
+        bar.appendChild(btn);
+
+        pre.appendChild(bar);
+        pre.dataset.enhanced = '1';
+    });
+}
+
+// 1) Ejecutar al cargar
+document.addEventListener('DOMContentLoaded', () => enhanceCodeBlocks(document));
+
+// 2) Ejecutar cuando entren nuevos mensajes al chat
+(() => {
+    const log = document.getElementById('chat-log');
+    if (!log) return;
+    const obs = new MutationObserver(muts => {
+        muts.forEach(m => m.addedNodes.forEach(n => {
+            if (n.nodeType === 1) enhanceCodeBlocks(n);
+        }));
+    });
+    obs.observe(log, { childList: true, subtree: true });
+})();
+
+(() => {
+    const form = document.getElementById('chat-form');
+    const input = document.getElementById('message-input');
+    const sendBtn = form?.querySelector('button[type="submit"]');
+
+    if (!form || !input || !sendBtn) return;
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const value = input.value;
+            input.value = value.substring(0, start) + '\n' + value.substring(end);
+            input.selectionStart = input.selectionEnd = start + 1;
+        }
+    });
+
+    sendBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        form.requestSubmit();
+    });
+
+    const autoresize = () => {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 180) + 'px';
+    };
+    input.addEventListener('input', autoresize);
+    autoresize();
+})();
+

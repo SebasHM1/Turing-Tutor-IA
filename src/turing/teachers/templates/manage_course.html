@@ -13,7 +13,8 @@
                 </a>
                 <h1>Gestionar Materia: {{ course.name }}</h1>
             </div>
-            <p class="welcome-sub">Administra los grupos, la base de conocimiento y la configuración de la IA para esta materia.</p>
+            <p class="welcome-sub">Administra los grupos, la base de conocimiento y la configuración de la IA para esta
+                materia.</p>
         </div>
 
         <div class="header-row">
@@ -30,7 +31,8 @@
                 </div>
                 <div class="course-meta muted">Horario: {{ group.schedule }}</div>
                 <div class="course-meta muted">
-                    <i class="fa-regular fa-user"></i> {{ group.enrollments.count }} estudiante{{ group.enrollments.count|pluralize }}
+                    <i class="fa-regular fa-user"></i> {{ group.enrollments.count }}
+                    estudiante{{ group.enrollments.count|pluralize }}
                 </div>
                 <div class="course-actions">
                     <a href="{% url 'teachers:manage_enrollments' group.pk %}" class="btn btn-primary-soft">
@@ -55,17 +57,12 @@
             <ul class="settings-list">
                 <li>
                     <div class="setting-info">
-                        <strong><i class="fa-solid fa-wand-magic-sparkles icon-prefix"></i> Prompt de IA</strong>
-                        <p>Define las instrucciones y el comportamiento base del chatbot para esta materia.</p>
-                    </div>
-                    <a href="{% url 'courses:prompt_edit' course.pk %}" class="btn btn-secondary">Editar Prompt</a>
-                </li>
-                <li>
-                    <div class="setting-info">
                         <strong><i class="fa-solid fa-database icon-prefix"></i> Base de Conocimiento (RAG)</strong>
-                        <p>Sube los archivos PDF (syllabus, lecturas, etc.) que el chatbot usará como fuente de verdad.</p>
+                        <p>Sube los archivos PDF (syllabus, lecturas, etc.) que el chatbot usará como fuente de verdad.
+                        </p>
                     </div>
-                    <a href="{% url 'courses:knowledge_base' course.pk %}" class="btn btn-secondary">Gestionar Archivos</a>
+                    <a href="{% url 'courses:knowledge_base' course.pk %}" class="btn btn-secondary">Gestionar
+                        Archivos</a>
                 </li>
             </ul>
         </div>
