@@ -1,47 +1,42 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm as DjangoUserCreationForm
-from .models import CustomUser 
-
+from .models import CustomUser
 from django.contrib.auth.forms import PasswordResetForm
 
 class CustomUserCreationForm(DjangoUserCreationForm):
-
     name = forms.CharField(
         label="Nombre(s)",
-        max_length=150,  # Coincidir con el max_length de User.first_name si es relevante, o TextField no tiene max_length
+        max_length=150,
         required=True,
         help_text='Tu nombre o nombres.'
     )
     last_name = forms.CharField(
         label="Apellido(s)",
-        max_length=150, # Coincidir con el max_length de User.last_name si es relevante
+        max_length=150,
         required=True,
         help_text='Tus apellidos.'
     )
-    cedula = forms.IntegerField( # O CharField si la cédula puede tener caracteres no numéricos
+    cedula = forms.IntegerField(
         label="Cédula",
         required=True,
         help_text='Tu número de cédula (sin puntos ni guiones).'
-        # Podrías añadir validadores aquí si es necesario
     )
     university_code = forms.CharField(
-        label="Código Universitario",
-        max_length=50, # Ajusta según la longitud máxima esperada
+        label="Código de estudiante",
+        max_length=50,
         required=True,
-        help_text='Tu código universitario único.'
+        help_text='Tu código único de estudiante.'
     )
     user_group = forms.CharField(
         label="Grupo",
-        max_length=50, # Ajusta según la longitud máxima esperada
+        max_length=50,
         required=True,
         help_text='Tu grupo de clase.'
     )
-    # El campo 'email' es manejado por UserCreationForm si es el USERNAME_FIELD.
-    # Los campos 'password' (password1 y password2) también son manejados por UserCreationForm.
+
     def clean_cedula(self):
         cedula = self.cleaned_data.get('cedula')
         if cedula:
-            # Elimina cualquier caracter que no sea un dígito
             return ''.join(filter(str.isdigit, str(cedula)))
         return cedula
 
