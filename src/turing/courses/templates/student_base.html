@@ -6,23 +6,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Mis Materias{% endblock %} - Turing</title>
+
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    {# Este es el bloque crucial para los estilos de cada página #}
     {% block extra_head %}{% endblock %}
 </head>
 
 <body class="dashboard">
     <div class="page">
+        <!-- Sidebar con el MISMO layout del chat (sin la sección de chats) -->
         <aside class="sidebar">
-            <a href="/chatbot/" class="brand-title brand-link">Turing</a>
-            <hr class="sidebar-divider">
+            <div class="user-info">
+                <div class="avatar" style="margin-left: 20px;">
+                    {% if user.profile.avatar_url %}
+                    <img src="{{ user.profile.avatar_url }}" alt="Avatar">
+                    {% else %}
+                    <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+                    {% endif %}
+                </div>
+                <div class="user-details" style="margin-left: 40px;">
+                    <div class="brand-title"><a href="/chatbot/" class="brand-link">Turing IA</a></div>
+                    <h3>{{ user.get_full_name|default:user.email }}</h3>
+                    {% if user.role == 'Student' and user.university_code %}
+                    <p>Código de estudiante:</p>
+                    <p class="student-id">{{ user.university_code }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <hr class="sidebar-divider" style="margin: 20px 0;">
+
             <ul class="nav-links">
-                <li><a class="active" href="{% url 'courses:my_student_groups' %}">
-                        <i class="fa-solid fa-layer-group"></i> Mis Materias
-                    </a></li>
+                <li>
+                    <a href="{% url 'chatbot:chatbot' %}">
+                        <i class="fas fa-comment"></i> Chats
+                    </a>
+                </li>
+                <li>
+                    <a class="active" href="{% url 'courses:my_student_groups' %}">
+                        <i class="fa-solid fa-user"></i> Perfil
+                    </a>
+                </li>
+                {# Eliminados Ajustes y Centro de ayuda #}
             </ul>
+
+            <hr class="sidebar-divider" style="margin: 20px 0;">
+            {# Importante: NO mostramos la lista de chats aquí #}
         </aside>
 
         <main>
@@ -48,13 +77,9 @@
                 </div>
             </div>
 
-            {# Este bloque estará VACÍO. Las otras plantillas lo llenarán. #}
-            {% block content %}
-            {% endblock content %}
-
+            {% block content %}{% endblock content %}
         </main>
     </div>
-
     <script src="{% static 'js/ui.js' %}"></script>
 </body>
 

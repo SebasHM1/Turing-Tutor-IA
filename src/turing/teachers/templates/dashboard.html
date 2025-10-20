@@ -13,7 +13,6 @@
 
 <body class="dashboard">
     <div class="page">
-        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="brand-title"><a href="/chatbot/" class="brand-link">Turing</a></div>
             <hr class="sidebar-divider">
@@ -30,22 +29,10 @@
                         <i class="fa-regular fa-calendar"></i> Horarios PDF
                     </a>
                 </li>
-                <li>
-                    <a href="#" class="{% if active_page == 'settings' %}active{% endif %}">
-                        <i class="fa-solid fa-gear"></i> Configuración
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="{% if active_page == 'help' %}active{% endif %}">
-                        <i class="fa-regular fa-circle-question"></i> Centro de Ayuda
-                    </a>
-                </li>
             </ul>
         </aside>
 
-        <!-- Columna principal -->
         <main>
-            <!-- Topbar (sin cambios mayores) -->
             <div class="topbar">
                 <div class="topbar-inner">
                     <form id="logout-form" method="post" action="{% url 'logout' %}" class="logout-form">
@@ -71,7 +58,6 @@
             </div>
 
             {% block content %}
-            <!-- Contenido del Dashboard -->
             <div class="content">
                 <div class="container">
                     {% if messages %}
@@ -89,13 +75,11 @@
                         <p class="welcome-sub">Gestiona tus materias, grupos y estudiantes desde aquí.</p>
                     </div>
 
-                    <!-- KPIs (Reflejan la nueva lógica) -->
                     <div class="kpis">
                         <div class="kpi card">
                             <div class="icon"><i class="fa-solid fa-book-open"></i></div>
                             <div>
                                 <div class="label">Grupos Asignados</div>
-                                {# CAMBIO: La vista ahora pasa 'active_groups', el conteo de grupos #}
                                 <div class="value">{{ active_groups }}</div>
                             </div>
                         </div>
@@ -108,7 +92,6 @@
                         </div>
                     </div>
 
-                    <!-- Encabezado y CTA principal -->
                     <div class="header-row">
                         <h2>Mis Grupos</h2>
                         <a href="{% url 'teachers:course_create' %}" class="btn btn-primary">
@@ -116,13 +99,10 @@
                         </a>
                     </div>
 
-                    <!-- Grid de Grupos -->
                     <div class="courses-grid">
-                        {# CAMBIO FUNDAMENTAL: Ahora iteramos sobre los 'groups' que la vista nos pasa #}
                         {% for group in groups %}
                         <article class="course-card card">
                             <div class="card-header">
-                                {# Mostramos el nombre del curso y el del grupo para diferenciarlos #}
                                 <div>
                                     <h3>{{ group.course.name }}</h3>
                                     <span class="badge">{{ group.name }}</span>
@@ -155,7 +135,6 @@
                             <div class="course-meta muted">Horario: {{ group.schedule }}</div>
                             <div class="course-meta muted">
                                 <i class="fa-regular fa-user"></i>
-                                {# La vista ahora calcula 'students_count' para cada grupo #}
                                 {{ group.students_count }} estudiante{{ group.students_count|pluralize }}
                             </div>
 
@@ -178,8 +157,6 @@
                         {% endfor %}
                     </div>
 
-                    {# CAMBIO RADICAL: Toda la sección de "Unirse a un curso" ha sido eliminada. #}
-                    {# Ya no es relevante para el flujo de trabajo del profesor. #}
                 </div>
             </div>
             {% endblock content %}

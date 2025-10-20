@@ -39,8 +39,13 @@
                     <a href="{% url 'courses:my_student_groups' %}" class="brand-link">Turing IA</a>
                 </div>
                 <h3>{{ user.get_full_name|default:user.email }}</h3>
-                <p>Student ID:</p>
+
+                {% if user.role == 'Student' and user.university_code %}
+                <p>Código de estudiante:</p>
                 <p class="student-id">{{ user.university_code }}</p>
+                {% elif user.role == 'Teacher' %}
+                <p>Profesor</p>
+                {% endif %}
             </div>
         </div>
         <hr class="sidebar-divider" style="margin: 20px 0;">
@@ -56,16 +61,18 @@
                 </a>
                 {% endif %}
             </li>
+
             {% if user.is_staff or user.role == 'Teacher' %}
             <li><a href="{% url 'teachers:dashboard' %}"><i class="fas fa-user"></i> Perfil</a></li>
+            <li><a href="{% url 'teachers:tutoring_schedules' %}"><i class="fa-regular fa-calendar"></i> Monitorías</a>
+            </li>
             {% elif user.role == 'Student' %}
             <li><a href="{% url 'courses:my_student_groups' %}"><i class="fas fa-user"></i> Perfil</a></li>
             {% else %}
             <li><a href="#"><i class="fas fa-user"></i> Perfil</a></li>
             {% endif %}
-            <li><a href="#"><i class="fas fa-cog"></i> Ajustes</a></li>
-            <li><a href="#"><i class="fas fa-question-circle"></i> Centro de ayuda</a></li>
         </ul>
+
         <hr class="sidebar-divider" style="margin: 20px 0;">
         <div class="recent-chats">
             <h3>
@@ -98,6 +105,7 @@
             {% endif %}
         </div>
     </div>
+
     <div class="main-chat">
         <div class="chat-header">
             <div class="avatar" style="margin-right: 10px;">

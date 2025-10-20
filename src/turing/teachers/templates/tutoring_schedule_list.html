@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container">
     <div class="header-row">
-        <h2>Gestionar Archivos de monitoria de Monitorías</h2>
+        <h2>Gestionar archivos de Monitorías</h2>
     </div>
     <p class="welcome-sub">Aquí puedes subir y actualizar el archivo PDF con los horarios de monitorías para cada uno de
         tus cursos.</p>
@@ -18,9 +18,8 @@
             {% if row.has_file %}
             <p>
                 <strong>Horario actual:</strong>
-                <a href="{{ row.file_url }}" target="_blank" rel="noopener">
-                    Ver PDF <i class="fa-solid fa-external-link-alt"></i>
-                </a>
+                <a href="{{ row.file_url }}" target="_blank" rel="noopener">Ver PDF <i
+                        class="fa-solid fa-external-link-alt"></i></a>
             </p>
             <div class="course-meta muted">
                 Actualizado el: {{ row.schedule.updated_at|date:"d/m/Y H:i" }}

@@ -10,35 +10,45 @@
     --primary: #1677FF;
     --danger-soft: #FEE2E2;
     --danger-text: #B91C1C;
+
+    /* === Igual que el chat === */
+    --sidebar-width: 280px;
+    /* ancho final del sidebar */
+    --sidebar-pad-x: 16px;
+    /* padding lateral */
+    --sidebar-pad-y: 20px;
+    /* padding vertical */
+    --layout-max: 1040px;
 }
 
-.pdf-viewer-container {
-    margin-top: 1rem;
-    padding: 0;
-    overflow: hidden;
-    height: 800px;
-    resize: vertical;
+html,
+body {
+    height: 100%;
 }
 
 body.dashboard {
     display: block;
+    margin: 0;
+    /* <<< quita el margen UA (8px) */
     background: var(--bg-app);
     color: var(--ink);
     font-family: 'Segoe UI', Arial, sans-serif;
 }
 
+/* ====== LAYOUT ====== */
 .page {
+    position: relative;
     display: grid;
-    grid-template-columns: 260px minmax(0, 1fr);
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
     min-height: 100vh;
     width: 100%;
 }
 
+/* Divisor vertical exactamente como en el chat */
 .page::before {
-    display: none;
     content: "";
     position: absolute;
-    left: 260px;
+    left: var(--sidebar-width);
     top: 0;
     bottom: 0;
     width: 1px;
@@ -46,16 +56,74 @@ body.dashboard {
     pointer-events: none;
 }
 
+/* ====== SIDEBAR ====== */
 .sidebar {
     background: var(--bg-sidebar);
-    padding: 20px;
-    width: 260px;
+    width: var(--sidebar-width);
+    box-sizing: border-box;
+    /* <<< para que 280 incluya padding */
+    padding: var(--sidebar-pad-y) var(--sidebar-pad-x);
 }
 
 .sidebar-divider {
     border: 0;
     border-top: 1px solid var(--border);
-    margin: 12px 0 14px 0;
+    margin: 20px 0;
+    /* <<< igual que el chat */
+}
+
+.sidebar .user-info {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.sidebar .user-info .avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid var(--border);
+}
+
+.sidebar .user-info .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sidebar .user-info .logo {
+    font-size: 24px;
+    color: var(--primary);
+}
+
+.sidebar .user-info .user-details h3 {
+    margin: 0 0 2px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.sidebar .user-info .user-details p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--ink-weak);
+}
+
+.sidebar .user-info .user-details .student-id {
+    font-weight: 600;
+    color: #374151;
+}
+
+.brand-title {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 18px;
 }
 
 .sidebar .nav-links {
@@ -98,23 +166,17 @@ body.dashboard {
     color: var(--primary);
 }
 
-.search {
-    width: 560px;
-    max-width: 60vw;
+.brand-link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
 }
 
-.search input {
-    height: 48px;
-    font-size: 15px;
+.brand-link:hover {
+    opacity: .9;
 }
 
-
-.brand-title {
-    font-weight: 700;
-    font-size: 18px;
-    margin-bottom: 18px;
-}
-
+/* ====== MAIN ====== */
 main {
     background: #fff;
     min-height: 100vh;
@@ -135,39 +197,17 @@ main {
     display: flex;
     align-items: center;
     gap: 12px;
-    max-width: 1040px;
+    max-width: var(--layout-max);
     margin: 0 auto;
     padding: 18px 24px;
 }
 
 .topbar-inner,
 .container {
-    max-width: 1040px;
+    max-width: var(--layout-max);
     width: 100%;
     margin: 0 auto;
     padding: 18px 24px;
-}
-
-
-.search {
-    width: 360px;
-    max-width: 42vw;
-}
-
-.search input {
-    width: 100%;
-    height: 44px;
-    padding: 10px 12px;
-    border: 1px solid #E1E5EA;
-    border-radius: 8px;
-    background: var(--bg-input);
-    font-size: 14px;
-}
-
-
-.search input:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(22, 119, 255, .15);
 }
 
 .topbar-user {
@@ -176,7 +216,6 @@ main {
     align-items: center;
     gap: 12px;
 }
-
 
 .avatar-circle {
     width: 28px;
@@ -201,18 +240,17 @@ main {
     color: #9CA3AF;
 }
 
-/* Contenido centrado */
+/* ====== CONTENIDO ====== */
 .content {
     padding: 24px 24px 32px;
 }
 
 .container {
-    max-width: 1040px;
+    max-width: var(--layout-max);
     margin: 0 auto;
     padding: 0 24px;
 }
 
-/* Bienvenida y botón volver */
 .welcome h1 {
     font-size: 28px;
     font-weight: 700;
@@ -232,20 +270,6 @@ main {
     gap: 12px;
 }
 
-.welcome-head.place-back .btn-back {
-    position: static;
-    transform: none;
-}
-
-
-@media (max-width:768px) {
-    .welcome-head.place-back .btn-back {
-        position: static;
-        transform: none;
-    }
-}
-
-/* Botón volver */
 .btn-back {
     width: 36px;
     height: 36px;
@@ -272,7 +296,7 @@ main {
     transform: scale(.98);
 }
 
-/* Tarjetas base y texto tenue */
+/* Tarjetas y texto tenue */
 .card {
     background: var(--bg-card);
     border: 1px solid #EEF0F3;
@@ -328,7 +352,7 @@ main {
     transform: translateY(-1px);
 }
 
-/* Sección cursos */
+/* Cursos */
 .header-row {
     display: flex;
     align-items: center;
@@ -363,26 +387,6 @@ main {
     align-items: flex-start;
     justify-content: space-between;
     margin-bottom: 6px;
-}
-
-.icon-button {
-    border: 0;
-    background: transparent;
-    color: #9CA3AF;
-    font-size: 18px;
-    padding: 4px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.icon-button:hover {
-    color: #6B7280;
-}
-
-.course-meta {
-    font-size: 14px;
-    margin: 6px 0 10px;
 }
 
 /* Botones */
@@ -436,49 +440,7 @@ button.btn:hover {
     border: 1px solid #FECACA;
 }
 
-.brand-link {
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-}
-
-.brand-link:hover {
-    opacity: .9;
-}
-
-
-/* Ripple */
-.ripple {
-    position: absolute;
-    border-radius: 999px;
-    transform: scale(0);
-    background: rgba(0, 0, 0, .1);
-    opacity: .7;
-    pointer-events: none;
-    width: 10px;
-    height: 10px;
-    animation: ripple .45s ease-out forwards;
-}
-
-.alert {
-    padding: 10px 12px;
-    border-radius: 10px;
-    font-size: 14px;
-    border: 1px solid transparent;
-}
-
-.alert.success {
-    background: #ECFDF5;
-    border-color: #A7F3D0;
-    color: #065F46;
-}
-
-.alert.error {
-    background: #FEF2F2;
-    border-color: #FECACA;
-    color: #991B1B;
-}
-
+/* Menú contextual */
 .menu {
     position: relative;
 }
@@ -531,59 +493,7 @@ button.btn:hover {
     background: var(--danger-soft);
 }
 
-.menu-pop a.danger {
-    color: var(--danger-text);
-}
-
-.menu-pop a.danger:hover {
-    background: var(--danger-soft);
-}
-
-
-@keyframes ripple {
-    to {
-        transform: scale(18);
-        opacity: 0;
-    }
-}
-
-/* Micro interacción campana */
-.bell {
-    transition: transform .15s ease;
-}
-
-.bell:hover {
-    transform: rotate(-8deg);
-}
-
-/* Unirse a un curso dentro de tarjeta gris */
-.join-card {
-    background: var(--bg-tile);
-    border: 0;
-    padding: 16px;
-    margin-top: 18px;
-    display: grid;
-    gap: 12px;
-}
-
-.join-inline {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.join-inline input {
-    flex: 1;
-    height: 44px;
-    padding: 10px 12px;
-    border: 1px solid #E1E5EA;
-    border-radius: 8px;
-    background: var(--bg-input) !important;
-    font-size: 14px;
-}
-
-
-/* Badge styles for knowledge base processing status */
+/* Badges y botones suaves */
 .badge {
     display: inline-block;
     padding: 4px 8px;
@@ -664,9 +574,7 @@ button.btn:hover {
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    /* Alinea los botones a la derecha */
     gap: 1rem;
-    /* Espacio entre botones */
     margin-top: 2rem;
     padding-top: 1.5rem;
     border-top: 1px solid #e9ecef;
@@ -679,7 +587,6 @@ button.btn:hover {
 .enrollment-manager {
     display: grid;
     grid-template-columns: 1fr;
-    /* Una columna en móviles */
     gap: 2rem;
     margin-top: 2rem;
 }
@@ -711,7 +618,6 @@ button.btn:hover {
     margin: 0;
     max-height: 500px;
     overflow-y: auto;
-    /* Scroll si la lista es muy larga */
 }
 
 .student-item {
@@ -1168,7 +1074,7 @@ button.btn:hover {
     font-size: 1.125rem;
 }
 
-/* Responsive */
+/* ============================ Responsive ============================ */
 @media (max-width: 768px) {
     .slot-fields {
         grid-template-columns: 1fr;
@@ -1181,6 +1087,7 @@ button.btn:hover {
     }
 }
 
+/* Grillas en pantallas medianas */
 @media (max-width:1100px) {
     .kpis {
         grid-template-columns: 1fr 1fr;
@@ -1191,15 +1098,11 @@ button.btn:hover {
     }
 }
 
+/* Ajustes móviles generales */
 @media (max-width:768px) {
     .topbar-inner {
         flex-wrap: wrap;
         gap: 12px;
-    }
-
-    .search {
-        width: 100%;
-        max-width: none;
     }
 
     .kpis {
@@ -1216,3 +1119,10 @@ button.btn:hover {
         padding: 0 4px;
     }
 }
+
+/* ==== Overrides finales para igualar el ancho exacto del sidebar del chat ==== */
+:root {
+    --sidebar-width: 280px;
+}
+
+/* el chat usa ~280px */
