@@ -1,0 +1,39 @@
+{% extends "users/base_auth.html" %}
+
+{% block title %}Restablecer Contraseña - Turing Tutor{% endblock %}
+
+{% block auth_content %}
+<h2>Restablecer Contraseña</h2>
+<p>Introduce correo electrónico restablecer contraseña</p>
+
+{% if form.non_field_errors %}
+    <p class="form-error">
+        {% for error in form.non_field_errors %}
+            {{ error }}
+        {% endfor %}
+    </p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+
+    <label for="{{ form.email.id_for_label }}">Email</label>
+    <div class="input-group">
+        <i class="fa-regular fa-envelope"></i>
+        {{ form.email }}
+    </div>
+    {% if form.email.errors %}
+        {% for error in form.email.errors %}
+            <p class="field-error">{{ error }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <div class="field-spacer"></div>
+
+    <button type="submit" class="sign-in-btn">Enviar enlace de restablecimiento</button>
+</form>
+
+<div class="register-link">
+    <a href="{% url 'login' %}">Volver a iniciar sesión</a>
+</div>
+{% endblock %}

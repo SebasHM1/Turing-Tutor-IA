@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/hamburger_sidebar.css' %}">
+{% block teacher_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block body_content %}
+<body class="dashboard">
+    <div class="page">
+        {% include "teachers/partials/_sidebar.html" %}
+
+        <main>
+            {% include "teachers/partials/_topbar.html" %}
+
+            <div class="content">
+                <div class="container">
+                    {% if messages %}
+                    <div class="flash-stack">
+                        {% for m in messages %}
+                        <div class="alert {{ m.tags }}">{{ m }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{% static 'js/ui.js' %}"></script>
+    <script src="{% static 'js/hamburger_menu.js' %}"></script>
+    {% block teacher_extra_js %}{% endblock %}
+</body>
+{% endblock %}

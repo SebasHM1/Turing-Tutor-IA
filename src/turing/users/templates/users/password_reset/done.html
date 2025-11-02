@@ -1,0 +1,20 @@
+{% extends "users/base_auth.html" %}
+
+{% block title %}Restablecer Contraseña - Turing Tutor{% endblock %}
+
+{% block auth_content %}
+<!-- Título y mensaje -->
+<h2>Revisa tu correo electrónico</h2>
+<p class="subtitle">
+    Te hemos enviado un enlace para restablecer tu contraseña.
+
+</p>
+<p class="subtitle">
+    Revisa tu bandeja de entrada y spam.
+</p>
+
+<!-- Botón para volver a login -->
+<div class="register-link">
+    <a href="{% url 'login' %}" class="forgot">Volver a iniciar sesión</a>
+</div>
+{% endblock %}

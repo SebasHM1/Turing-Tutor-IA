@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Restablece tu contraseña</title>
+    <link rel="stylesheet" href="/static/css/email.css">
+</head>
+<body>
+
+    <div class="email-container">
+        <div class="email-header">
+            <div class="logo-title">
+                <span class="brand">Turing Tutor</span>
+            </div>
+        </div>
+
+        <h2>Hola {{ user.get_username }},</h2>
+
+        <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta en Turing Tutor.</p>
+
+        <p>Haz clic en el siguiente botón para crear una nueva contraseña:</p>
+
+        <p class="centered-text">
+            <a href="{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}" class="reset-button">
+                Restablecer Contraseña
+            </a>
+        </p>
+
+        <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
+
+        <p>¡Gracias!</p>
+
+        <div class="footer">
+            Este mensaje fue enviado automáticamente desde Turing Tutor.<br>
+            © 2025 Turing Tutor. Todos los derechos reservados.
+        </div>
+    </div>
+
+</body>
+</html>

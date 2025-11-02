@@ -11,16 +11,16 @@ urlpatterns = [
 
     path('chatbot/', include('chatbot.urls')),
     path('password_reset/', auth_views.PasswordResetView.as_view(
-        template_name='password_reset/form.html',
-        email_template_name='password_reset/email.html',
-        html_email_template_name='password_reset/email.html'
+        template_name='users/password_reset/form.html',
+        email_template_name='users/password_reset/email.html',
+        html_email_template_name='users/password_reset/email.html'
     ), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(
-        template_name='password_reset/done.html'), name='password_reset_done'),
+        template_name='users/password_reset/done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
-        template_name='password_reset/confirm.html'), name='password_reset_confirm'),
+        template_name='users/password_reset/confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
-        template_name='password_reset/complete.html'), name='password_reset_complete'),
+        template_name='users/password_reset/complete.html'), name='password_reset_complete'),
 
     path('courses/', include('courses.urls')),
     path('teachers/', include('teachers.urls')),

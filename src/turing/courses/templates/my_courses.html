@@ -23,7 +23,6 @@
                 {# CAMBIO: El enlace "Mis Cursos" ahora apunta al dashboard principal del profesor #}
                 <li><a href="{% url 'teachers:tutoring_schedules' %}"><i class="fa-solid fa-layer-group"></i> Horarios
                         PDF</a></li>
-                <li><a href="#"><i class="fa-regular fa-calendar"></i> Calendario</a></li>
             </ul>
         </aside>
 
@@ -121,7 +120,7 @@
                             </div>
                         </article>
                         {% empty %}
-                        <div class="card card-muted" style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                        <div class="card card-muted empty-state">
                             <p>Aún no impartes ningún grupo. Crea una materia y luego añádele tu primer grupo.</p>
                         </div>
                         {% endfor %}

@@ -1,0 +1,24 @@
+{% load static %}
+
+<aside class="sidebar" id="teacher-sidebar">
+    <div class="brand-title">
+        <a href="/chatbot/" class="brand-link">Turing</a>
+        <img class="brand-video" id="sidebar-gif" src="{% static 'videos/Abierto.gif' %}" alt="Menu" />
+    </div>
+
+    <hr class="sidebar-divider">
+
+    <ul class="nav-links">
+        <li>
+            <a href="{% url 'teachers:dashboard' %}" class="{% if active_page == 'dashboard' %}active{% endif %}">
+                <i class="fa-solid fa-house"></i> Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'teachers:tutoring_schedules' %}"
+                class="{% if active_page == 'tutoring_schedules' %}active{% endif %}">
+                <i class="fa-regular fa-calendar"></i> Horarios PDF
+            </a>
+        </li>
+    </ul>
+</aside>
