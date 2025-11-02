@@ -163,6 +163,13 @@ body.dashboard {
     color: var(--primary);
 }
 
+.sidebar .brand-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
 .brand-link {
     text-decoration: none;
     color: inherit;
@@ -171,6 +178,19 @@ body.dashboard {
 
 .brand-link:hover {
     opacity: .9;
+}
+
+.brand-title .brand-link {
+    display: inline-flex;
+    align-items: center;
+}
+
+.brand-video {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 /* ====== MAIN ====== */
@@ -1136,4 +1156,358 @@ button.btn:hover {
     .container {
         padding: 0 4px;
     }
+}
+
+.sidebar-section {
+    margin: 1rem 0;
+}
+
+.sidebar-title {
+    color: #666;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 0.5rem 1rem;
+    padding: 0.5rem 0;
+}
+
+.hamburger-btn {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    width: 50px;
+    height: 50px;
+    border: none;
+    background: var(--bg-card);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hamburger-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.hamburger-btn:active {
+    transform: scale(0.95);
+}
+
+.hamburger-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+}
+
+@media (max-width: 1024px) {
+    .hamburger-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        height: 100vh;
+        z-index: 1000;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 12px rgba(0, 0, 0, 0);
+        overflow-y: auto;
+    }
+
+    .sidebar.open {
+        left: 0;
+        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .page {
+        grid-template-columns: 1fr;
+    }
+
+    .page::before {
+        display: none;
+    }
+
+    main {
+        width: 100%;
+    }
+
+    .topbar {
+        padding-left: 80px;
+    }
+
+    .sidebar-overlay {
+        display: block;
+    }
+}
+
+.brand-video,
+#hamburger-gif {
+    transition: opacity 0.2s ease-in-out;
+}
+
+.brand-video {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.brand-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+@media (min-width: 1025px) {
+    .sidebar-overlay {
+        display: none !important;
+    }
+
+    .sidebar {
+        position: relative;
+        left: 0;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.hamburger-btn {
+    animation: bounceIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+
+@media (max-width: 1024px) {
+    .sidebar {
+        will-change: left;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .sidebar.open {
+        will-change: auto;
+    }
+}
+
+.brand-title {
+    position: relative;
+    padding: 8px 0;
+}
+
+.brand-link {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.brand-link:hover {
+    color: var(--primary);
+}
+
+@media (min-width: 1025px) {
+    .brand-video:hover {
+        transform: scale(1.1);
+        transition: transform 0.2s ease;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.sidebar-overlay.active {
+    animation: fadeIn 0.3s ease;
+}
+
+.sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--ink-weak);
+}
+
+@media (max-width: 1024px) {
+    body.dashboard {
+        position: relative;
+    }
+
+    .hamburger-btn {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .hamburger-btn,
+    .brand-video {
+        touch-action: manipulation;
+    }
+}
+
+.hamburger-btn:active {
+    animation: pulse 0.3s ease;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.92);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.hamburger-btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .hamburger-btn {
+        background: #2a2a2a;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+}
+
+.flash-stack {
+    margin-bottom: 10px;
+}
+
+.inline-form {
+    display: inline;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem;
+}
+
+.form-card {
+    max-width: 700px;
+    margin-top: 2rem;
+}
+
+.section-spacing {
+    margin-top: 2.5rem;
+}
+
+.hidden {
+    display: none;
+}
+
+.knowledge-upload-card {
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.upload-inline-form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.knowledge-files-card {
+    padding: 16px;
+}
+
+.prompt-form-card {
+    padding: 16px;
+}
+
+.form-actions-inline {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.meta-info {
+    margin-top: 8px;
+}
+
+.pdf-embed-wrapper {
+    position: relative;
+    width: 100%;
+    height: 800px;
+}
+
+.kpis-start {
+    justify-content: start;
+}
+
+.empty-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.small-text {
+    font-size: 0.9rem;
 }

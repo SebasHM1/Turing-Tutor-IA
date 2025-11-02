@@ -1,0 +1,28 @@
+{% extends "courses/base_course_management.html" %}
+{% load static %}
+
+{% block title %}Prompt del curso{% endblock %}
+
+{% block content %}
+<div class="header-row">
+    <h1>Prompt del curso: {{ object.course.name }}</h1>
+    <a href="{% url 'teachers:manage_course' object.course.id %}" class="btn btn-secondary">← Volver</a>
+</div>
+<form method="post" class="card prompt-form-card">
+    {% csrf_token %}
+    <label for="{{ form.content.id_for_label }}" class="label">Prompt del profesor para este curso</label>
+    {{ form.content }}
+    <div class="form-actions-inline">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a class="btn btn-ghost" href="{% url 'teachers:manage_course' object.course.id %}">Cancelar</a>
+    </div>
+</form>
+{% if object and object.updated_at %}
+<p class="muted meta-info">
+    Última actualización: {{ object.updated_at|date:"Y-m-d H:i" }}
+    {% if object.updated_by %}
+    por {{ object.updated_by.get_full_name|default:object.updated_by.email }}
+    {% endif %}
+</p>
+{% endif %}
+{% endblock content %}

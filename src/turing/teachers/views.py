@@ -27,7 +27,7 @@ class TeacherDashboardView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
     Dashboard principal del profesor.
     Muestra los GRUPOS que imparte el profesor (no los cursos).
     """
-    template_name = 'dashboard.html'
+    template_name = 'teachers/dashboard.html'
     context_object_name = 'groups'
 
     def get_queryset(self):
@@ -62,7 +62,7 @@ class CourseCreateView(LoginRequiredMixin, TeachersOnlyMixin, CreateView):
     """
     model = Course
     form_class = CourseForm
-    template_name = 'course_form.html'
+    template_name = 'teachers/forms/course_form.html'
 
     def form_valid(self, form):
         # Asignamos al profesor actual como el 'owner' de la materia
@@ -80,7 +80,7 @@ class GroupCreateView(LoginRequiredMixin, TeachersOnlyMixin, CreateView):
     """
     model = Group
     form_class = GroupForm # Necesitarás crear este formulario
-    template_name = 'group_form.html'
+    template_name = 'teachers/forms/group_form.html'
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -149,12 +149,12 @@ def manage_group_enrollments(request, group_pk):
         'enrolled_students': CustomUser.objects.filter(id__in=enrolled_students_ids),
         'available_students': CustomUser.objects.filter(role='Student').exclude(id__in=enrolled_students_ids),
     }
-    return render(request, 'manage_enrollments.html', context)
+    return render(request, 'teachers/enrollment/manage_enrollments.html', context)
 
 
 
 class TutoringScheduleListView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
-    template_name = 'tutoring_schedule_list.html'
+    template_name = 'teachers/schedules/tutoring_schedule_list.html'
     context_object_name = 'courses'
 
     def get_queryset(self):
@@ -192,7 +192,7 @@ class TutoringScheduleListView(LoginRequiredMixin, TeachersOnlyMixin, ListView):
 class TutoringScheduleUploadView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
     model = TutoringSchedule
     form_class = TutoringScheduleForm
-    template_name = 'tutoring_schedule_form.html'
+    template_name = 'teachers/schedules/tutoring_schedule_form.html'
     
     def get_success_url(self):
         return reverse('teachers:tutoring_schedules')
@@ -252,7 +252,7 @@ def manage_tutoring_slots(request, group_pk):
         'group': group,
         'course': group.course
     }
-    return render(request, 'manage_tutoring.html', context)
+    return render(request, 'teachers/course_management/manage_tutoring.html', context)
 
 class ManageCourseView(LoginRequiredMixin, TeachersOnlyMixin, DetailView):
     """
@@ -260,7 +260,7 @@ class ManageCourseView(LoginRequiredMixin, TeachersOnlyMixin, DetailView):
     Desde aquí se gestionan los grupos, el prompt y la base de conocimiento.
     """
     model = Course
-    template_name = 'manage_course.html'  # Crearemos esta nueva plantilla
+    template_name = 'teachers/course_management/manage_course.html'
     context_object_name = 'course'
 
     def get_queryset(self):
@@ -279,7 +279,7 @@ class GroupPromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
     """Edita el prompt de IA específico para un grupo."""
     model = Group
     fields = ['ai_prompt']
-    template_name = 'group_prompt_edit.html'
+    template_name = 'teachers/prompts/group_prompt_edit.html'
     pk_url_kwarg = 'group_pk'
     
     def get_queryset(self):

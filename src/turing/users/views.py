@@ -7,7 +7,7 @@ from .forms import CustomUserCreationForm
 from .models import UserState, UserRole
 
 class TuringLoginView(LoginView):
-    template_name = 'registration/login.html'
+    template_name = 'users/auth/login.html'
     redirect_authenticated_user = True
 
     def get_success_url(self):
@@ -27,7 +27,7 @@ def register_view(request):
             return redirect('login')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, 'users/auth/register.html', {'form': form})
 
 @login_required
 def redirect_after_login(request):
