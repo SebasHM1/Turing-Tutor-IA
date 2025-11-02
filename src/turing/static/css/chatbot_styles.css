@@ -627,3 +627,38 @@ th {
 #chat-form button[type="submit"]:hover {
     background: #1d4ed8;
 }
+.chat-avatar {
+    margin-left: 20px;
+}
+
+.chat-user-details {
+    margin-left: 40px;
+}
+
+.sidebar-divider {
+    margin: 20px 0;
+}
+
+.chat-action-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.delete-chat-btn {
+    border: none;
+    background: none;
+    color: red;
+}
+
+.inline-form {
+    display: inline;
+}
+
+.chat-header .avatar {
+    margin-right: 10px;
+}
+
+.chat-header .bot-details {
+    margin-left: 10px;
+}

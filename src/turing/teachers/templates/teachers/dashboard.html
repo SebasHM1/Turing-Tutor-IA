@@ -1,0 +1,94 @@
+{% extends "teachers/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="welcome">
+    <div class="welcome-head">
+        <h1>Dashboard del Profesor</h1>
+    </div>
+    <p class="welcome-sub">Gestiona tus materias, grupos y estudiantes desde aquí.</p>
+</div>
+
+<div class="kpis">
+    <div class="kpi card">
+        <div class="icon"><i class="fa-solid fa-book-open"></i></div>
+        <div>
+            <div class="label">Grupos Asignados</div>
+            <div class="value">{{ active_groups }}</div>
+        </div>
+    </div>
+    <div class="kpi card">
+        <div class="icon"><i class="fa-solid fa-user-group"></i></div>
+        <div>
+            <div class="label">Total Estudiantes</div>
+            <div class="value">{{ total_students }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="header-row">
+    <h2>Mis Grupos</h2>
+    <a href="{% url 'teachers:course_create' %}" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i> Crear Nueva Materia
+    </a>
+</div>
+
+<div class="courses-grid">
+    {% for group in groups %}
+    <article class="course-card card">
+        <div class="card-header">
+            <div>
+                <h3>{{ group.course.name }}</h3>
+                <span class="badge">{{ group.name }}</span>
+            </div>
+            <div class="menu">
+                <button class="icon-button" type="button" title="Opciones"
+                    onclick="this.nextElementSibling.classList.toggle('open')">
+                    <i class="fa-solid fa-ellipsis"></i>
+                </button>
+                <div class="menu-pop">
+                    <a href="{% url 'teachers:manage_course' group.course.pk %}"
+                        class="dropdown-item">
+                        <i class="fa-solid fa-pen-to-square"></i> Editar Grupo
+                    </a>
+
+                    {% if group.course.owner_id == user.id %}
+                    <form method="post" action="{% url 'teachers:course_delete' group.course.pk %}"
+                        class="inline-form">
+                        {% csrf_token %}
+                        <button type="submit" class="menu-delete-btn"
+                            onclick="return confirm('¿Seguro que quieres eliminar la materia \'{{ group.course.name }}\' y TODOS sus grupos? Esta acción no se puede deshacer.');">
+                            Eliminar Materia
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="course-meta muted">Horario: {{ group.schedule }}</div>
+        <div class="course-meta muted">
+            <i class="fa-regular fa-user"></i>
+            {{ group.students_count }} estudiante{{ group.students_count|pluralize }}
+        </div>
+
+        <div class="course-actions">
+            <a href="{% url 'teachers:manage_enrollments' group.pk %}" class="btn btn-primary-soft">
+                <i class="fa-solid fa-users"></i> Estudiantes
+            </a>
+            <a href="{% url 'teachers:manage_tutoring' group.pk %}" class="btn btn-secondary">
+                <i class="fa-regular fa-clock"></i> Monitorías
+            </a>
+            <a href="{% url 'teachers:group_prompt_edit' group.pk %}" class="btn btn-outline">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Prompt IA
+            </a>
+        </div>
+    </article>
+    {% empty %}
+    <div class="card card-muted empty-state">
+        <p>Aún no impartes ningún grupo. Crea una materia y luego añádele tu primer grupo.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}
