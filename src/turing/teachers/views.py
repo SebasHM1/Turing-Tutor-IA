@@ -282,11 +282,8 @@ class ManageCourseView(LoginRequiredMixin, TeachersOnlyMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Pasamos los grupos de este curso que son impartidos por el profesor actual
         context['teacher_groups'] = self.object.groups.filter(teacher=self.request.user)
         context['active_page'] = 'manage_course'
-        # Obtener el primer grupo del profesor para este curso (para el sidebar contextual)
-        context['group'] = self.object.groups.filter(teacher=self.request.user).first()
         return context
 
 

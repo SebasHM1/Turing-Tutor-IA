@@ -11,7 +11,7 @@
 
         const CHAT_POLL_MS = 2000;
         const ENABLE_TYPING_EFFECT = true;
-        const TYPING_SPEED_MS = 15;
+        const TYPING_SPEED_MS = 2;
 
         function getCookie(name) {
             const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
@@ -282,40 +282,6 @@
     }
 })();
 
-(() => {
-    const form = document.getElementById('chat-form');
-    const textarea = document.getElementById('message-input');
-    const sendBtn = document.getElementById('send-btn') || (form ? form.querySelector('button[type="submit"]') : null);
-    if (!form || !textarea) return;
-
-    const autoresize = () => {
-        textarea.style.height = 'auto';
-        textarea.style.height = Math.min(textarea.scrollHeight, 160) + 'px';
-    };
-    textarea.addEventListener('input', autoresize);
-    queueMicrotask(autoresize);
-
-    textarea.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-            e.preventDefault();
-            form.requestSubmit();
-        }
-    });
-
-    if (sendBtn && sendBtn.type !== 'submit') {
-        sendBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            form.requestSubmit();
-        });
-    }
-
-    window.WRITE_INSTANT = true;
-
-    if (window.typeWriter) {
-        window.typeWriter = (el, html) => { el.innerHTML = html; enhanceCodeBlocks(el); };
-    }
-})();
-
 // ======= Mejora visual de <pre><code> + botón Copiar =======
 function enhanceCodeBlocks(scope) {
     const root = scope && scope.querySelectorAll ? scope : document;
@@ -381,12 +347,14 @@ document.addEventListener('DOMContentLoaded', () => enhanceCodeBlocks(document))
 
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-            e.preventDefault();
-            const start = input.selectionStart;
-            const end = input.selectionEnd;
-            const value = input.value;
-            input.value = value.substring(0, start) + '\n' + value.substring(end);
-            input.selectionStart = input.selectionEnd = start + 1;
+            if (e.shiftKey) {
+                // Shift+Enter: insertar nueva línea (comportamiento por defecto)
+                return;
+            } else {
+                // Enter solo: enviar el formulario
+                e.preventDefault();
+                form.requestSubmit();
+            }
         }
     });
 

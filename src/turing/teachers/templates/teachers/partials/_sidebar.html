@@ -16,7 +16,17 @@
         </li>
     </ul>
 
-    {% if group %}
+    {% if course and active_page == 'manage_course' %}
+    <hr class="sidebar-divider">
+    <ul class="nav-links">
+        <li>
+            <a href="{% url 'teachers:manage_course' course.pk %}"
+                class="{% if active_page == 'manage_course' %}active{% endif %}">
+                <i class="fa-solid fa-circle-info"></i> Detalles del Curso
+            </a>
+        </li>
+    </ul>
+    {% elif group %}
     <hr class="sidebar-divider">
     <ul class="nav-links">
         <li>
