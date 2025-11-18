@@ -406,6 +406,13 @@ main {
     margin-bottom: 6px;
 }
 
+.course-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
 /* Botones */
 .btn {
     display: inline-block;

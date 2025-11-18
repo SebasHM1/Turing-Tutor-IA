@@ -7,15 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chatbot</title>
     <link rel="stylesheet" href="{% static 'css/chatbot_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/hamburger_sidebar.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="{% static 'js/mathjax_config.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
 <body class="chat-page">
-    {% include "chatbot/partials/_chat_sidebar.html" %}
+    <div class="page">
+        {% include "chatbot/partials/_chat_sidebar.html" %}
 
-    <div class="main-chat">
+        <div class="main-chat">
         <div class="chat-header">
             <div class="avatar">
                 <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
@@ -43,8 +45,11 @@
             <textarea id="message-input" rows="1" placeholder="Escribe tu mensaje..." required></textarea>
             <button type="submit"><i class="fas fa-paper-plane"></i></button>
         </form>
+        </div>
     </div>
     <script src="{% static 'js/chatbot.js' %}"></script>
+    <script src="{% static 'js/hamburger_menu.js' %}"></script>
+    <script src="{% static 'js/chat_menu.js' %}"></script>
 </body>
 
 </html>

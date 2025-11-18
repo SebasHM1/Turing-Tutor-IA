@@ -1,11 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
-    const sidebar = document.getElementById('teacher-sidebar');
+    const sidebar = document.getElementById('teacher-sidebar') ||
+                   document.getElementById('student-sidebar') ||
+                   document.getElementById('chat-sidebar');
     const sidebarGif = document.getElementById('sidebar-gif');
-    const pageContainer = document.querySelector('.page');
+    const pageContainer = document.querySelector('.page') || document.querySelector('body.chat-page');
 
-    if (!sidebar || !sidebarGif || !pageContainer) {
+    if (!sidebar || !sidebarGif) {
         console.warn('Hamburger menu: elementos no encontrados');
         return;
     }
@@ -28,14 +30,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (isOpen) {
             changeGif(GIFS.DERECHA);
-            pageContainer.classList.remove('sidebar-closed');
+            sidebar.classList.remove('sidebar-closed');
+            if (pageContainer) {
+                pageContainer.classList.remove('sidebar-closed');
+            }
 
             setTimeout(function () {
                 changeGif(GIFS.ABIERTO);
             }, 300);
         } else {
             changeGif(GIFS.IZQUIERDA);
-            pageContainer.classList.add('sidebar-closed');
+            sidebar.classList.add('sidebar-closed');
+            if (pageContainer) {
+                pageContainer.classList.add('sidebar-closed');
+            }
 
             setTimeout(function () {
                 changeGif(GIFS.CERRADO);
