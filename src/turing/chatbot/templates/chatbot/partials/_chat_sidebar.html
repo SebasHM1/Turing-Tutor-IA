@@ -1,28 +1,21 @@
-<div class="sidebar">
-    <div class="user-info">
-        <div class="avatar chat-avatar">
-            {% if user.profile.avatar_url %}
-            <img src="{{ user.profile.avatar_url }}" alt="User Avatar">
-            {% else %}
-            <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
-            {% endif %}
-        </div>
-        <div class="user-details chat-user-details">
-            <div class="brand-title">
-                <a href="{% url 'courses:my_student_groups' %}" class="brand-link">Turing IA</a>
-            </div>
-            <h3>{{ user.get_full_name|default:user.email }}</h3>
+{% load static %}
 
-            {% if user.role == 'Student' and user.university_code %}
-            <p>Código de estudiante:</p>
-            <p class="student-id">{{ user.university_code }}</p>
-            {% elif user.role == 'Teacher' %}
-            <p>Profesor</p>
-            {% endif %}
-        </div>
+<div class="sidebar" id="chat-sidebar">
+    <div class="brand-title">
+        <a href="{% url 'courses:my_student_groups' %}" class="brand-link">Turing</a>
+        <img class="brand-video" id="sidebar-gif" src="{% static 'videos/Abierto.gif' %}" alt="Menu" />
     </div>
+
     <hr class="sidebar-divider">
     <ul class="nav-links">
+        {% if user.is_staff or user.role == 'Teacher' %}
+        <li><a href="{% url 'teachers:dashboard' %}"><i class="fa-solid fa-layer-group"></i> Mis Materias</a></li>
+        {% elif user.role == 'Student' %}
+        <li><a href="{% url 'courses:my_student_groups' %}"><i class="fa-solid fa-layer-group"></i> Mis Materias</a></li>
+        {% else %}
+        <li><a href="#"><i class="fa-solid fa-layer-group"></i> Mis Materias</a></li>
+        {% endif %}
+
         <li>
             {% if current_course %}
             <a class="active" href="{% url 'chatbot:course_chat' current_course.id %}">
@@ -34,16 +27,6 @@
             </a>
             {% endif %}
         </li>
-
-        {% if user.is_staff or user.role == 'Teacher' %}
-        <li><a href="{% url 'teachers:dashboard' %}"><i class="fas fa-user"></i> Perfil</a></li>
-        <li><a href="{% url 'teachers:tutoring_schedules' %}"><i class="fa-regular fa-calendar"></i> Monitorías</a>
-        </li>
-        {% elif user.role == 'Student' %}
-        <li><a href="{% url 'courses:my_student_groups' %}"><i class="fas fa-user"></i> Perfil</a></li>
-        {% else %}
-        <li><a href="#"><i class="fas fa-user"></i> Perfil</a></li>
-        {% endif %}
     </ul>
 
     <hr class="sidebar-divider">
@@ -53,25 +36,37 @@
         </h3>
         <ul>
             {% for chat in recent_chats %}
-            <li>
-                <a href="{% url 'chatbot:chat_detail' chat.id %}">
+            <li class="chat-item {% if current_session.id == chat.id %}active{% endif %}">
+                <a href="{% url 'chatbot:chat_detail' chat.id %}" class="chat-link">
                     <div class="chat-info">
-                        <span class="chat-name">{{ chat.name }}</span>
+                        <span class="chat-name" contenteditable="false" data-id="{{ chat.id }}">{{ chat.name }}</span>
                         <span class="chat-time">{{ chat.created_at|date:"H:i" }}</span>
                     </div>
                 </a>
-                <button type="button" class="rename-chat chat-action-btn" data-id="{{ chat.id }}" title="Renombrar">✏️</button>
-                <form method="post" action="{% url 'chatbot:delete_session' chat.id %}" class="inline-form">
-                    {% csrf_token %}<button type="submit" class="delete-chat-btn">🗑️</button>
-                </form>
+                <div class="chat-menu">
+                    <button type="button" class="chat-menu-btn" data-chat-id="{{ chat.id }}" aria-label="Opciones">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+                    <div class="chat-menu-dropdown" id="chat-menu-{{ chat.id }}">
+                        <button type="button" class="chat-menu-item chat-rename-btn" data-chat-id="{{ chat.id }}">
+                            <i class="fa-solid fa-pen"></i> Renombrar
+                        </button>
+                        <form method="post" action="{% url 'chatbot:delete_session' chat.id %}" class="chat-delete-form">
+                            {% csrf_token %}
+                            <button type="submit" class="chat-menu-item chat-menu-item-danger">
+                                <i class="fa-solid fa-trash"></i> Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </li>
             {% empty %}
-            <li>No tienes chats recientes</li>
+            <li class="chat-empty">No tienes chats recientes</li>
             {% endfor %}
         </ul>
         {% if current_course %}
         <a href="{% url 'chatbot:create_session_course' current_course.id %}" class="btn">Nuevo Chat</a>
-        {% else %}
+        {% elif current_session.course %}
         <a href="{% url 'chatbot:create_session_course' current_session.course.id %}" class="btn">Nuevo Chat</a>
         {% endif %}
     </div>

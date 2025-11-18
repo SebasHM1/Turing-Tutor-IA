@@ -53,9 +53,11 @@
                     <a href="{% url 'courses:student_group_detail' enrollment.group.pk %}" class="btn btn-secondary">
                         <i class="fa-solid fa-circle-info"></i> Ver Detalles
                     </a>
-                    <a href="{% url 'chatbot:course_chat' enrollment.group.course.id %}" class="btn btn-primary">
-                        <i class="fa-solid fa-comments"></i> Abrir Chat IA
-                    </a>
+                    <div style="margin-left: auto;">
+                        <a href="{% url 'chatbot:course_chat' enrollment.group.course.id %}" class="btn btn-primary">
+                            <i class="fa-solid fa-comments"></i> Abrir Chat IA
+                        </a>
+                    </div>
                 </div>
             </article>
             {% empty %}

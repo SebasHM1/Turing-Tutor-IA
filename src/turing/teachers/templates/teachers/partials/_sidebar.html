@@ -2,7 +2,7 @@
 
 <aside class="sidebar" id="teacher-sidebar">
     <div class="brand-title">
-        <a href="/chatbot/" class="brand-link">Turing</a>
+        <a href="{% url 'teachers:dashboard' %}" class="brand-link">Turing</a>
         <img class="brand-video" id="sidebar-gif" src="{% static 'videos/Abierto.gif' %}" alt="Menu" />
     </div>
 
@@ -14,11 +14,63 @@
                 <i class="fa-solid fa-house"></i> Dashboard
             </a>
         </li>
+    </ul>
+
+    {% if course and active_page == 'manage_course' %}
+    <hr class="sidebar-divider">
+    <ul class="nav-links">
         <li>
-            <a href="{% url 'teachers:tutoring_schedules' %}"
-                class="{% if active_page == 'tutoring_schedules' %}active{% endif %}">
-                <i class="fa-regular fa-calendar"></i> Horarios PDF
+            <a href="{% url 'teachers:manage_course' course.pk %}"
+                class="{% if active_page == 'manage_course' %}active{% endif %}">
+                <i class="fa-solid fa-circle-info"></i> Detalles del Curso
             </a>
         </li>
     </ul>
+    {% elif group %}
+    <hr class="sidebar-divider">
+    <ul class="nav-links">
+        <li>
+            <a href="{% url 'teachers:group_details' group.pk %}"
+                class="{% if active_page == 'group_details' %}active{% endif %}">
+                <i class="fa-solid fa-info-circle"></i> Detalles del Grupo
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'teachers:manage_enrollments' group.pk %}"
+                class="{% if active_page == 'manage_enrollments' %}active{% endif %}">
+                <i class="fa-solid fa-users"></i> Estudiantes
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'teachers:manage_tutoring' group.pk %}"
+                class="{% if active_page == 'manage_tutoring' %}active{% endif %}">
+                <i class="fa-regular fa-clock"></i> Monitorías
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'teachers:group_prompt_edit' group.pk %}"
+                class="{% if active_page == 'group_prompt_edit' %}active{% endif %}">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Prompt IA
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'courses:knowledge_base' group.course.pk %}"
+                class="{% if active_page == 'knowledge_base' %}active{% endif %}">
+                <i class="fa-solid fa-book"></i> Base de Conocimiento
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'teachers:upload_schedule' group.course.pk %}"
+                class="{% if active_page == 'upload_schedule' %}active{% endif %}">
+                <i class="fa-regular fa-calendar"></i> Horarios PDF
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'teachers:group_analytics' group.pk %}"
+                class="{% if active_page == 'group_analytics' %}active{% endif %}">
+                <i class="fa-solid fa-chart-line"></i> Analytics
+            </a>
+        </li>
+    </ul>
+    {% endif %}
 </aside>

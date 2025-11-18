@@ -31,6 +31,11 @@ class MyStudentGroupsView(LoginRequiredMixin, StudentsOnlyMixin, ListView):
                 .select_related('group', 'group__course', 'group__teacher')
                 .order_by('group__course__name', 'group__name'))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_page'] = 'my_groups'
+        return context
+
 class StudentGroupDetailView(LoginRequiredMixin, StudentsOnlyMixin, DetailView):
     model = Group
     template_name = 'courses/student/student_group_detail.html'
@@ -44,13 +49,15 @@ class StudentGroupDetailView(LoginRequiredMixin, StudentsOnlyMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         group = self.get_object()
-        
+
+        context['group'] = group
         context['course'] = group.course
-        
+        context['active_page'] = 'group_detail'
+
         context['groups'] = group.course.groups.all().select_related(
             'teacher'
         ).prefetch_related('tutoring_slots')
-        
+
         return context
 
 class CoursePromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
@@ -90,6 +97,8 @@ class KnowledgeBaseView(LoginRequiredMixin, TeachersOnlyMixin, FormView):
         context['course'] = self.course
         context['files'] = KnowledgeBaseFile.objects.filter(course=self.course)
         context['active_page'] = 'knowledge_base'
+        # Obtener el primer grupo del profesor para este curso (para el sidebar contextual)
+        context['group'] = Group.objects.filter(course=self.course, teacher=self.request.user).first()
         return context
 
     def form_valid(self, form):
