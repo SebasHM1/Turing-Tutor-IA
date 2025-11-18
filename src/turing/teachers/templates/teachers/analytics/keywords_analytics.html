@@ -1,0 +1,531 @@
+{% extends "teachers/base.html" %}
+
+{% block title %}Analytics de Keywords{% endblock %}
+
+{% block teacher_extra_css %}
+<style>
+    .analytics-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .filter-controls select {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--bg-card);
+        color: var(--ink);
+        font-size: 0.9rem;
+        min-width: 200px;
+    }
+
+    .filter-controls select:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--bg-card);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+    }
+
+    .stat-card .icon {
+        font-size: 2rem;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card .value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-card .label {
+        font-size: 0.875rem;
+        color: var(--ink-weak);
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-card {
+        background: var(--bg-card);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+    }
+
+    .chart-card h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.125rem;
+        color: var(--ink);
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+
+    .table-card {
+        background: var(--bg-card);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        margin-bottom: 1.5rem;
+    }
+
+    .table-card h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.125rem;
+        color: var(--ink);
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        text-align: left;
+        padding: 0.75rem;
+        border-bottom: 2px solid var(--border);
+        color: var(--ink-weak);
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .data-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--ink);
+    }
+
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .data-table tr:hover {
+        background: var(--bg-tile);
+    }
+
+    .badge-topic {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        background: var(--bg-tile);
+        border-radius: 6px;
+        font-size: 0.75rem;
+        color: var(--ink-weak);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        color: var(--ink-weak);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    @media (max-width: 1024px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .analytics-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="welcome">
+    <div class="welcome-head">
+        <h1>Analytics de Keywords</h1>
+    </div>
+    <p class="welcome-sub">Analiza las palabras clave detectadas en las conversaciones de tus estudiantes</p>
+</div>
+
+<div class="analytics-header">
+    <div class="filter-controls">
+        <form method="get" id="filter-form">
+            <select name="group" id="group-filter" onchange="this.form.submit()">
+                <option value="">Todos mis grupos</option>
+                {% for group in teacher_groups %}
+                <option value="{{ group.id }}" {% if selected_group and selected_group.id == group.id %}selected{% endif %}>
+                    {{ group.course.name }} - {{ group.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+</div>
+
+{% if total_keywords_detected > 0 %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="icon"><i class="fa-solid fa-key"></i></div>
+        <div class="value">{{ total_keywords_detected }}</div>
+        <div class="label">Keywords Detectados</div>
+    </div>
+    <div class="stat-card">
+        <div class="icon"><i class="fa-solid fa-users"></i></div>
+        <div class="value">{{ total_students }}</div>
+        <div class="label">Estudiantes Activos</div>
+    </div>
+    <div class="stat-card">
+        <div class="icon"><i class="fa-solid fa-book"></i></div>
+        <div class="value">{{ total_topics }}</div>
+        <div class="label">Temas Cubiertos</div>
+    </div>
+</div>
+
+<div class="charts-grid">
+    <div class="chart-card">
+        <h3>Top Keywords</h3>
+        <div class="chart-container">
+            <canvas id="topKeywordsChart"></canvas>
+        </div>
+    </div>
+    <div class="chart-card">
+        <h3>Keywords por Tema</h3>
+        <div class="chart-container">
+            <canvas id="topicDistributionChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="chart-card">
+    <h3>Actividad en el Tiempo (Últimos 30 Días)</h3>
+    <div class="chart-container">
+        <canvas id="activityTimelineChart"></canvas>
+    </div>
+</div>
+
+<div class="table-card">
+    <h3>Top 10 Keywords Más Mencionados</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Keyword</th>
+                <th>Tema</th>
+                <th>Menciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in top_keywords %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong>{{ item.keyword__keyword }}</strong></td>
+                <td><span class="badge-topic">{{ item.topic__name }}</span></td>
+                <td>{{ item.count }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; color: var(--ink-weak);">No hay datos disponibles</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="table-card">
+    <h3>Top 10 Estudiantes Más Activos</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Estudiante</th>
+                <th>Email</th>
+                <th>Keywords Detectados</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in top_students %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong>{{ student.student__name }} {{ student.student__last_name }}</strong></td>
+                <td>{{ student.student__email }}</td>
+                <td>{{ student.count }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; color: var(--ink-weak);">No hay datos disponibles</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% else %}
+<div class="card empty-state">
+    <i class="fa-solid fa-chart-line"></i>
+    <h3>No hay datos disponibles</h3>
+    <p>Aún no se han detectado keywords en las conversaciones de tus estudiantes.</p>
+    {% if not selected_group %}
+    <p class="muted">Asegúrate de haber configurado temas y palabras clave en la sección de administración.</p>
+    {% else %}
+    <p class="muted">No hay datos para el grupo seleccionado. Prueba seleccionar otro grupo o ver todos los grupos.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block teacher_extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    {% if total_keywords_detected > 0 %}
+    // Configuración de colores
+    const colors = [
+        'rgba(22, 119, 255, 0.8)',
+        'rgba(99, 102, 241, 0.8)',
+        'rgba(168, 85, 247, 0.8)',
+        'rgba(236, 72, 153, 0.8)',
+        'rgba(251, 146, 60, 0.8)',
+        'rgba(34, 197, 94, 0.8)',
+        'rgba(14, 165, 233, 0.8)',
+        'rgba(139, 92, 246, 0.8)',
+        'rgba(244, 63, 94, 0.8)',
+        'rgba(245, 158, 11, 0.8)',
+    ];
+
+    // Chart.js defaults
+    Chart.defaults.font.family = "'Segoe UI', Arial, sans-serif";
+    Chart.defaults.color = '#6B7280';
+
+    // Top Keywords Chart (Horizontal Bar)
+    const topKeywordsData = {
+        labels: [
+            {% for item in top_keywords %}
+            '{{ item.keyword__keyword }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Menciones',
+            data: [
+                {% for item in top_keywords %}
+                {{ item.count }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: colors,
+            borderWidth: 0,
+            borderRadius: 6,
+        }]
+    };
+
+    new Chart(document.getElementById('topKeywordsChart'), {
+        type: 'bar',
+        data: topKeywordsData,
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                    padding: 12,
+                    borderRadius: 8,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(229, 231, 235, 0.5)'
+                    },
+                    ticks: {
+                        precision: 0
+                    }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Topic Distribution Chart (Doughnut)
+    const topicDistributionData = {
+        labels: [
+            {% for item in keywords_by_topic %}
+            '{{ item.topic__name }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for item in keywords_by_topic %}
+                {{ item.count }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: colors,
+            borderWidth: 2,
+            borderColor: '#FFFFFF',
+        }]
+    };
+
+    new Chart(document.getElementById('topicDistributionChart'), {
+        type: 'doughnut',
+        data: topicDistributionData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        padding: 15,
+                        font: {
+                            size: 12
+                        },
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    return {
+                                        text: `${label}: ${value}`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                    padding: 12,
+                    borderRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Activity Timeline Chart (Line)
+    const activityData = {{ activity_by_date|safe }};
+    const dates = activityData.map(d => d.date);
+    const counts = activityData.map(d => d.count);
+
+    new Chart(document.getElementById('activityTimelineChart'), {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Keywords Detectados',
+                data: counts,
+                borderColor: colors[0],
+                backgroundColor: colors[0].replace('0.8', '0.1'),
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: colors[0],
+                pointBorderColor: '#FFFFFF',
+                pointBorderWidth: 2,
+                pointHoverRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                    padding: 12,
+                    borderRadius: 8,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(229, 231, 235, 0.5)'
+                    },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(229, 231, 235, 0.5)'
+                    },
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}

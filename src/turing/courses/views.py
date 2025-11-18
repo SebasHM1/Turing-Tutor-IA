@@ -90,6 +90,8 @@ class KnowledgeBaseView(LoginRequiredMixin, TeachersOnlyMixin, FormView):
         context['course'] = self.course
         context['files'] = KnowledgeBaseFile.objects.filter(course=self.course)
         context['active_page'] = 'knowledge_base'
+        # Obtener el primer grupo del profesor para este curso (para el sidebar contextual)
+        context['group'] = Group.objects.filter(course=self.course, teacher=self.request.user).first()
         return context
 
     def form_valid(self, form):

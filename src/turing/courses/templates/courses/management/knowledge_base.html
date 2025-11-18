@@ -1,91 +1,144 @@
-{% extends "courses/base_course_management.html" %}
+{% extends "teachers/base.html" %}
 {% load static %}
 
 {% block title %}Base de Conocimiento{% endblock %}
 
+{% block teacher_extra_css %}
+<link rel="stylesheet" href="{% static 'css/knowledge_base.css' %}">
+<script src="{% static 'js/upload_pdf.js' %}"></script>
+{% endblock %}
+
 {% block content %}
-<div class="header-row">
-    <h1>Base de Conocimiento: {{ course.name }}</h1>
-    <a href="{% url 'teachers:manage_course' course.id %}" class="btn btn-secondary">← Volver</a>
-</div>
-<div class="card knowledge-upload-card">
-    <h2>Subir nuevo archivo PDF</h2>
-
-    {% if form.errors %}
-    <div class="alert alert-danger">
-        <h4>Errores en el formulario:</h4>
-        {{ form.errors }}
+<div class="welcome">
+    <div class="welcome-head place-back">
+        <a href="{% url 'teachers:group_details' group.pk %}" class="btn-back" aria-label="Volver atrás">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        <h1>Base de Conocimiento</h1>
     </div>
-    {% endif %}
+    <p class="welcome-sub">Para el curso: <strong>{{ course.name }}</strong></p>
+</div>
 
-    <form method="post" enctype="multipart/form-data" class="upload-inline-form">
+<div class="card upload-card">
+    <form method="post" enctype="multipart/form-data" id="upload-form">
         {% csrf_token %}
-        {{ form.file }}
-        {{ form.name }}
-        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-upload"></i> Subir</button>
+
+        <div class="upload-area" id="upload-area">
+            <input type="file" name="{{ form.file.name }}" accept=".pdf" required
+                id="{{ form.file.id_for_label }}" class="file-input">
+            <label for="{{ form.file.id_for_label }}" class="upload-label">
+                <div class="upload-icon">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="upload-text">
+                    <p class="upload-title">Haz clic para seleccionar un archivo PDF</p>
+                    <p class="upload-subtitle">o arrastra y suelta aquí</p>
+                </div>
+            </label>
+        </div>
+
+        {% if form.file.errors %}
+        <div class="form-error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            {{ form.file.errors|first }}
+        </div>
+        {% endif %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-upload"></i> Subir Archivo
+            </button>
+        </div>
     </form>
 </div>
 
-<div class="card knowledge-files-card">
-    <h2>Archivos subidos</h2>
+<div class="card section-spacing">
+    <h3 style="margin: 0 0 1.5rem 0;"><i class="fa-solid fa-database"></i> Archivos Subidos</h3>
+
     {% if files %}
-    <p><strong>Total de archivos encontrados: {{ files|length }}</strong></p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Archivo</th>
-                <th>Estado</th>
-                <th>Subido</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for f in files %}
-            <tr>
-                <td>{{ f.name|default:f.file.name }}</td>
-                <td><a href="{{ f.file.url }}" target="_blank">Ver PDF</a></td>
-                <td>
-                    {% if f.processed %}
-                        <span class="badge badge-success">
-                            <i class="fa-solid fa-check"></i> Procesado
-                            ({{ f.text_chunks|length }} fragmentos)
-                        </span>
-                    {% elif f.processing_error %}
-                        <span class="badge badge-danger">
-                            <i class="fa-solid fa-exclamation-triangle"></i> Error
-                        </span>
-                        <br><small class="text-muted">{{ f.processing_error|truncatechars:100 }}</small>
-                    {% else %}
-                        <span class="badge badge-warning">
-                            <i class="fa-solid fa-clock"></i> Sin procesar
-                        </span>
-                    {% endif %}
-                </td>
-                <td>{{ f.uploaded_at|date:"Y-m-d H:i" }}</td>
-                <td>
-                    {% if not f.processed or f.processing_error %}
-                    <form method="post" action="{% url 'courses:knowledge_base_reprocess' course.id f.id %}" class="inline-form">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-primary-soft" title="Reprocesar para RAG">
-                            <i class="fa-solid fa-sync"></i> Reprocesar
-                        </button>
-                    </form>
-                    {% endif %}
-                    <form method="post" action="{% url 'courses:knowledge_base_delete' course.id f.id %}" class="inline-form">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger-soft" onclick="return confirm('¿Eliminar este archivo?')">
-                            <i class="fa-solid fa-trash"></i> Eliminar
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div style="overflow-x: auto;">
+        <table class="files-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                    <th>Subido</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in files %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i class="fa-regular fa-file-pdf" style="font-size: 1.5rem; color: #EF4444;"></i>
+                            <div>
+                                <strong>{{ f.name|default:f.file.name }}</strong>
+                                {% if f.file %}
+                                <div style="margin-top: 0.5rem;">
+                                    <a href="{{ f.file.url }}" target="_blank" class="current-file-link" style="padding: 0.375rem 0.75rem; font-size: 0.8125rem;">
+                                        <i class="fa-regular fa-eye"></i>
+                                        <span>Ver PDF</span>
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if f.processed %}
+                            <span class="badge badge-success">
+                                <i class="fa-solid fa-check"></i> Procesado
+                            </span>
+                            <br>
+                            <small style="color: var(--ink-weak);">{{ f.text_chunks|length }} fragmentos</small>
+                        {% elif f.processing_error %}
+                            <span class="badge badge-danger">
+                                <i class="fa-solid fa-exclamation-triangle"></i> Error
+                            </span>
+                            <br>
+                            <small style="color: var(--ink-weak);">{{ f.processing_error|truncatechars:100 }}</small>
+                        {% else %}
+                            <span class="badge badge-warning">
+                                <i class="fa-solid fa-clock"></i> Sin procesar
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ f.uploaded_at|date:"d/m/Y" }}
+                        <br>
+                        <small style="color: var(--ink-weak);">{{ f.uploaded_at|date:"H:i" }}</small>
+                    </td>
+                    <td>
+                        <div class="file-actions">
+                            {% if not f.processed or f.processing_error %}
+                            <form method="post" action="{% url 'courses:knowledge_base_reprocess' course.id f.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary btn-sm" title="Reprocesar para RAG">
+                                    <i class="fa-solid fa-sync"></i> Reprocesar
+                                </button>
+                            </form>
+                            {% endif %}
+                            <form method="post" action="{% url 'courses:knowledge_base_delete' course.id f.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar este archivo?')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
-    <p class="muted">No hay archivos subidos aún para el curso ID: {{ course.id }}</p>
-    <p class="muted">Información de debug: Se están buscando archivos para course_id={{ course.id }}</p>
+    <div class="empty-state">
+        <i class="fa-solid fa-database"></i>
+        <h3>No hay archivos subidos</h3>
+        <p>Sube tu primer archivo PDF para comenzar a construir la base de conocimiento del curso.</p>
+    </div>
     {% endif %}
 </div>
-{% endblock content %}
+{% endblock %}

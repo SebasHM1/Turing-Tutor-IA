@@ -71,7 +71,7 @@
         </ul>
         {% if current_course %}
         <a href="{% url 'chatbot:create_session_course' current_course.id %}" class="btn">Nuevo Chat</a>
-        {% else %}
+        {% elif current_session.course %}
         <a href="{% url 'chatbot:create_session_course' current_session.course.id %}" class="btn">Nuevo Chat</a>
         {% endif %}
     </div>

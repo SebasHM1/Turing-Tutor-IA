@@ -4,12 +4,12 @@
 {% block content %}
 <div class="welcome">
     <div class="welcome-head place-back">
-        <a href="{% url 'teachers:dashboard' %}" class="btn-back" aria-label="Volver atrás">
+        <a href="{% url 'teachers:group_details' group.pk %}" class="btn-back" aria-label="Volver atrás">
             <i class="fa-solid fa-chevron-left"></i>
         </a>
-        <h1>Gestionar Estudiantes del Grupo: {{ group.name }}</h1>
+        <h1>Gestionar Estudiantes del {{ group.name }}</h1>
     </div>
-    <p class="welcome-sub">Materia: {{ group.course.name }}</p>
+    <p class="welcome-sub"><strong>Materia:</strong> {{ group.course.name }}</p>
 </div>
 
 <div class="enrollment-manager">
@@ -22,22 +22,22 @@
         </div>
         <ul class="student-list">
             {% for student in enrolled_students %}
-                <li class="student-item">
-                    <span>{{ student.get_full_name }}</span>
-                    <form method="post" class="inline-form">
-                        {% csrf_token %}
-                        <input type="hidden" name="student_id" value="{{ student.id }}">
-                        <input type="hidden" name="action" value="remove">
-                        <button type="submit" class="btn btn-danger-soft" title="Eliminar del grupo">
-                            <i class="fa-solid fa-user-minus"></i> Quitar
-                        </button>
-                    </form>
-                </li>
+            <li class="student-item">
+                <span>{{ student.get_full_name }}</span>
+                <form method="post" class="inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="student_id" value="{{ student.id }}">
+                    <input type="hidden" name="action" value="remove">
+                    <button type="submit" class="btn btn-danger-soft" title="Eliminar del grupo">
+                        <i class="fa-solid fa-user-minus"></i> Quitar
+                    </button>
+                </form>
+            </li>
             {% empty %}
-                <div class="empty-list-message">
-                    <i class="fa-regular fa-folder-open"></i>
-                    <p>No hay estudiantes en este grupo.</p>
-                </div>
+            <div class="empty-list-message">
+                <i class="fa-regular fa-folder-open"></i>
+                <p>No hay estudiantes en este grupo.</p>
+            </div>
             {% endfor %}
         </ul>
     </div>
@@ -50,22 +50,22 @@
         </div>
         <ul class="student-list">
             {% for student in available_students %}
-                <li class="student-item">
-                    <span>{{ student.get_full_name }}</span>
-                    <form method="post" class="inline-form">
-                        {% csrf_token %}
-                        <input type="hidden" name="student_id" value="{{ student.id }}">
-                        <input type="hidden" name="action" value="add">
-                        <button type="submit" class="btn btn-primary-soft" title="Añadir al grupo">
-                            <i class="fa-solid fa-plus"></i> Añadir
-                        </button>
-                    </form>
-                </li>
+            <li class="student-item">
+                <span>{{ student.get_full_name }}</span>
+                <form method="post" class="inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="student_id" value="{{ student.id }}">
+                    <input type="hidden" name="action" value="add">
+                    <button type="submit" class="btn btn-primary-soft" title="Añadir al grupo">
+                        <i class="fa-solid fa-plus"></i> Añadir
+                    </button>
+                </form>
+            </li>
             {% empty %}
-                <div class="empty-list-message">
-                    <i class="fa-regular fa-circle-check"></i>
-                    <p>No hay más estudiantes disponibles.</p>
-                </div>
+            <div class="empty-list-message">
+                <i class="fa-regular fa-circle-check"></i>
+                <p>No hay más estudiantes disponibles.</p>
+            </div>
             {% endfor %}
         </ul>
     </div>
