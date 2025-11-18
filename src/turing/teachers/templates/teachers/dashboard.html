@@ -7,7 +7,7 @@
     <div class="welcome-head">
         <h1>Dashboard del Profesor</h1>
     </div>
-    <p class="welcome-sub">Gestiona tus materias, grupos y estudiantes desde aquí.</p>
+    <p class="welcome-sub">Gestiona tus materias y grupos desde aquí.</p>
 </div>
 
 <div class="kpis">
@@ -42,29 +42,26 @@
                 <h3>{{ group.course.name }}</h3>
                 <span class="badge">{{ group.name }}</span>
             </div>
+            {% if group.course.owner_id == user.id %}
             <div class="menu">
                 <button class="icon-button" type="button" title="Opciones"
                     onclick="this.nextElementSibling.classList.toggle('open')">
                     <i class="fa-solid fa-ellipsis"></i>
                 </button>
                 <div class="menu-pop">
-                    <a href="{% url 'teachers:manage_course' group.course.pk %}"
-                        class="dropdown-item">
-                        <i class="fa-solid fa-pen-to-square"></i> Editar Grupo
+                    <a href="{% url 'teachers:manage_course' group.course.pk %}" class="dropdown-item">
+                        <i class="fa-solid fa-pen-to-square"></i> Gestionar Curso
                     </a>
-
-                    {% if group.course.owner_id == user.id %}
-                    <form method="post" action="{% url 'teachers:course_delete' group.course.pk %}"
-                        class="inline-form">
+                    <form method="post" action="{% url 'teachers:course_delete' group.course.pk %}" class="inline-form">
                         {% csrf_token %}
-                        <button type="submit" class="menu-delete-btn"
+                        <button type="submit" class="dropdown-item" style="color: var(--danger-text);"
                             onclick="return confirm('¿Seguro que quieres eliminar la materia \'{{ group.course.name }}\' y TODOS sus grupos? Esta acción no se puede deshacer.');">
-                            Eliminar Materia
+                            <i class="fa-solid fa-trash"></i> Eliminar
                         </button>
                     </form>
-                    {% endif %}
                 </div>
             </div>
+            {% endif %}
         </div>
 
         <div class="course-meta muted">Horario: {{ group.schedule }}</div>
@@ -74,14 +71,8 @@
         </div>
 
         <div class="course-actions">
-            <a href="{% url 'teachers:manage_enrollments' group.pk %}" class="btn btn-primary-soft">
-                <i class="fa-solid fa-users"></i> Estudiantes
-            </a>
-            <a href="{% url 'teachers:manage_tutoring' group.pk %}" class="btn btn-secondary">
-                <i class="fa-regular fa-clock"></i> Monitorías
-            </a>
-            <a href="{% url 'teachers:group_prompt_edit' group.pk %}" class="btn btn-outline">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> Prompt IA
+            <a href="{% url 'teachers:group_details' group.pk %}" class="btn btn-primary">
+                <i class="fa-solid fa-arrow-right"></i> Ver Detalles
             </a>
         </div>
     </article>

@@ -11,8 +11,6 @@
         </a>
         <h1>Gestionar Materia: {{ course.name }}</h1>
     </div>
-    <p class="welcome-sub">Administra los grupos, la base de conocimiento y la configuración de la IA para esta
-        materia.</p>
 </div>
 
 <div class="header-row">
@@ -33,11 +31,8 @@
             estudiante{{ group.enrollments.count|pluralize }}
         </div>
         <div class="course-actions">
-            <a href="{% url 'teachers:manage_enrollments' group.pk %}" class="btn btn-primary-soft">
-                <i class="fa-solid fa-users"></i> Estudiantes
-            </a>
-            <a href="{% url 'teachers:manage_tutoring' group.pk %}" class="btn btn-secondary">
-                <i class="fa-regular fa-clock"></i> Monitorías
+            <a href="{% url 'teachers:group_details' group.pk %}" class="btn btn-primary">
+                <i class="fa-solid fa-arrow-right"></i> Ver Detalles
             </a>
         </div>
     </article>
@@ -46,22 +41,5 @@
         <p>Aún no impartes ningún grupo en esta materia. ¡Añade uno!</p>
     </div>
     {% endfor %}
-</div>
-
-<div class="header-row section-spacing">
-    <h2><i class="fa-solid fa-cogs"></i> Configuración de la Materia</h2>
-</div>
-<div class="card">
-    <ul class="settings-list">
-        <li>
-            <div class="setting-info">
-                <strong><i class="fa-solid fa-database icon-prefix"></i> Base de Conocimiento (RAG)</strong>
-                <p>Sube los archivos PDF (syllabus, lecturas, etc.) que el chatbot usará como fuente de verdad.
-                </p>
-            </div>
-            <a href="{% url 'courses:knowledge_base' course.pk %}" class="btn btn-secondary">Gestionar
-                Archivos</a>
-        </li>
-    </ul>
 </div>
 {% endblock content %}

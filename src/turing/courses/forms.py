@@ -7,7 +7,13 @@ class CourseForm(forms.ModelForm):
         model  = Course
         fields = ['name', 'description', 'level', 'schedule']
         labels = {'level': 'Semestre'}
-        widgets = {'description': forms.Textarea(attrs={'rows': 3})}
+        widgets = {
+            'description': forms.Textarea(attrs={
+                'rows': 4,
+                'class': 'textarea-modern',
+                'placeholder': 'Describe brevemente la materia...'
+            })
+        }
 
 
 class JoinByCodeTeacherForm(forms.Form):

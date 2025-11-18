@@ -9,13 +9,7 @@
 {% endblock %}
 
 {% block auth_content %}
-<div class="logo-title">
-    <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
-    <span class="brand">Crear Materia</span>
-</div>
-
 <h2>Nueva materia</h2>
-<p class="subtitle">Completa el formulario y haz clic en Guardar</p>
 
 <form method="post">
     {% csrf_token %}
@@ -28,7 +22,7 @@
     <div class="input-group"><i class="fa-solid fa-align-left"></i>{{ form.description }}</div>
     {% for error in form.description.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
 
-    <label for="{{ form.level.id_for_label }}">Nivel</label>
+    <label for="{{ form.level.id_for_label }}">Semestre</label>
     <div class="input-group"><i class="fa-solid fa-layer-group"></i>{{ form.level }}</div>
     {% for error in form.level.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
 

@@ -1,0 +1,141 @@
+{% extends "teachers/base.html" %}
+
+{% block title %}{{ group.name }} - Detalles{% endblock %}
+
+{% block teacher_extra_css %}
+<style>
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .action-card {
+        background: var(--bg-card);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .action-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .action-card-icon {
+        font-size: 2rem;
+        color: var(--primary);
+    }
+
+    .action-card h3 {
+        margin: 0;
+        font-size: 1.125rem;
+        color: var(--ink);
+    }
+
+    .action-card p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--ink-weak);
+        flex-grow: 1;
+    }
+
+    @media (max-width: 768px) {
+        .action-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="welcome">
+    <div class="welcome-head place-back">
+        <a href="{% url 'teachers:dashboard' %}" class="btn-back" aria-label="Volver atrás">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        <h1>{{ group.course.name }} - {{ group.name }}</h1>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom: 2rem;">
+    <h3 style="margin: 0 0 0.5rem 0;">Información del Grupo</h3>
+    <p style="margin: 0; color: var(--ink-weak);"><strong>Horario:</strong> {{ group.schedule }}</p>
+    <p style="margin: 0.5rem 0 0 0; color: var(--ink-weak);"><strong>Total de Estudiantes:</strong> {{ total_students }}
+    </p>
+</div>
+
+<h2><i class="fa-solid fa-tools"></i> Gestión del Grupo</h2>
+<div class="action-grid">
+    <div class="action-card">
+        <div class="action-card-icon"><i class="fa-solid fa-users"></i></div>
+        <div>
+            <h3>Estudiantes</h3>
+            <p>Administra los estudiantes inscritos en este grupo</p>
+        </div>
+        <a href="{% url 'teachers:manage_enrollments' group.pk %}" class="btn btn-primary">
+            Gestionar Estudiantes
+        </a>
+    </div>
+
+    <div class="action-card">
+        <div class="action-card-icon"><i class="fa-regular fa-clock"></i></div>
+        <div>
+            <h3>Monitorías</h3>
+            <p>Configura los horarios de monitoría para este grupo</p>
+        </div>
+        <a href="{% url 'teachers:manage_tutoring' group.pk %}" class="btn btn-primary">
+            Gestionar Monitorías
+        </a>
+    </div>
+
+    <div class="action-card">
+        <div class="action-card-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <div>
+            <h3>Prompt de IA</h3>
+            <p>Personaliza las instrucciones del asistente de IA</p>
+        </div>
+        <a href="{% url 'teachers:group_prompt_edit' group.pk %}" class="btn btn-primary">
+            Editar Prompt
+        </a>
+    </div>
+
+    <div class="action-card">
+        <div class="action-card-icon"><i class="fa-solid fa-database"></i></div>
+        <div>
+            <h3>Base de Conocimiento</h3>
+            <p>Administra los archivos PDF del curso previamente esocogido</p>
+        </div>
+        <a href="{% url 'courses:knowledge_base' course.pk %}" class="btn btn-primary">
+            Gestionar Archivos
+        </a>
+    </div>
+
+    <div class="action-card">
+        <div class="action-card-icon"><i class="fa-regular fa-calendar"></i></div>
+        <div>
+            <h3>Horarios PDF</h3>
+            <p>Sube y gestiona el PDF con los horarios de monitorías</p>
+        </div>
+        <a href="{% url 'teachers:upload_schedule' course.pk %}" class="btn btn-primary">
+            Gestionar Horarios
+        </a>
+    </div>
+
+    <div class="action-card">
+        <div class="action-card-icon"><i class="fa-solid fa-chart-line"></i></div>
+        <div>
+            <h3>Analytics de Keywords</h3>
+            <p>Visualiza estadísticas de palabras clave detectadas</p>
+        </div>
+        <a href="{% url 'teachers:group_analytics' group.pk %}" class="btn btn-primary">
+            Ver Analytics
+        </a>
+    </div>
+</div>
+{% endblock %}

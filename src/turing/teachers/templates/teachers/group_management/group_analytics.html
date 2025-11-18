@@ -1,0 +1,331 @@
+{% extends "teachers/base.html" %}
+{% load static %}
+
+{% block title %}Analytics - {{ group.name }}{% endblock %}
+
+{% block teacher_extra_css %}
+<link rel="stylesheet" href="{% static 'css/analytics.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="welcome">
+    <div class="welcome-head place-back">
+        <a href="{% url 'teachers:group_details' group.pk %}" class="btn-back" aria-label="Volver atrás">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        <h1>Analytics - {{ group.course.name }} / {{ group.name }}</h1>
+    </div>
+    <p class="welcome-sub">Estadísticas de palabras clave detectadas en las conversaciones</p>
+</div>
+
+{% if total_keywords_detected > 0 %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="icon"><i class="fa-solid fa-key"></i></div>
+        <div class="value">{{ total_keywords_detected }}</div>
+        <div class="label">Total Keywords Detectados</div>
+    </div>
+    <div class="stat-card">
+        <div class="icon"><i class="fa-solid fa-users"></i></div>
+        <div class="value">{{ students_with_activity }}/{{ total_students }}</div>
+        <div class="label">Estudiantes con Actividad</div>
+    </div>
+    <div class="stat-card">
+        <div class="icon"><i class="fa-solid fa-percent"></i></div>
+        <div class="value">{{ participation_rate }}%</div>
+        <div class="label">Tasa de Participación</div>
+    </div>
+    <div class="stat-card">
+        <div class="icon"><i class="fa-solid fa-clock"></i></div>
+        <div class="value">{{ recent_activity }}</div>
+        <div class="label">Actividad (últimos 7 días)</div>
+    </div>
+</div>
+
+<div class="charts-grid">
+    <div class="chart-card">
+        <h3>Top Keywords</h3>
+        <div class="chart-container">
+            <canvas id="topKeywordsChart"></canvas>
+        </div>
+    </div>
+    <div class="chart-card">
+        <h3>Keywords por Tema</h3>
+        <div class="chart-container">
+            <canvas id="topicDistributionChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="chart-card" style="margin-bottom: 1.5rem;">
+    <h3>Engagement de Estudiantes</h3>
+    <div class="chart-container">
+        <canvas id="studentEngagementChart"></canvas>
+    </div>
+</div>
+
+<div class="table-card">
+    <h3>Top 10 Keywords Más Mencionados</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Keyword</th>
+                <th>Tema</th>
+                <th>Menciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in top_keywords %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong>{{ item.keyword__keyword }}</strong></td>
+                <td><span class="badge-topic">{{ item.topic__name }}</span></td>
+                <td>{{ item.count }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; color: var(--ink-weak);">No hay datos disponibles</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="table-card">
+    <h3>Top 10 Estudiantes Más Activos</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Estudiante</th>
+                <th>Email</th>
+                <th>Keywords Detectados</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in top_students %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong>{{ student.student__name }} {{ student.student__last_name }}</strong></td>
+                <td>{{ student.student__email }}</td>
+                <td>{{ student.count }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; color: var(--ink-weak);">No hay datos disponibles</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% else %}
+<div class="card empty-state">
+    <i class="fa-solid fa-chart-line"></i>
+    <h3>No hay datos disponibles</h3>
+    <p>Aún no se han detectado keywords en las conversaciones de los estudiantes de este grupo.</p>
+    <p class="muted">Asegúrate de haber configurado temas y palabras clave en la sección de administración.</p>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block teacher_extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    {% if total_keywords_detected > 0 %}
+    const colors = [
+        'rgba(22, 119, 255, 0.8)',
+        'rgba(99, 102, 241, 0.8)',
+        'rgba(168, 85, 247, 0.8)',
+        'rgba(236, 72, 153, 0.8)',
+        'rgba(251, 146, 60, 0.8)',
+        'rgba(34, 197, 94, 0.8)',
+        'rgba(14, 165, 233, 0.8)',
+        'rgba(139, 92, 246, 0.8)',
+        'rgba(244, 63, 94, 0.8)',
+        'rgba(245, 158, 11, 0.8)',
+    ];
+
+    Chart.defaults.font.family = "'Segoe UI', Arial, sans-serif";
+    Chart.defaults.color = '#6B7280';
+
+    const topKeywordsData = {
+        labels: [
+            {% for item in top_keywords %}
+            '{{ item.keyword__keyword }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Menciones',
+            data: [
+                {% for item in top_keywords %}
+                {{ item.count }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: colors,
+            borderWidth: 0,
+            borderRadius: 6,
+        }]
+    };
+
+    new Chart(document.getElementById('topKeywordsChart'), {
+        type: 'bar',
+        data: topKeywordsData,
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                    padding: 12,
+                    borderRadius: 8,
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(229, 231, 235, 0.5)'
+                    },
+                    ticks: {
+                        precision: 0
+                    }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    const topicDistributionData = {
+        labels: [
+            {% for item in keywords_by_topic %}
+            '{{ item.topic__name }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for item in keywords_by_topic %}
+                {{ item.count }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: colors,
+            borderWidth: 2,
+            borderColor: '#FFFFFF',
+        }]
+    };
+
+    new Chart(document.getElementById('topicDistributionChart'), {
+        type: 'doughnut',
+        data: topicDistributionData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        padding: 15,
+                        font: {
+                            size: 12
+                        },
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    return {
+                                        text: `${label}: ${value}`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                    padding: 12,
+                    borderRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Student Engagement Chart (Bar Chart)
+    const studentEngagementData = {
+        labels: [
+            {% for item in student_engagement %}
+            '{{ item.student__name|truncatechars:15 }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Keywords por Estudiante',
+            data: [
+                {% for item in student_engagement %}
+                {{ item.count }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: 'rgba(22, 119, 255, 0.8)',
+            borderRadius: 6,
+        }]
+    };
+
+    new Chart(document.getElementById('studentEngagementChart'), {
+        type: 'bar',
+        data: studentEngagementData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                    padding: 12,
+                    borderRadius: 8,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(229, 231, 235, 0.5)'
+                    },
+                    ticks: {
+                        precision: 0
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}

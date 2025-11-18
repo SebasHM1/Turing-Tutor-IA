@@ -8,12 +8,12 @@
 {% block content %}
 <div class="welcome">
     <div class="welcome-head place-back">
-        <a href="{% url 'teachers:tutoring_schedules' %}" class="btn-back js-back" aria-label="Volver atrás">
+        <a href="{% url 'teachers:group_details' group.pk %}" class="btn-back js-back" aria-label="Volver atrás">
             <i class="fa-solid fa-chevron-left"></i>
         </a>
-        <h1>Subir Horario de Monitorías</h1>
+        <h1>Horarios PDF</h1>
     </div>
-    <p class="welcome-sub">Para el curso: <strong>{{ course.name }}</strong></p>
+    <p class="welcome-sub">Para el grupo: <strong>{{ course.name }} - {{ group.name }}</strong></p>
 </div>
 
 <div class="card upload-card">
@@ -60,11 +60,8 @@
         {% endif %}
 
         <div class="form-actions">
-            <a href="{% url 'teachers:tutoring_schedules' %}" class="btn btn-secondary">
-                <i class="fa-solid fa-xmark"></i> Cancelar
-            </a>
             <button type="submit" class="btn btn-primary">
-                <i class="fa-solid fa-floppy-disk"></i> Guardar Horario
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
             </button>
         </div>
     </form>
