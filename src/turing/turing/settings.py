@@ -3,6 +3,7 @@ Django settings for turing project.
 """
 
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 import mimetypes
@@ -92,6 +93,7 @@ DATABASES = {
     }
 }
 
+
 ROOT_URLCONF = 'turing.urls'
 
 TEMPLATES = [
@@ -127,6 +129,17 @@ STORAGES = {
         },
     },
 }
+
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
+
+    STORAGES["staticfiles"] = {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    }
+
 
 WSGI_APPLICATION = 'turing.wsgi.application'
 
