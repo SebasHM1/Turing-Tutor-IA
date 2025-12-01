@@ -136,8 +136,14 @@ if 'test' in sys.argv:
         'NAME': ':memory:',
     }
 
-    STORAGES["staticfiles"] = {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    STORAGES = {
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+        "default": {
+            # Esto guarda los archivos subidos en una carpeta local temporal en vez de Supabase
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
     }
 
 
