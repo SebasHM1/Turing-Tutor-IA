@@ -5,6 +5,11 @@ from datetime import date
 from chatbot.models import ChatSession, ChatMessage, TopicWeight
 from courses.models import Course, CourseTopics, TopicKeyword, KeywordVariation
 from chatbot.topic_analyzer import TopicAnalyzer
+from django.test import Client
+from django.urls import reverse
+from unittest.mock import patch, MagicMock
+from courses.models import Group, Enrollment
+from users.models import UserRole
 
 User = get_user_model()
 
@@ -248,3 +253,115 @@ class TopicAnalyzerTestCase(TestCase):
         keyword_ids = [w.keyword.id for w in weights]
         self.assertEqual(len(keyword_ids), len(set(keyword_ids)), "No debe haber TopicWeights duplicados para la misma keyword")
 
+class ChatbotViewTests(TestCase):
+    """Test suite para las Vistas e Interacción del Chat (Mocking OpenAI)"""
+
+    def setUp(self):
+        self.client = Client()
+        self.User = get_user_model()
+        
+        # 1. Crear Usuarios
+        self.teacher = self.User.objects.create_user(
+            email='profesor@chat.com', password='123', role=UserRole.TEACHER,
+            name='Profe', last_name='T', cedula='555', university_code='TP1', user_group='Staff'
+        )
+        self.student = self.User.objects.create_user(
+            email='alumno@chat.com', password='123', role=UserRole.STUDENT,
+            name='Alumno', last_name='S', cedula='666', university_code='ST1', user_group='A'
+        )
+        
+        # 2. Crear Curso, Grupo e Inscripción (Vital para acceder al chat)
+        self.course = Course.objects.create(name="Inteligencia Artificial", owner=self.teacher, level="1")
+        self.group = Group.objects.create(course=self.course, teacher=self.teacher, name="G1")
+        Enrollment.objects.create(student=self.student, group=self.group)
+        
+        # 3. Crear sesión existente
+        self.session = ChatSession.objects.create(user=self.student, course=self.course, name="Chat de Prueba")
+
+    def test_view_access_enrolled_student(self):
+        """Un estudiante inscrito puede acceder a la vista del chat."""
+        self.client.login(email='alumno@chat.com', password='123')
+        url = reverse('chatbot:course_chat', kwargs={'course_id': self.course.pk})
+        
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Chat de Prueba")
+
+    def test_view_access_forbidden_not_enrolled(self):
+        """Un estudiante NO inscrito debe ser redirigido."""
+        # Curso extra sin inscripción
+        course2 = Course.objects.create(name="Física", owner=self.teacher, level="1")
+        
+        self.client.login(email='alumno@chat.com', password='123')
+        url = reverse('chatbot:course_chat', kwargs={'course_id': course2.pk})
+        
+        response = self.client.get(url)
+        # Redirección a mis grupos (302)
+        self.assertEqual(response.status_code, 302)
+
+    @patch('chatbot.views.OpenAI')       # Mock de la clase OpenAI
+    @patch('chatbot.views.rag_processor') # Mock del RAG
+    def test_send_message_success(self, mock_rag, mock_openai):
+        """
+        Prueba el flujo completo de enviar mensaje POST.
+        Simula la respuesta de OpenAI para no usar API real.
+        """
+        self.client.login(email='alumno@chat.com', password='123')
+
+        # Configurar Mock de OpenAI
+        mock_client = MagicMock()
+        mock_openai.return_value = mock_client
+        mock_completion = MagicMock()
+        # Simulamos la estructura JSON que devuelve OpenAI
+        mock_completion.model_dump_json.return_value = '{"choices": [{"message": {"content": "Respuesta simulada del bot"}}]}'
+        mock_client.chat.completions.create.return_value = mock_completion
+
+        # Configurar Mock de RAG (para que no falle buscando PDFs)
+        mock_rag.create_rag_context.return_value = ""
+
+        # Enviar mensaje
+        url = reverse('chatbot:send_message')
+        data = {'session_id': self.session.id, 'message': 'Hola Bot'}
+        
+        response = self.client.post(url, data)
+        
+        # Validaciones
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {'bot_message': '<p>Respuesta simulada del bot</p>'})
+        
+        # Verificar BD
+        self.assertEqual(ChatMessage.objects.filter(session=self.session).count(), 2) # User + Bot
+        self.assertTrue(ChatMessage.objects.filter(message='Hola Bot', sender='user').exists())
+
+    def test_create_new_session(self):
+        """Prueba crear una nueva sesión desde el botón."""
+        self.client.login(email='alumno@chat.com', password='123')
+        url = reverse('chatbot:create_session_course', kwargs={'course_id': self.course.pk})
+        
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        # Debe haber 2 sesiones ahora (la del setUp y la nueva)
+        self.assertEqual(ChatSession.objects.filter(user=self.student, course=self.course).count(), 2)
+
+    def test_rename_session(self):
+        """Prueba renombrar una sesión vía AJAX."""
+        self.client.login(email='alumno@chat.com', password='123')
+        url = reverse('chatbot:rename_session', kwargs={'pk': self.session.pk})
+        
+        # Simulamos petición AJAX
+        response = self.client.post(url, {'name': 'Nuevo Nombre'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        self.assertEqual(response.status_code, 200)
+        self.session.refresh_from_db()
+        self.assertEqual(self.session.name, 'Nuevo Nombre')
+
+    def test_delete_session(self):
+        """Prueba eliminar una sesión."""
+        self.client.login(email='alumno@chat.com', password='123')
+        url = reverse('chatbot:delete_session', kwargs={'session_id': self.session.pk})
+        
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertFalse(ChatSession.objects.filter(pk=self.session.pk).exists())
