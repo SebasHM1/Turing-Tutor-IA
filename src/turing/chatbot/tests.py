@@ -365,3 +365,138 @@ class ChatbotViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         
         self.assertFalse(ChatSession.objects.filter(pk=self.session.pk).exists())
+
+
+class ChatbotHelperTests(TestCase):
+    """Tests para funciones helper del chatbot."""
+    
+    def setUp(self):
+        self.User = get_user_model()
+        
+        self.teacher = self.User.objects.create_user(
+            email='teacher@helpers.com', password='123', name='T', last_name='T',
+            cedula='777', university_code='TH1', user_group='Teachers',
+            role=UserRole.TEACHER
+        )
+        
+        self.student = self.User.objects.create_user(
+            email='student@helpers.com', password='123', name='S', last_name='S',
+            cedula='888', university_code='SH1', user_group='Group A',
+            role=UserRole.STUDENT
+        )
+        
+        self.course = Course.objects.create(name='Test Course', owner=self.teacher, level='1')
+        self.group = Group.objects.create(
+            course=self.course, 
+            teacher=self.teacher, 
+            name='Test Group',
+            ai_prompt='Test prompt for group'
+        )
+        Enrollment.objects.create(student=self.student, group=self.group)
+        
+        self.session = ChatSession.objects.create(
+            user=self.student,
+            course=self.course,
+            name='Test Session'
+        )
+
+    def test_get_student_group(self):
+        """Prueba que get_student_group devuelva el grupo correcto."""
+        from chatbot.views import get_student_group
+        
+        group = get_student_group(self.student, self.course.id)
+        self.assertEqual(group, self.group)
+
+    def test_get_student_group_not_enrolled(self):
+        """Prueba que get_student_group devuelva None si no está inscrito."""
+        from chatbot.views import get_student_group
+        
+        other_student = self.User.objects.create_user(
+            email='other@test.com', password='123', name='O', last_name='O',
+            cedula='999', university_code='OS1', user_group='Group B',
+            role=UserRole.STUDENT
+        )
+        
+        group = get_student_group(other_student, self.course.id)
+        self.assertIsNone(group)
+
+    def test_get_chat_context_with_group_prompt(self):
+        """Prueba que get_chat_context incluya el prompt del grupo."""
+        from chatbot.views import get_chat_context
+        
+        # Crear algunos mensajes
+        ChatMessage.objects.create(session=self.session, sender='user', message='Hola')
+        ChatMessage.objects.create(session=self.session, sender='bot', message='Hola, ¿en qué puedo ayudarte?')
+        
+        context = get_chat_context(self.student, self.session, limit=5)
+        
+        # Verificar que hay mensajes en el contexto
+        self.assertIsInstance(context, list)
+        self.assertGreater(len(context), 0)
+        
+        # Verificar que el prompt del grupo está incluido
+        system_messages = [msg for msg in context if msg.get('role') == 'system']
+        self.assertTrue(any('Test prompt for group' in msg.get('content', '') for msg in system_messages))
+
+    def test_get_chat_context_without_course(self):
+        """Prueba get_chat_context con sesión sin curso."""
+        from chatbot.views import get_chat_context
+        
+        session_no_course = ChatSession.objects.create(
+            user=self.student,
+            name='Session without course'
+        )
+        
+        ChatMessage.objects.create(session=session_no_course, sender='user', message='Test')
+        
+        context = get_chat_context(self.student, session_no_course, limit=5)
+        
+        # No debería incluir prompt de grupo
+        system_messages = [msg for msg in context if msg.get('role') == 'system']
+        self.assertFalse(any('Test prompt for group' in msg.get('content', '') for msg in system_messages))
+
+    def test_poll_messages(self):
+        """Prueba el endpoint poll_messages."""
+        self.client = Client()
+        self.client.login(email='student@helpers.com', password='123')
+        
+        # Crear mensajes
+        msg1 = ChatMessage.objects.create(session=self.session, sender='user', message='Mensaje 1')
+        msg2 = ChatMessage.objects.create(session=self.session, sender='bot', message='Respuesta 1')
+        
+        url = reverse('chatbot:poll_messages')
+        response = self.client.get(url, {
+            'session_id': self.session.id,
+            'after_id': msg1.id
+        })
+        
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn('messages', data)
+        
+        # Solo debería devolver mensajes después de msg1
+        messages = data['messages']
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0]['id'], msg2.id)
+
+    def test_poll_messages_no_session_id(self):
+        """Prueba poll_messages sin session_id."""
+        self.client = Client()
+        self.client.login(email='student@helpers.com', password='123')
+        
+        url = reverse('chatbot:poll_messages')
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn('error', data)
+
+    def test_poll_messages_invalid_session(self):
+        """Prueba poll_messages con sesión inválida."""
+        self.client = Client()
+        self.client.login(email='student@helpers.com', password='123')
+        
+        url = reverse('chatbot:poll_messages')
+        response = self.client.get(url, {'session_id': 99999})
+        
+        self.assertEqual(response.status_code, 404)

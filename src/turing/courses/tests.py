@@ -183,3 +183,147 @@ class CourseViewTests(TestCase):
         
         # Verificar que el mock fue llamado
         self.assertTrue(mock_rag.process_pdf_file.called)
+
+    def test_knowledge_base_delete(self):
+        """Prueba la eliminación de un archivo de la base de conocimiento."""
+        self.client.login(email='teacher@courses.com', password='123')
+        
+        # Crear un archivo en la base de conocimiento
+        kb_file = KnowledgeBaseFile.objects.create(
+            course=self.course,
+            name='Archivo para eliminar',
+            file='knowledge_base/test.pdf'
+        )
+        
+        url = reverse('courses:knowledge_base_delete', kwargs={
+            'course_pk': self.course.pk,
+            'file_pk': kb_file.pk
+        })
+        
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        # Verificar que el archivo fue eliminado
+        self.assertFalse(KnowledgeBaseFile.objects.filter(pk=kb_file.pk).exists())
+
+    @patch('courses.views.rag_processor')
+    def test_knowledge_base_reprocess(self, mock_rag):
+        """Prueba el reprocesamiento de un archivo de la base de conocimiento."""
+        self.client.login(email='teacher@courses.com', password='123')
+        
+        mock_rag.process_pdf_file.return_value = {
+            'success': True, 
+            'chunks_count': 10, 
+            'text_length': 200
+        }
+        
+        # Crear un archivo en la base de conocimiento
+        kb_file = KnowledgeBaseFile.objects.create(
+            course=self.course,
+            name='Archivo para reprocesar',
+            file='knowledge_base/test.pdf'
+        )
+        
+        url = reverse('courses:knowledge_base_reprocess', kwargs={
+            'course_pk': self.course.pk,
+            'file_pk': kb_file.pk
+        })
+        
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        # Verificar que el mock fue llamado
+        self.assertTrue(mock_rag.process_pdf_file.called)
+
+    def test_student_group_detail_full_context(self):
+        """Prueba que StudentGroupDetailView devuelve el contexto completo."""
+        self.client.login(email='student@courses.com', password='123')
+        
+        # Crear otro grupo para el mismo curso
+        group2 = Group.objects.create(course=self.course, name="G2", teacher=self.teacher)
+        
+        url = reverse('courses:student_group_detail', kwargs={'pk': self.group.pk})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['current_group'], self.group)
+        self.assertEqual(response.context['course'], self.course)
+        
+        # Verificar que todos los grupos del curso están en el contexto
+        groups_in_context = list(response.context['groups'])
+        self.assertIn(self.group, groups_in_context)
+        self.assertIn(group2, groups_in_context)
+
+
+class CourseTopicsTests(TestCase):
+    """Tests para CourseTopics, TopicKeyword y KeywordVariation."""
+    
+    def setUp(self):
+        self.User = get_user_model()
+        self.teacher = self.User.objects.create_user(
+            email='teacher@topics.com', password='123', name='T', last_name='T',
+            cedula='555', university_code='TT1', user_group='T',
+            role=UserRole.TEACHER
+        )
+        self.course = Course.objects.create(name="Matemáticas", owner=self.teacher, level="1")
+
+    def test_create_course_topic(self):
+        """Prueba la creación de un tema de curso."""
+        from courses.models import CourseTopics
+        topic = CourseTopics.objects.create(
+            course=self.course,
+            name="Álgebra",
+            description="Ecuaciones y sistemas",
+            is_active=True
+        )
+        self.assertEqual(str(topic), "Matemáticas - Álgebra")
+        self.assertTrue(topic.is_active)
+
+    def test_create_topic_keyword(self):
+        """Prueba la creación de palabras clave para un tema."""
+        from courses.models import CourseTopics, TopicKeyword
+        topic = CourseTopics.objects.create(
+            course=self.course,
+            name="Geometría",
+            is_active=True
+        )
+        keyword = TopicKeyword.objects.create(
+            topic=topic,
+            keyword="triángulo"
+        )
+        self.assertEqual(str(keyword), "Geometría - triángulo")
+
+    def test_create_keyword_variation(self):
+        """Prueba la creación de variaciones de palabras clave."""
+        from courses.models import CourseTopics, TopicKeyword, KeywordVariation
+        topic = CourseTopics.objects.create(
+            course=self.course,
+            name="Geometría",
+            is_active=True
+        )
+        keyword = TopicKeyword.objects.create(
+            topic=topic,
+            keyword="triángulo"
+        )
+        variation = KeywordVariation.objects.create(
+            keyword=keyword,
+            variation="triangulo"
+        )
+        self.assertEqual(str(variation), "triángulo → triangulo")
+
+    def test_topic_unique_together(self):
+        """Prueba que no se pueden crear temas duplicados para el mismo curso."""
+        from courses.models import CourseTopics
+        CourseTopics.objects.create(
+            course=self.course,
+            name="Álgebra",
+            is_active=True
+        )
+        
+        # Intentar crear otro tema con el mismo nombre debería fallar
+        with self.assertRaises(Exception):
+            CourseTopics.objects.create(
+                course=self.course,
+                name="Álgebra",
+                is_active=True
+            )

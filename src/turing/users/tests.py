@@ -132,3 +132,99 @@ class UsersViewTests(TestCase):
         
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('teachers:dashboard'))
+
+
+class CustomPasswordResetFormTests(TestCase):
+    """Tests para el formulario de restablecimiento de contraseña."""
+    
+    def test_password_reset_form_valid(self):
+        """Prueba que el formulario de reset es válido con un email correcto."""
+        from users.forms import CustomPasswordResetForm
+        
+        form_data = {'email': 'test@example.com'}
+        form = CustomPasswordResetForm(data=form_data)
+        
+        self.assertTrue(form.is_valid())
+
+    def test_password_reset_form_invalid_email(self):
+        """Prueba que el formulario falla con un email inválido."""
+        from users.forms import CustomPasswordResetForm
+        
+        form_data = {'email': 'invalid-email'}
+        form = CustomPasswordResetForm(data=form_data)
+        
+        self.assertFalse(form.is_valid())
+        self.assertIn('email', form.errors)
+
+
+class TuringLoginViewTests(TestCase):
+    """Tests adicionales para TuringLoginView."""
+    
+    def setUp(self):
+        self.client = Client()
+        self.User = get_user_model()
+        
+        self.student = self.User.objects.create_user(
+            email='student@login.com', password='testpass123', name='S', last_name='S',
+            cedula='1111', university_code='SL1', user_group='G1', role=UserRole.STUDENT
+        )
+        
+        self.teacher = self.User.objects.create_user(
+            email='teacher@login.com', password='testpass123', name='T', last_name='T',
+            cedula='2222', university_code='TL1', user_group='Staff', role=UserRole.TEACHER
+        )
+
+    def test_login_view_get(self):
+        """Prueba que la página de login carga correctamente."""
+        url = reverse('login')
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'registration/login.html')
+
+    def test_login_success_student(self):
+        """Prueba login exitoso de un estudiante."""
+        url = reverse('login')
+        response = self.client.post(url, {
+            'username': 'student@login.com',
+            'password': 'testpass123'
+        }, follow=True)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.wsgi_request.user.is_authenticated)
+        # Debe redirigir a grupos del estudiante
+        self.assertRedirects(response, reverse('courses:my_student_groups'))
+
+    def test_login_success_teacher(self):
+        """Prueba login exitoso de un profesor."""
+        url = reverse('login')
+        response = self.client.post(url, {
+            'username': 'teacher@login.com',
+            'password': 'testpass123'
+        }, follow=True)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.wsgi_request.user.is_authenticated)
+        # Debe redirigir al dashboard de profesores
+        self.assertRedirects(response, reverse('teachers:dashboard'))
+
+    def test_login_invalid_credentials(self):
+        """Prueba login con credenciales incorrectas."""
+        url = reverse('login')
+        response = self.client.post(url, {
+            'username': 'student@login.com',
+            'password': 'wrongpassword'
+        })
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.wsgi_request.user.is_authenticated)
+        self.assertContains(response, 'Please enter a correct', status_code=200)
+
+    def test_authenticated_user_redirect(self):
+        """Prueba que un usuario ya autenticado es redirigido."""
+        self.client.login(email='student@login.com', password='testpass123')
+        url = reverse('login')
+        response = self.client.get(url)
+        
+        # redirect_authenticated_user=True debería redirigir
+        self.assertEqual(response.status_code, 302)

@@ -156,3 +156,154 @@ class TeacherFormsTests(TestCase):
         form = TutoringSlotForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertIn('location', form.errors)
+
+
+class GroupManagementTests(TestCase):
+    """Tests para creación y gestión de grupos."""
+    
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
+    def setUp(self):
+        self.client = Client()
+        self.User = get_user_model()
+        
+        self.teacher = self.User.objects.create_user(
+            email='teacher@groups.com', password='123', name='T', last_name='T',
+            cedula='333', university_code='TG1', user_group='Staff',
+            role=UserRole.TEACHER
+        )
+        
+        self.course = Course.objects.create(name="Física", owner=self.teacher, level="2")
+
+    def test_group_create_view(self):
+        """Prueba la creación de un grupo dentro de un curso."""
+        self.client.login(email='teacher@groups.com', password='123')
+        url = reverse('teachers:group_create', kwargs={'course_pk': self.course.pk})
+        
+        data = {
+            'name': 'Grupo A',
+            'schedule': 'Lunes 8-10am'
+        }
+        
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        # Verificar que se creó el grupo
+        self.assertTrue(Group.objects.filter(course=self.course, name='Grupo A').exists())
+        group = Group.objects.get(course=self.course, name='Grupo A')
+        self.assertEqual(group.teacher, self.teacher)
+
+    def test_manage_course_view(self):
+        """Prueba la vista de gestión de curso."""
+        self.client.login(email='teacher@groups.com', password='123')
+        group = Group.objects.create(course=self.course, teacher=self.teacher, name="Grupo 1")
+        
+        url = reverse('teachers:manage_course', kwargs={'pk': self.course.pk})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['course'], self.course)
+        self.assertIn(group, response.context['teacher_groups'])
+
+    def test_group_prompt_edit_view(self):
+        """Prueba la edición del prompt de IA específico de un grupo."""
+        self.client.login(email='teacher@groups.com', password='123')
+        group = Group.objects.create(course=self.course, teacher=self.teacher, name="Grupo 1")
+        
+        url = reverse('teachers:group_prompt_edit', kwargs={'group_pk': group.pk})
+        
+        data = {
+            'ai_prompt': 'Instrucciones específicas para este grupo'
+        }
+        
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        # Verificar que el prompt fue actualizado
+        group.refresh_from_db()
+        self.assertEqual(group.ai_prompt, 'Instrucciones específicas para este grupo')
+
+
+class TutoringManagementTests(TestCase):
+    """Tests para gestión de monitorías."""
+    
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
+    def setUp(self):
+        self.client = Client()
+        self.User = get_user_model()
+        
+        self.teacher = self.User.objects.create_user(
+            email='teacher@tutoring.com', password='123', name='T', last_name='T',
+            cedula='444', university_code='TU1', user_group='Staff',
+            role=UserRole.TEACHER
+        )
+        
+        self.course = Course.objects.create(name="Química", owner=self.teacher, level="3")
+        self.group = Group.objects.create(course=self.course, teacher=self.teacher, name="Grupo A")
+
+    def test_tutoring_schedule_list_view(self):
+        """Prueba la vista de lista de horarios de monitoría."""
+        self.client.login(email='teacher@tutoring.com', password='123')
+        
+        url = reverse('teachers:tutoring_schedules')
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('course_rows', response.context)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_tutoring_schedule_upload_view(self):
+        """Prueba la subida de un horario de monitoría."""
+        self.client.login(email='teacher@tutoring.com', password='123')
+        
+        url = reverse('teachers:upload_schedule', kwargs={'course_pk': self.course.pk})
+        
+        pdf = SimpleUploadedFile("horario_monitoria.pdf", b"contenido_pdf", content_type="application/pdf")
+        
+        response = self.client.post(url, {'file': pdf}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        # Verificar que se creó el horario
+        self.assertTrue(TutoringSchedule.objects.filter(course=self.course).exists())
+
+    def test_manage_tutoring_slots_get(self):
+        """Prueba la vista GET de gestión de slots de monitoría."""
+        self.client.login(email='teacher@tutoring.com', password='123')
+        
+        url = reverse('teachers:manage_tutoring', kwargs={'group_pk': self.group.pk})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('formset', response.context)
+        self.assertEqual(response.context['group'], self.group)
+
+    def test_manage_tutoring_slots_post(self):
+        """Prueba la creación de slots de monitoría vía POST."""
+        self.client.login(email='teacher@tutoring.com', password='123')
+        
+        url = reverse('teachers:manage_tutoring', kwargs={'group_pk': self.group.pk})
+        
+        # Datos del formset (Django inline formset requiere datos específicos)
+        data = {
+            'tutoring_slots-TOTAL_FORMS': '1',
+            'tutoring_slots-INITIAL_FORMS': '0',
+            'tutoring_slots-MIN_NUM_FORMS': '0',
+            'tutoring_slots-MAX_NUM_FORMS': '1000',
+            'tutoring_slots-0-day': 'MON',
+            'tutoring_slots-0-start_time': '10:00',
+            'tutoring_slots-0-end_time': '12:00',
+            'tutoring_slots-0-location': 'Sala 101',
+        }
+        
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        # Verificar que se creó el slot
+        self.assertTrue(TutoringSlot.objects.filter(group=self.group).exists())
