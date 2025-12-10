@@ -248,3 +248,43 @@ https://api.render.com/deploy/srv-d3hj8jripnbc73chssag?key=6mc2_Znguk4
     entorno gestionado por la plataforma.
 
 ------------------------------------------------------------------------
+
+## ⚙️ CI/CD con GitHub Actions (Workflow real utilizado)
+
+Se configuró un pipeline automatizado para disparar el despliegue en
+Render cada vez que hay un push a la rama `deploy-render`.\
+Este flujo utiliza el **Deploy Hook URL** almacenado como un secreto en
+GitHub.
+
+### Archivo: `.github/workflows/deploy.yaml`
+
+``` yaml
+name: Trigger Render Deploy
+
+on:
+  push:
+    branches:
+      - deploy-render
+
+jobs:
+  deploy:
+    name: Trigger Render Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deploy Hook
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+```
+
+### Explicación del flujo CI/CD
+
+-   Cada push a la rama `deploy-render` activa este workflow.
+-   GitHub Actions ejecuta un job en una máquina Linux.
+-   Se envía una petición POST al Deploy Hook privado de Render.
+-   Render inicia un despliegue inmediato utilizando la configuración
+    del servicio.
+
+Este pipeline garantiza un despliegue consistente y automatizado sin
+necesidad de usar el panel manualmente.
+
+------------------------------------------------------------------------
