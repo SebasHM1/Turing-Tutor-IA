@@ -159,62 +159,92 @@ pytest --cov=. --cov-report=html
 
 ## 📦 Despliegue
 
-### Preparación para producción
+------------------------------------------------------------------------
 
-1. **Configurar variables de entorno en producción:**
-   - `DEBUG=False`
-   - `ALLOWED_HOSTS=tudominio.com,www.tudominio.com`
-   - Configurar DB_HOST con la IP/dominio de tu base de datos en producción
+### 🏗️ Configuración General del Servicio
 
-2. **Recopilar archivos estáticos:**
-   ```powershell
-   python manage.py collectstatic --noinput
-   ```
+-   **Nombre del servicio:** `Turing-Tutor-IA`\
+-   **Región:** `Oregon (US West)`\
+-   **Plan:** `Free`
+    -   **0.1 CPU**\
+    -   **512 MB RAM**
 
-3. **Ejecutar migraciones:**
-   ```powershell
-   python manage.py migrate
-   ```
+------------------------------------------------------------------------
 
-### Despliegue en Render/Railway/Heroku
+### 🔗 Build & Deploy
 
-1. Conectar repositorio de Git
-2. Configurar variables de entorno desde el panel
-3. Comando de build: `pip install -r requirements-deploy.txt`
-4. Comando de inicio: `gunicorn turing.wsgi:application`
+#### **Repositorio conectado**
 
-### Despliegue en servidor VPS
+-   `https://github.com/SebasHM1/Turing-Tutor-IA`
 
-1. Instalar dependencias del sistema:
-   ```bash
-   sudo apt update
-   sudo apt install python3-pip python3-venv postgresql nginx
-   ```
+#### **Branch utilizada para el deploy**
 
-2. Configurar Nginx como reverse proxy
-3. Configurar Gunicorn como servicio systemd
-4. Configurar SSL con Let's Encrypt (certbot)
+-   `deploy-render`
 
-## 🔑 Acceso al Sistema
+#### **Credenciales Git**
 
-- **Admin:** `/admin/`
-- **Login:** `/login/`
-- **Dashboard Profesor:** `/teachers/dashboard/`
-- **Grupos Estudiante:** `/courses/my-groups/`
-- **Chat:** `/chat/course/<course_id>/`
+-   Usuario conectado para el pull del repositorio:\
+    `santiagoarbobledavelasco@gmail.com`
 
-## 📝 Notas Importantes
+#### **Root Directory**
 
-- Los tests usan SQLite en memoria automáticamente (configurado en `settings.py`)
-- Los archivos multimedia en desarrollo se guardan localmente, en producción en Supabase
-- Para usar el chatbot necesitas créditos en tu cuenta de OpenAI
-- Los PDFs se procesan automáticamente para RAG al subirlos
+-   `src/turing`\
+    Render ejecuta los comandos desde esta carpeta en lugar del root del
+    repositorio.
 
-## 🛠️ Tecnologías Utilizadas
+------------------------------------------------------------------------
 
-- **Backend:** Django 5.2
-- **Base de datos:** PostgreSQL
-- **IA:** OpenAI o3-mini, scikit-learn
-- **Storage:** Supabase S3
-- **Frontend:** HTML, CSS, JavaScript (vanilla)
-- **Testing:** pytest, pytest-django
+### ⚙️ Comandos configurados en Render
+
+#### **Build Command**
+
+``` bash
+src/turing/ $ pip install -r requirements.txt
+```
+
+#### **Pre-Deploy Command**
+
+*(Vacío --- no se ejecuta nada antes del arranque)*
+
+#### **Start Command**
+
+``` bash
+src/turing/ $ gunicorn turing.wsgi:application --bind 0.0.0.0:$PORT
+```
+
+------------------------------------------------------------------------
+
+### 🚀 Auto-Deploy
+
+-   **Modo:** `On Commit`\
+    Cada push al branch configurado (`deploy-render`) desencadena
+    automáticamente un nuevo despliegue.
+
+------------------------------------------------------------------------
+
+### 🔄 Deploy Hook
+
+-   Render generó un **Deploy Hook privado** con este formato:
+
+``` text
+https://api.render.com/deploy/srv-d3hj8jripnbc73chssag?key=6mc2_Znguk4
+```
+
+*(Se deberia actualizar este hook por seguridad).*
+
+------------------------------------------------------------------------
+
+## 🛠️ Flujo real del despliegue en Render
+
+1.  Se conectó el repositorio de GitHub al servicio de Render.
+2.  Se configuró `src/turing` como **Root Directory** para ejecutar los
+    comandos desde allí.
+3.  Se establecieron:
+    -   **Build command:** instalación desde `requirements.txt`
+    -   **Start command:** ejecución con Gunicorn enlazado al puerto
+        asignado por Render
+4.  Se activó Auto-Deploy en modo **On Commit**.
+5.  Render realiza el deploy automáticamente usando Gunicorn y el
+    entorno gestionado por la plataforma.
+
+------------------------------------------------------------------------
