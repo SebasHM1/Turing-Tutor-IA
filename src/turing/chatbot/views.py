@@ -258,7 +258,7 @@ def rename_session(request, pk):
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'ok': True, 'name': session.name})
-    return redirect('chatbot:chat_detail', pk=session.id)
+    return redirect('chatbot:chat_detail', session_id=session.id)
 
 
 @student_required

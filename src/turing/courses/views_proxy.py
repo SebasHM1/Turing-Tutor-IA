@@ -20,7 +20,7 @@ def tutoring_schedule_proxy(request, pk):
 
     user = request.user
     is_staff = user.is_staff
-    is_enrolled = Enrollment.objects.filter(student=user, course=course).exists()
+    is_enrolled = Enrollment.objects.filter(student=user, group__course=course).exists()
 
     if not (is_staff or is_enrolled):
         return HttpResponse("Forbidden", status=403)

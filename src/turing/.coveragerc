@@ -1,16 +1,4 @@
-[pytest]
-DJANGO_SETTINGS_MODULE = turing.settings
-python_files = tests.py test_*.py *_tests.py
-python_classes = Test* *Tests *TestCase
-python_functions = test_*
-addopts = 
-    --reuse-db
-    --no-migrations
-    -v
-    --tb=short
-testpaths = chatbot courses users teachers
-
-[coverage:run]
+[run]
 omit =
     */migrations/*
     *\migrations\*
@@ -26,7 +14,7 @@ omit =
     */wsgi.py
     *\wsgi.py
 
-[coverage:report]
+[report]
 exclude_lines =
     pragma: no cover
     if __name__ == .__main__.
