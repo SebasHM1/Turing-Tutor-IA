@@ -307,3 +307,183 @@ class TutoringManagementTests(TestCase):
         
         # Verificar que se creó el slot
         self.assertTrue(TutoringSlot.objects.filter(group=self.group).exists())
+
+
+class TeacherPermissionTests(TestCase):
+    """Tests para verificar permisos en vistas de profesores."""
+    
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
+    def setUp(self):
+        self.client = Client()
+        self.User = get_user_model()
+        
+        self.teacher = self.User.objects.create_user(
+            email='teacher@perm.com', password='123', name='T', last_name='T',
+            cedula='1111', university_code='TP1', user_group='Staff',
+            role=UserRole.TEACHER
+        )
+        
+        self.other_teacher = self.User.objects.create_user(
+            email='other@perm.com', password='123', name='O', last_name='O',
+            cedula='2222', university_code='OP1', user_group='Staff',
+            role=UserRole.TEACHER
+        )
+        
+        self.course = Course.objects.create(name='Perm Course', owner=self.teacher, level='1')
+        self.group = Group.objects.create(course=self.course, teacher=self.teacher, name='Perm Group')
+
+    def test_teacher_of_group_can_manage_enrollments(self):
+        """El profesor del grupo puede gestionar inscripciones."""
+        self.client.login(email='teacher@perm.com', password='123')
+        
+        student = self.User.objects.create_user(
+            email='student@perm.com', password='123', name='S', last_name='S',
+            cedula='3333', university_code='SP1', user_group='G1',
+            role=UserRole.STUDENT
+        )
+        
+        url = reverse('teachers:manage_enrollments', kwargs={'group_pk': self.group.pk})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+
+    def test_course_owner_can_manage_enrollments(self):
+        """El dueño del curso puede gestionar inscripciones aunque no sea el teacher del grupo."""
+        # Crear un grupo con otro profesor
+        other_group = Group.objects.create(
+            course=self.course,
+            teacher=self.other_teacher,
+            name='Other Group'
+        )
+        
+        # El dueño del curso (self.teacher) debería poder gestionar el grupo del otro profesor
+        self.client.login(email='teacher@perm.com', password='123')
+        
+        url = reverse('teachers:manage_enrollments', kwargs={'group_pk': other_group.pk})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+
+    def test_unauthorized_teacher_cannot_manage_enrollments(self):
+        """Un profesor no autorizado no puede gestionar inscripciones."""
+        # Crear un curso de otro profesor
+        other_course = Course.objects.create(
+            name='Other Course',
+            owner=self.other_teacher,
+            level='1'
+        )
+        other_group = Group.objects.create(
+            course=other_course,
+            teacher=self.other_teacher,
+            name='Other Group'
+        )
+        
+        self.client.login(email='teacher@perm.com', password='123')
+        
+        url = reverse('teachers:manage_enrollments', kwargs={'group_pk': other_group.pk})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 403)
+
+    def test_manage_enrollments_invalid_post(self):
+        """Prueba POST inválido en manage_enrollments."""
+        self.client.login(email='teacher@perm.com', password='123')
+        
+        url = reverse('teachers:manage_enrollments', kwargs={'group_pk': self.group.pk})
+        
+        # POST sin student_id ni action
+        response = self.client.post(url, {})
+        
+        self.assertEqual(response.status_code, 302)  # Redirige con error
+
+
+class TeacherDashboardContextTests(TestCase):
+    """Tests para verificar el contexto del dashboard."""
+    
+    def setUp(self):
+        self.client = Client()
+        self.User = get_user_model()
+        
+        self.teacher = self.User.objects.create_user(
+            email='teacher@context.com', password='123', name='T', last_name='T',
+            cedula='4444', university_code='TC1', user_group='Staff',
+            role=UserRole.TEACHER
+        )
+        
+        self.course1 = Course.objects.create(name='Course 1', owner=self.teacher, level='1')
+        self.course2 = Course.objects.create(name='Course 2', owner=self.teacher, level='2')
+        
+        self.group1 = Group.objects.create(course=self.course1, teacher=self.teacher, name='Group 1')
+        self.group2 = Group.objects.create(course=self.course2, teacher=self.teacher, name='Group 2')
+
+    def test_dashboard_shows_manageable_courses(self):
+        """El dashboard debe mostrar los cursos que el profesor puede gestionar."""
+        self.client.login(email='teacher@context.com', password='123')
+        
+        url = reverse('teachers:dashboard')
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('manageable_courses', response.context)
+        
+        manageable = list(response.context['manageable_courses'])
+        self.assertIn(self.course1, manageable)
+        self.assertIn(self.course2, manageable)
+
+    def test_dashboard_shows_correct_counts(self):
+        """El dashboard debe mostrar conteos correctos."""
+        self.client.login(email='teacher@context.com', password='123')
+        
+        # Agregar algunos estudiantes
+        student1 = self.User.objects.create_user(
+            email='s1@context.com', password='123', name='S1', last_name='S1',
+            cedula='5555', university_code='SC1', user_group='G1',
+            role=UserRole.STUDENT
+        )
+        student2 = self.User.objects.create_user(
+            email='s2@context.com', password='123', name='S2', last_name='S2',
+            cedula='6666', university_code='SC2', user_group='G1',
+            role=UserRole.STUDENT
+        )
+        
+        Enrollment.objects.create(student=student1, group=self.group1)
+        Enrollment.objects.create(student=student2, group=self.group1)
+        Enrollment.objects.create(student=student1, group=self.group2)
+        
+        url = reverse('teachers:dashboard')
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['active_groups'], 2)
+        self.assertEqual(response.context['total_students'], 3)  # 2 en group1, 1 en group2
+
+
+class TeacherModelsTests(TestCase):
+    """Tests para modelos de teachers."""
+    
+    def setUp(self):
+        self.User = get_user_model()
+        
+        self.teacher = self.User.objects.create_user(
+            email='teacher@modtest.com', password='123', name='T', last_name='T',
+            cedula='9999', university_code='TMT1', user_group='Staff',
+            role=UserRole.TEACHER
+        )
+
+    def test_prompt_config_str(self):
+        """Prueba el método __str__ de PromptConfig."""
+        from teachers.models import PromptConfig
+        
+        prompt = PromptConfig.objects.create(
+            key='test_key',
+            content='Test content',
+            updated_by=self.teacher
+        )
+        
+        str_representation = str(prompt)
+        self.assertIn('test_key', str_representation)
+        self.assertIsInstance(str_representation, str)

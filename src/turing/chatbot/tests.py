@@ -492,11 +492,243 @@ class ChatbotHelperTests(TestCase):
         self.assertIn('error', data)
 
     def test_poll_messages_invalid_session(self):
-        """Prueba poll_messages con sesión inválida."""
-        self.client = Client()
+        """Prueba poll_messages con ID de sesión inválido."""
         self.client.login(email='student@helpers.com', password='123')
         
         url = reverse('chatbot:poll_messages')
-        response = self.client.get(url, {'session_id': 99999})
+        response = self.client.get(url, {'session_id': '99999'})
         
         self.assertEqual(response.status_code, 404)
+        data = response.json()
+        self.assertIn('error', data)
+
+
+class ChatbotViewEdgeCasesTests(TestCase):
+    """Tests adicionales para cubrir casos edge en chatbot/views.py."""
+    
+    def setUp(self):
+        self.client = Client()
+        self.User = get_user_model()
+        
+        self.teacher = self.User.objects.create_user(
+            email='teacher@edge.com', password='123', name='T', last_name='T',
+            cedula='1111', university_code='TE1', user_group='Staff',
+            role=UserRole.TEACHER
+        )
+        
+        self.student = self.User.objects.create_user(
+            email='student@edge.com', password='123', name='S', last_name='S',
+            cedula='2222', university_code='SE1', user_group='G1',
+            role=UserRole.STUDENT
+        )
+        
+        self.course = Course.objects.create(name='Edge Course', owner=self.teacher, level='1')
+        self.group = Group.objects.create(course=self.course, teacher=self.teacher, name='Edge Group')
+        Enrollment.objects.create(student=self.student, group=self.group)
+
+    def test_chatbot_view_with_invalid_session_id(self):
+        """Prueba acceso con un session_id inválido."""
+        self.client.login(email='student@edge.com', password='123')
+        
+        url = reverse('chatbot:chat_detail', kwargs={'session_id': 99999})
+        response = self.client.get(url)
+        
+        # Debe redirigir a mis grupos
+        self.assertEqual(response.status_code, 302)
+
+    @patch('chatbot.views.OpenAI')
+    @patch('chatbot.views.rag_processor')
+    def test_send_message_with_rag_exception(self, mock_rag, mock_openai):
+        """Prueba send_message cuando RAG falla."""
+        self.client.login(email='student@edge.com', password='123')
+        
+        session = ChatSession.objects.create(
+            user=self.student,
+            course=self.course,
+            name='RAG Error Session'
+        )
+        
+        # Configurar mock de RAG para lanzar excepción
+        mock_rag.create_rag_context.side_effect = Exception('RAG Error')
+        
+        # Configurar mock de OpenAI
+        mock_client = MagicMock()
+        mock_openai.return_value = mock_client
+        
+        mock_completion = MagicMock()
+        mock_completion.model_dump_json.return_value = '{"choices": [{"message": {"content": "Response"}}]}'
+        mock_client.chat.completions.create.return_value = mock_completion
+        
+        url = reverse('chatbot:send_message')
+        response = self.client.post(url, {
+            'message': 'Test message',
+            'session_id': session.id
+        })
+        
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn('bot_message', data)
+
+    @patch('chatbot.views.OpenAI')
+    def test_send_message_openai_exception(self, mock_openai):
+        """Prueba send_message cuando OpenAI falla."""
+        self.client.login(email='student@edge.com', password='123')
+        
+        session = ChatSession.objects.create(
+            user=self.student,
+            course=self.course,
+            name='OpenAI Error Session'
+        )
+        
+        # Configurar mock de OpenAI para lanzar excepción
+        mock_openai.side_effect = Exception('OpenAI Error')
+        
+        url = reverse('chatbot:send_message')
+        response = self.client.post(url, {
+            'message': 'Test message',
+            'session_id': session.id
+        })
+        
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn('Sorry, there was an error', data['bot_message'])
+
+    def test_send_message_invalid_session(self):
+        """Prueba send_message con sesión inválida."""
+        self.client.login(email='student@edge.com', password='123')
+        
+        url = reverse('chatbot:send_message')
+        response = self.client.post(url, {
+            'message': 'Test message',
+            'session_id': 99999
+        })
+        
+        self.assertEqual(response.status_code, 404)
+
+    def test_send_message_get_request(self):
+        """Prueba send_message con GET request (debería fallar)."""
+        self.client.login(email='student@edge.com', password='123')
+        
+        url = reverse('chatbot:send_message')
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 400)
+
+    def test_rename_session_not_ajax(self):
+        """Prueba rename_session sin AJAX."""
+        self.client.login(email='student@edge.com', password='123')
+        
+        session = ChatSession.objects.create(
+            user=self.student,
+            course=self.course,
+            name='Old Name'
+        )
+        
+        url = reverse('chatbot:rename_session', kwargs={'pk': session.pk})
+        response = self.client.post(url, {'name': 'New Name'}, follow=True)
+        
+        # Debería redirigir a chat_detail (usando session_id)
+        self.assertEqual(response.status_code, 200)
+        session.refresh_from_db()
+        self.assertEqual(session.name, 'New Name')
+
+    def test_chatbot_view_with_course_creates_session(self):
+        """Prueba que al acceder por course_id se crea una sesión si no existe."""
+        self.client.login(email='student@edge.com', password='123')
+        
+        url = reverse('chatbot:course_chat', kwargs={'course_id': self.course.pk})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        # Debe haber creado una sesión para este curso
+        self.assertTrue(ChatSession.objects.filter(user=self.student, course=self.course).exists())
+
+
+class ChatbotModelsTests(TestCase):
+    """Tests para los métodos __str__ y propiedades de modelos."""
+    
+    def setUp(self):
+        self.User = get_user_model()
+        
+        self.teacher = self.User.objects.create_user(
+            email='teacher@models.com', password='123', name='T', last_name='T',
+            cedula='1111', university_code='TM1', user_group='Staff',
+            role=UserRole.TEACHER
+        )
+        
+        self.student = self.User.objects.create_user(
+            email='student@models.com', password='123', name='S', last_name='S',
+            cedula='2222', university_code='SM1', user_group='G1',
+            role=UserRole.STUDENT
+        )
+        
+        self.course = Course.objects.create(name='Models Course', owner=self.teacher, level='1')
+
+    def test_chat_session_str(self):
+        """Prueba el método __str__ de ChatSession."""
+        session = ChatSession.objects.create(
+            user=self.student,
+            course=self.course,
+            name='Test Session'
+        )
+        
+        # El __str__ debería contener información útil
+        str_representation = str(session)
+        self.assertIsInstance(str_representation, str)
+        self.assertGreater(len(str_representation), 0)
+
+    def test_chat_message_str(self):
+        """Prueba el método __str__ de ChatMessage."""
+        session = ChatSession.objects.create(
+            user=self.student,
+            course=self.course,
+            name='Test Session'
+        )
+        
+        message = ChatMessage.objects.create(
+            session=session,
+            sender='user',
+            message='Test message'
+        )
+        
+        str_representation = str(message)
+        self.assertIsInstance(str_representation, str)
+
+    def test_topic_weight_creation(self):
+        """Prueba la creación de TopicWeight."""
+        from courses.models import CourseTopics, TopicKeyword
+        
+        topic = CourseTopics.objects.create(
+            course=self.course,
+            name='Test Topic',
+            is_active=True
+        )
+        
+        keyword = TopicKeyword.objects.create(
+            topic=topic,
+            keyword='test'
+        )
+        
+        session = ChatSession.objects.create(
+            user=self.student,
+            course=self.course,
+            name='Test Session'
+        )
+        
+        message = ChatMessage.objects.create(
+            session=session,
+            sender='user',
+            message='test message'
+        )
+        
+        weight = TopicWeight.objects.create(
+            message=message,
+            student=self.student,
+            course=self.course,
+            topic=topic,
+            keyword=keyword,
+            date=date.today()
+        )
+        
+        self.assertEqual(weight.student, self.student)
+        self.assertEqual(weight.keyword, keyword)
