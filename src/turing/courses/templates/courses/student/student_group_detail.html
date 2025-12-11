@@ -1,0 +1,103 @@
+{% extends "courses/base_student.html" %}
+{% load static %}
+
+{% block title %}{{ course.name }}{% endblock %}
+
+{% block student_extra_css %}
+<link rel="stylesheet" href="{% static 'css/student_course_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="container">
+
+        <div class="welcome">
+            <div class="welcome-head place-back">
+                <a href="{% url 'courses:my_student_groups' %}" class="btn-back" aria-label="Volver atrás">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <h1>{{ course.name }}</h1>
+            </div>
+            <p class="welcome-sub">{{ course.description }}</p>
+        </div>
+
+        <div class="card info-card">
+            <h3><i class="fa-solid fa-circle-info"></i> Información General</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <i class="fa-solid fa-graduation-cap icon-prefix"></i>
+                    <strong>Semestre:</strong> {{ course.level }}
+                </div>
+                <div class="info-item">
+                    <i class="fa-regular fa-calendar-alt icon-prefix"></i>
+                    <strong>Horario:</strong> {{ course.schedule }}
+                </div>
+                <div class="info-item">
+                    <i class="fa-solid fa-barcode icon-prefix"></i>
+                    <strong>Código:</strong> {{ course.code }}
+                </div>
+            </div>
+        </div>
+
+        <div class="header-row section-spacing">
+            <h2><i class="fa-solid fa-user-group"></i> Monitorías por Grupo</h2>
+        </div>
+
+        {% for group in groups %}
+        {% if group.tutoring_slots.all %}
+        <div class="card teacher-card">
+            <div class="teacher-card-header">
+                <i class="fa-solid fa-users"></i>
+                <div class="teacher-details">
+                    <span class="teacher-name">{{ group.name }}</span>
+                    <span class="teacher-title">{{ group.teacher.get_full_name }} - Profesor(a)</span>
+                </div>
+            </div>
+            <ul class="tutoring-slots-list">
+                {% for slot in group.tutoring_slots.all %}
+                <li class="tutoring-slot">
+                    <div class="slot-info">
+                        <i class="fa-solid fa-calendar-day icon-prefix"></i>
+                        <strong>{{ slot.get_day_display }}</strong>
+                    </div>
+                    <div class="slot-info">
+                        <i class="fa-regular fa-clock icon-prefix"></i>
+                        <span>{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</span>
+                    </div>
+                    <div class="slot-info">
+                        <i class="fa-solid fa-location-dot icon-prefix"></i>
+                        <span>{{ slot.location }}</span>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        {% empty %}
+        <div class="card card-muted">
+            <i class="fa-regular fa-folder-open"></i>
+            <p>Aún no hay monitorías personalizadas publicadas en este curso.</p>
+        </div>
+        {% endfor %}
+
+        <div class="header-row section-spacing">
+            <h2><i class="fa-regular fa-file-pdf"></i> Horario General de Monitorías</h2>
+        </div>
+
+        {% if course.tutoring_schedule and course.tutoring_schedule.file %}
+        <div class="card pdf-viewer-card">
+            <div class="pdf-embed-wrapper">
+                <embed src="{{ course.tutoring_schedule.file.url }}" type="application/pdf" width="100%"
+                    height="100%" />
+            </div>
+        </div>
+        {% else %}
+        <div class="card card-muted">
+            <i class="fa-solid fa-file-circle-xmark"></i>
+            <p>Aún no se ha publicado un horario general de monitorías para este curso.</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock content %}

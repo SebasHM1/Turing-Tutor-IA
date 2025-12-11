@@ -1,0 +1,79 @@
+:root {
+    --sidebar-width-open: 280px;
+    --sidebar-width-closed: 70px;
+}
+
+.page {
+    transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page.sidebar-closed {
+    grid-template-columns: var(--sidebar-width-closed) minmax(0, 1fr);
+}
+
+.page.sidebar-closed::before {
+    left: var(--sidebar-width-closed);
+}
+
+.sidebar-closed .sidebar {
+    width: var(--sidebar-width-closed);
+    overflow: hidden;
+}
+
+.sidebar-closed .sidebar .brand-link,
+.sidebar-closed .sidebar .nav-links a span,
+.sidebar-closed .sidebar .nav-links li a {
+    font-size: 0;
+    opacity: 0;
+}
+
+.sidebar-closed .sidebar .nav-links i {
+    font-size: 20px;
+    margin: 0;
+}
+
+.sidebar-closed .sidebar .brand-title {
+    justify-content: center;
+}
+
+.sidebar-closed .sidebar .nav-links {
+    text-align: center;
+}
+
+.sidebar-closed .sidebar .nav-links li a {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.brand-video {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.brand-video:hover {
+    transform: scale(1.1);
+}
+
+.sidebar {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar .brand-link,
+.sidebar .nav-links a {
+    transition: opacity 0.3s ease, font-size 0.3s ease;
+}
+
+.sidebar .nav-links i {
+    transition: font-size 0.3s ease, margin 0.3s ease;
+    margin-right: 8px;
+}
+
+.sidebar .nav-links li a {
+    display: flex;
+    align-items: center;
+    transition: padding 0.3s ease, justify-content 0.3s ease;
+}

@@ -1,0 +1,32 @@
+{% load static %}
+
+<aside class="sidebar" id="student-sidebar">
+    <div class="brand-title">
+        <a href="{% url 'courses:my_student_groups' %}" class="brand-link">Turing</a>
+        <img class="brand-video" id="sidebar-gif" src="{% static 'videos/Abierto.gif' %}" alt="Menu" />
+    </div>
+
+    <hr class="sidebar-divider">
+
+    <ul class="nav-links">
+        <li>
+            <a href="{% url 'courses:my_student_groups' %}" class="{% if active_page == 'my_groups' %}active{% endif %}">
+                <i class="fa-solid fa-layer-group"></i> Mis Materias
+            </a>
+        </li>
+    </ul>
+
+    {% if group %}
+    <hr class="sidebar-divider">
+    <ul class="nav-links">
+        <li>
+            <a href="{% url 'courses:student_group_detail' group.pk %}"
+                class="{% if active_page == 'group_detail' %}active{% endif %}">
+                <i class="fa-solid fa-circle-info"></i> Detalles del Curso
+            </a>
+        </li>
+    </ul>
+    {% endif %}
+
+    <hr class="sidebar-divider">
+</aside>

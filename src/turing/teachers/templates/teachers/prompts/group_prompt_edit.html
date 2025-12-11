@@ -1,0 +1,56 @@
+{% extends "teachers/base.html" %}
+{% load static %}
+
+{% block teacher_extra_css %}
+<link rel="stylesheet" href="{% static 'css/prompt_editor.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="welcome">
+    <div class="welcome-head place-back">
+        <a href="{% url 'teachers:group_details' group.pk %}" class="btn-back js-back" aria-label="Volver atrás">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        <h1>Prompt de IA</h1>
+    </div>
+    <p class="welcome-sub">
+        Para el grupo: <strong>{{ course.name }} - {{ group.name }}</strong>
+    </p>
+</div>
+
+{% if messages %}
+<div class="flash-stack">
+    {% for m in messages %}
+    <div class="alert {{ m.tags }}">
+        <i class="fa-solid fa-circle-check"></i>
+        {{ m }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="card prompt-editor">
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="{{ form.ai_prompt.id_for_label }}">
+                <i class="fa-solid fa-robot"></i> Instrucciones para el Agente de IA
+            </label>
+            <textarea name="ai_prompt" id="{{ form.ai_prompt.id_for_label }}"
+                placeholder="Ejemplo: Eres un asistente de IA especializado en este curso. Tu objetivo es ayudar a los estudiantes a comprender conceptos, resolver dudas y guiarlos en sus ejercicios sin darles las respuestas directamente...">{{ form.ai_prompt.value|default:'' }}</textarea>
+
+            {% if form.ai_prompt.errors %}
+            <div class="field-error">{{ form.ai_prompt.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

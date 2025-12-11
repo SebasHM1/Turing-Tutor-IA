@@ -1,0 +1,74 @@
+{% extends "courses/base_student.html" %}
+{% load static %}
+
+{% block title %}Mis Grupos{% endblock %}
+
+{% block student_extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="container">
+        <div class="welcome">
+            <div class="welcome-head">
+                <h1>Bienvenido, {{ user.name }}</h1>
+            </div>
+            <p class="welcome-sub">Aquí encontrarás todos los grupos a los que has sido asignado.</p>
+        </div>
+
+        <!-- KPIs Simplificados -->
+        <div class="kpis kpis-start">
+            <div class="kpi card">
+                <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
+                <div>
+                    <div class="label">Grupos Inscritos</div>
+                    <div class="value">{{ enrollments|length }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Encabezado de la sección -->
+        <div class="header-row">
+            <h2>Mis Grupos</h2>
+        </div>
+
+        <!-- Grid de Grupos/Cursos -->
+        <div class="courses-grid">
+            {# CAMBIO FUNDAMENTAL: Ahora iteramos sobre 'enrollments', que nos da acceso a todo #}
+            {% for enrollment in enrollments %}
+            <article class="course-card card">
+                <div class="card-header">
+                    {# Mostramos el nombre de la materia... #}
+                    <h3>{{ enrollment.group.course.name }}</h3>
+                    {# ...y el nombre del grupo para ser específicos #}
+                    <span class="badge">{{ enrollment.group.name }}</span>
+                </div>
+
+                {# Mostramos información relevante del grupo y del profesor #}
+                <div class="course-meta muted">Profesor(a): {{ enrollment.group.teacher.get_full_name }}</div>
+                <div class="course-meta muted">Horario: {{ enrollment.group.schedule }}</div>
+
+                <div class="course-actions">
+                    <a href="{% url 'courses:student_group_detail' enrollment.group.pk %}" class="btn btn-secondary">
+                        <i class="fa-solid fa-circle-info"></i> Ver Detalles
+                    </a>
+                    <div style="margin-left: auto;">
+                        <a href="{% url 'chatbot:course_chat' enrollment.group.course.id %}" class="btn btn-primary">
+                            <i class="fa-solid fa-comments"></i> Abrir Chat IA
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="card card-muted empty-state">
+                <i class="fa-regular fa-folder-open empty-icon"></i>
+                <p>Aún no has sido inscrito en ningún grupo.</p>
+                <p class="muted small-text">Contacta a tus profesores si crees que esto es un error.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

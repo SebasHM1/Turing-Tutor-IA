@@ -13,51 +13,35 @@ from .rag_utils import rag_processor
 
 
 class StudentsOnlyMixin(UserPassesTestMixin):
-    """Asegura que solo los usuarios con el rol 'Student' puedan acceder."""
     def test_func(self):
-        # Verificamos que el usuario esté autenticado y tenga el rol correcto
         return self.request.user.is_authenticated and self.request.user.role == 'Student'
 
 class TeachersOnlyMixin(UserPassesTestMixin):
-    """Asegura que solo los usuarios con el rol 'Teacher' puedan acceder."""
     def test_func(self):
         return self.request.user.is_authenticated and self.request.user.role == 'Teacher'
 
 class MyStudentGroupsView(LoginRequiredMixin, StudentsOnlyMixin, ListView):
-    """
-    [VISTA MODIFICADA] Muestra la lista de GRUPOS en los que el estudiante está inscrito.
-    Reemplaza a la antigua 'MyStudentCoursesView'.
-    """
-    # La nueva plantilla mostrará una lista de los grupos del estudiante
-    template_name = 'my_student_groups.html' 
-    # El objeto de contexto ahora son las inscripciones (enrollments)
+    template_name = 'courses/student/my_student_groups.html'
+
     context_object_name = 'enrollments'
 
     def get_queryset(self):
-        """
-        La consulta es más eficiente. Obtenemos las inscripciones del estudiante
-        y usamos `select_related` para traer la información del grupo y el curso
-        en la misma consulta, evitando múltiples accesos a la base de datos.
-        """
         return (Enrollment.objects
                 .filter(student=self.request.user, group__isnull=False)
                 .select_related('group', 'group__course', 'group__teacher')
                 .order_by('group__course__name', 'group__name'))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_page'] = 'my_groups'
+        return context
+
 class StudentGroupDetailView(LoginRequiredMixin, StudentsOnlyMixin, DetailView):
-    """
-    Muestra la página de detalles de un GRUPO específico, incluyendo
-    información del curso y todos los grupos del mismo curso con sus monitorías.
-    """
     model = Group
-    template_name = 'student_group_detail.html'
+    template_name = 'courses/student/student_group_detail.html'
     context_object_name = 'current_group'
 
     def get_queryset(self):
-        """
-        Aseguramos que un estudiante solo pueda acceder a los grupos
-        en los que está formalmente inscrito.
-        """
         return Group.objects.filter(
             enrollments__student=self.request.user
         ).select_related('course', 'teacher')
@@ -65,23 +49,24 @@ class StudentGroupDetailView(LoginRequiredMixin, StudentsOnlyMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         group = self.get_object()
-        
+
+        context['group'] = group
         context['course'] = group.course
-        
+        context['active_page'] = 'group_detail'
+
         context['groups'] = group.course.groups.all().select_related(
             'teacher'
         ).prefetch_related('tutoring_slots')
-        
+
         return context
 
 class CoursePromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
     model = CoursePrompt
     form_class = CoursePromptForm
-    template_name = 'course_prompt_edit.html'
+    template_name = 'courses/management/course_prompt_edit.html'
 
     def get_object(self, queryset=None):
         course = get_object_or_404(Course, pk=self.kwargs['pk'])
-        # Verificamos que el profesor tenga permiso sobre este curso (es el dueño o imparte un grupo)
         if not (course.owner == self.request.user or Group.objects.filter(course=course, teacher=self.request.user).exists()):
             raise PermissionDenied("No tienes permisos para editar el prompt de este curso.")
             
@@ -98,13 +83,12 @@ class CoursePromptEditView(LoginRequiredMixin, TeachersOnlyMixin, UpdateView):
 
 
 class KnowledgeBaseView(LoginRequiredMixin, TeachersOnlyMixin, FormView):
-    template_name = 'knowledge_base.html'
+    template_name = 'courses/management/knowledge_base.html'
     form_class = KnowledgeBaseFileForm
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.course = get_object_or_404(Course, pk=self.kwargs['pk'])
-        # Verificación de permisos
         if not (self.course.owner == request.user or Group.objects.filter(course=self.course, teacher=request.user).exists()):
              raise PermissionDenied("No tienes permisos para gestionar la base de conocimiento de este curso.")
 
@@ -113,6 +97,8 @@ class KnowledgeBaseView(LoginRequiredMixin, TeachersOnlyMixin, FormView):
         context['course'] = self.course
         context['files'] = KnowledgeBaseFile.objects.filter(course=self.course)
         context['active_page'] = 'knowledge_base'
+        # Obtener el primer grupo del profesor para este curso (para el sidebar contextual)
+        context['group'] = Group.objects.filter(course=self.course, teacher=self.request.user).first()
         return context
 
     def form_valid(self, form):
@@ -150,7 +136,6 @@ class KnowledgeBaseDeleteView(LoginRequiredMixin, TeachersOnlyMixin, RedirectVie
     def post(self, request, *args, **kwargs):
         file_obj = get_object_or_404(KnowledgeBaseFile, pk=kwargs['file_pk'], course_id=kwargs['course_pk'])
         
-        # Verificación de permisos
         if not (file_obj.course.owner == request.user or Group.objects.filter(course=file_obj.course, teacher=request.user).exists()):
             raise PermissionDenied("No tienes permisos para eliminar este archivo.")
 

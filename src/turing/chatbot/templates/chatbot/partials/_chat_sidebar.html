@@ -1,0 +1,73 @@
+{% load static %}
+
+<div class="sidebar" id="chat-sidebar">
+    <div class="brand-title">
+        <a href="{% url 'courses:my_student_groups' %}" class="brand-link">Turing</a>
+        <img class="brand-video" id="sidebar-gif" src="{% static 'videos/Abierto.gif' %}" alt="Menu" />
+    </div>
+
+    <hr class="sidebar-divider">
+    <ul class="nav-links">
+        {% if user.is_staff or user.role == 'Teacher' %}
+        <li><a href="{% url 'teachers:dashboard' %}"><i class="fa-solid fa-layer-group"></i> Mis Materias</a></li>
+        {% elif user.role == 'Student' %}
+        <li><a href="{% url 'courses:my_student_groups' %}"><i class="fa-solid fa-layer-group"></i> Mis Materias</a></li>
+        {% else %}
+        <li><a href="#"><i class="fa-solid fa-layer-group"></i> Mis Materias</a></li>
+        {% endif %}
+
+        <li>
+            {% if current_course %}
+            <a class="active" href="{% url 'chatbot:course_chat' current_course.id %}">
+                <i class="fas fa-comment"></i> Chats
+            </a>
+            {% else %}
+            <a class="active" href="{% url 'chatbot:chatbot' %}">
+                <i class="fas fa-comment"></i> Chats
+            </a>
+            {% endif %}
+        </li>
+    </ul>
+
+    <hr class="sidebar-divider">
+    <div class="recent-chats">
+        <h3>
+            {% if current_course %}Chats de {{ current_course.name }}{% else %}Chats recientes{% endif %}
+        </h3>
+        <ul>
+            {% for chat in recent_chats %}
+            <li class="chat-item {% if current_session.id == chat.id %}active{% endif %}">
+                <a href="{% url 'chatbot:chat_detail' chat.id %}" class="chat-link">
+                    <div class="chat-info">
+                        <span class="chat-name" contenteditable="false" data-id="{{ chat.id }}">{{ chat.name }}</span>
+                        <span class="chat-time">{{ chat.created_at|date:"H:i" }}</span>
+                    </div>
+                </a>
+                <div class="chat-menu">
+                    <button type="button" class="chat-menu-btn" data-chat-id="{{ chat.id }}" aria-label="Opciones">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+                    <div class="chat-menu-dropdown" id="chat-menu-{{ chat.id }}">
+                        <button type="button" class="chat-menu-item chat-rename-btn" data-chat-id="{{ chat.id }}">
+                            <i class="fa-solid fa-pen"></i> Renombrar
+                        </button>
+                        <form method="post" action="{% url 'chatbot:delete_session' chat.id %}" class="chat-delete-form">
+                            {% csrf_token %}
+                            <button type="submit" class="chat-menu-item chat-menu-item-danger">
+                                <i class="fa-solid fa-trash"></i> Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+            {% empty %}
+            <li class="chat-empty">No tienes chats recientes</li>
+            {% endfor %}
+        </ul>
+        {% if current_course %}
+        <a href="{% url 'chatbot:create_session_course' current_course.id %}" class="btn">Nuevo Chat</a>
+        {% elif current_session.course %}
+        <a href="{% url 'chatbot:create_session_course' current_session.course.id %}" class="btn">Nuevo Chat</a>
+        {% endif %}
+    </div>
+</div>

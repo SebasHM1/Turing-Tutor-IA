@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block body_content %}
+<body>
+    <div class="login-container">
+        {% include "partials/_auth_logo.html" %}
+        {% block auth_content %}{% endblock %}
+    </div>
+    {% block auth_scripts %}{% endblock %}
+</body>
+{% endblock %}

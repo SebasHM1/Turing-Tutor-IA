@@ -1,0 +1,76 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+.email-container {
+    max-width: 500px;
+    margin: 40px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    border: 1px solid #eee;
+    text-align: center;
+}
+
+.email-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    background: #0066ff;
+    color: #fff;
+    border-radius: 12px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-right: 10px;
+}
+
+.brand {
+    font-weight: bold;
+    font-size: 1.2em;
+    vertical-align: middle;
+}
+
+h2 {
+    font-size: 20px;
+    color: #333;
+    margin-top: 0;
+}
+
+.reset-button {
+    display: inline-block;
+    margin: 20px 0;
+    padding: 12px 24px;
+    background-color: #0066ff;
+    color: white !important;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.footer {
+    font-size: 0.9em;
+    color: #777;
+    margin-top: 30px;
+    text-align: center;
+}
+
+p {
+    margin-bottom: 10px;
+}
+
+.centered-text {
+    text-align: center;
+}

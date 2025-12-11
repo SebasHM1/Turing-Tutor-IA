@@ -1,0 +1,16 @@
+{% extends "users/base_auth.html" %}
+
+{% block title %}Contraseña Restablecida - Turing Tutor{% endblock %}
+
+{% block auth_content %}
+<h2>¡Contraseña Restablecida!</h2>
+<p class="subtitle">
+    Tu contraseña ha sido restablecida con éxito. Ahora puedes iniciar sesión con tu nueva contraseña.
+</p>
+
+<a href="{% url 'login' %}" class="sign-in-btn centered-btn">Iniciar Sesión</a>
+
+<div class="register-link top-spacing">
+    ¿No tienes cuenta? <a href="{% url 'users:register' %}">Regístrate</a>
+</div>
+{% endblock %}

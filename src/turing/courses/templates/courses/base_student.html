@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/hamburger_sidebar.css' %}">
+{% block student_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block body_content %}
+<body class="dashboard">
+    <div class="page">
+        {% include "courses/partials/_student_sidebar.html" %}
+
+        <main>
+            {% include "courses/partials/_student_topbar.html" %}
+
+            {% block content %}{% endblock content %}
+        </main>
+    </div>
+
+    <script src="{% static 'js/ui.js' %}"></script>
+    <script src="{% static 'js/hamburger_menu.js' %}"></script>
+    {% block student_extra_js %}{% endblock %}
+</body>
+{% endblock %}
