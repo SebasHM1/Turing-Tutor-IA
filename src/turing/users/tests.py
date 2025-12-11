@@ -111,7 +111,7 @@ class UsersViewTests(TestCase):
         url = reverse('users:register')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'registration/register.html')
+        self.assertTemplateUsed(response, 'users/auth/register.html')
 
     def test_redirect_after_login_student(self):
         """Prueba que un estudiante es redirigido a sus grupos."""
@@ -176,12 +176,12 @@ class TuringLoginViewTests(TestCase):
         )
 
     def test_login_view_get(self):
-        """Prueba que la página de login carga correctamente."""
+        """Prueba que la vista de login se carga correctamente."""
         url = reverse('login')
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'registration/login.html')
+        self.assertTemplateUsed(response, 'users/auth/login.html')
 
     def test_login_success_student(self):
         """Prueba login exitoso de un estudiante."""

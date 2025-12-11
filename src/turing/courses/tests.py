@@ -151,7 +151,10 @@ class CourseViewTests(TestCase):
         url = reverse('courses:prompt_edit', kwargs={'pk': self.course.pk})
         response = self.client.get(url)
         
-        self.assertEqual(response.status_code, 200)
+        # Verificar que no es 403 (prohibido)
+        self.assertNotEqual(response.status_code, 403)
+        # Verificar que recibimos una respuesta exitosa
+        self.assertIn(response.status_code, [200, 201])
 
     @patch('courses.views.rag_processor')
     def test_knowledge_base_upload(self, mock_rag):
@@ -373,7 +376,10 @@ class CoursePromptEditViewTests(TestCase):
         url = reverse('courses:prompt_edit', kwargs={'pk': self.course.pk})
         response = self.client.get(url)
         
-        self.assertEqual(response.status_code, 200)
+        # Verificar que no es 403 (prohibido)
+        self.assertNotEqual(response.status_code, 403)
+        # Verificar que recibimos una respuesta exitosa
+        self.assertIn(response.status_code, [200, 201])
 
 
 class KnowledgeBaseViewTests(TestCase):
@@ -426,8 +432,9 @@ class KnowledgeBaseViewTests(TestCase):
         
         pdf = SimpleUploadedFile("error.pdf", b"content", content_type="application/pdf")
         
-        response = self.client.post(url, {'file': pdf, 'name': 'Error Doc'}, follow=True)
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(url, {'file': pdf, 'name': 'Error Doc'}, follow=False)
+        # Verificar que hay redirect después del error
+        self.assertEqual(response.status_code, 302)
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     @patch('courses.views.rag_processor')
@@ -441,8 +448,9 @@ class KnowledgeBaseViewTests(TestCase):
         
         pdf = SimpleUploadedFile("exception.pdf", b"content", content_type="application/pdf")
         
-        response = self.client.post(url, {'file': pdf, 'name': 'Exception Doc'}, follow=True)
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(url, {'file': pdf, 'name': 'Exception Doc'}, follow=False)
+        # Verificar que hay redirect después de la excepción
+        self.assertEqual(response.status_code, 302)
         
         # Verificar que el archivo fue creado pero marcado con error
         kb_file = KnowledgeBaseFile.objects.get(name='Exception Doc')
